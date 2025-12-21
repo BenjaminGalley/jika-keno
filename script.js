@@ -1,39 +1,22 @@
-// JIKA KENO HD - Engine
 const grid = document.getElementById('grid');
 const timerDisplay = document.getElementById('timer');
-let timeLeft = 120; // 2 minutes
 
-// 1. Create the 80 Keno Numbers
+// Create 80 buttons
 for (let i = 1; i <= 80; i++) {
     const btn = document.createElement('div');
-    btn.innerText = i;
-    btn.classList.add('number-btn');
-    
-    // Make numbers clickable
-    btn.onclick = () => {
-        btn.classList.toggle('selected');
-    };
-    
+    btn.innerText = i.toString().padStart(2, '0');
+    btn.style.padding = "10px";
+    btn.style.background = "#2a2a2a";
+    btn.style.borderRadius = "5px";
+    btn.style.cursor = "pointer";
     grid.appendChild(btn);
 }
 
-// 2. The Countdown Timer
-function startTimer() {
-    const countdown = setInterval(() => {
-        let minutes = Math.floor(timeLeft / 60);
-        let seconds = timeLeft % 60;
-        
-        // Format as 00:00
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        timerDisplay.innerText = `0${minutes}:${seconds}`;
-
-        if (timeLeft <= 0) {
-            timeLeft = 120; // Reset timer for next round
-        } else {
-            timeLeft--;
-        }
-    }, 1000);
-}
-
-// Start the game logic
-startTimer();
+// Simple 2-minute countdown
+let time = 120;
+setInterval(() => {
+    let mins = Math.floor(time / 60);
+    let secs = time % 60;
+    timerDisplay.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    if (time > 0) time--;
+}, 1000);
