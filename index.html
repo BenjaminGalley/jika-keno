@@ -3,77 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Casino - Home</title>
+    <title>Simba Casino | Ethiopia</title>
     <style>
-        body { background: #0b0d17; color: white; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
-        
-        /* TOP NAV */
-        .top-nav { background: #1a1d29; display: flex; justify-content: space-between; padding: 12px; border-bottom: 2px solid #fbbf24; align-items: center; }
-        .logo { font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
-        .auth-btns button { padding: 6px 12px; border-radius: 4px; border: none; font-weight: bold; font-size: 11px; cursor: pointer; }
-        .login-btn { background: transparent; color: #fbbf24; border: 1px solid #fbbf24 !important; }
-        .join-btn { background: #fbbf24; color: black; margin-left: 5px; }
+        :root { --gold: #fbbf24; --dark-bg: #0b0d17; --card-bg: #1a1d29; --green: #22c55e; }
+        body { background: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
 
-        /* BALANCE SECTION */
-        .balance-bar { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .amount { color: #fbbf24; font-size: 24px; font-weight: bold; }
-        .deposit-btn { background: #22c55e; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .nav-icon { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+        /* HEADER & WALLET */
+        .header { background: var(--card-bg); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 2px solid var(--gold); }
+        .brand { font-weight: 900; color: var(--gold); font-size: 20px; }
+        .wallet-bar { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .balance-amount { font-size: 22px; font-weight: bold; color: var(--gold); }
+        
+        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-deposit { background: var(--green); color: white; display: flex; align-items: center; gap: 8px; }
+
+        /* DEPOSIT MODAL */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--card-bg); margin: 15% auto; padding: 20px; border: 1px solid var(--gold); width: 85%; border-radius: 15px; }
+        .method { background: #0b0d17; padding: 12px; margin: 10px 0; border-radius: 8px; border-left: 4px solid var(--gold); }
+        .method-name { color: var(--gold); font-weight: bold; font-size: 14px; display: block; }
+        .method-acc { font-family: monospace; font-size: 16px; color: white; letter-spacing: 1px; }
+        .close { float: right; color: white; font-size: 28px; cursor: pointer; }
 
         /* GAME GRID */
-        .lobby-title { padding: 15px 15px 5px; font-size: 12px; color: #888; font-weight: bold; }
-        .lobby-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .game-card { background: #1a1d29; border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; cursor: pointer; transition: 0.2s; }
-        .game-card:active { transform: scale(0.95); }
+        .game-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .game-card { background: var(--card-bg); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
         .game-card img { width: 100%; display: block; }
-        .game-card p { margin: 10px; font-weight: bold; color: #fbbf24; font-size: 14px; }
-
-        /* BOTTOM NAV */
-        .footer { position: fixed; bottom: 0; width: 100%; background: #1a1d29; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
-        .f-item { font-size: 10px; color: #888; text-align: center; }
+        .game-label { padding: 10px; font-weight: bold; color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
-        <div class="logo">SIMBA CASINO</div>
-        <div class="auth-btns">
-            <button class="login-btn">LOGIN</button>
-            <button class="join-btn">JOIN</button>
+    <div id="depModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDep()">&times;</span>
+            <h3 style="margin-top:0">DEPOSIT FUNDS</h3>
+            <p style="font-size: 11px; color: #888;">Transfer to any account below and send screenshot to support.</p>
+            
+            <div class="method">
+                <span class="method-name">TELEBIRR</span>
+                <span class="method-acc">0943595090</span>
+            </div>
+            
+            <div class="method">
+                <span class="method-name">CBE BIRR</span>
+                <span class="method-acc">0911045825</span>
+            </div>
+
+            <div class="method">
+                <span class="method-name">AWASH BANK</span>
+                <span class="method-acc">01320459472600</span>
+            </div>
+
+            <button class="btn" style="width:100%; background:var(--gold); color:black; margin-top:10px;">I HAVE PAID</button>
         </div>
     </div>
 
-    <div class="balance-bar">
-        <div>
-            <div style="font-size: 10px; color: #888;">MY BALANCE</div>
-            <div class="amount">0.00 ETB</div>
+    <div class="header">
+        <div class="brand">SIMBA</div>
+        <div style="display:flex; gap:5px;">
+            <button class="btn" style="background:transparent; color:var(--gold); border:1px solid var(--gold)">LOGIN</button>
+            <button class="btn" style="background:var(--gold); color:black">JOIN</button>
         </div>
-        <button class="deposit-btn">
-            <img src="assets/assets/nav.jpg" class="nav-icon">
-            DEPOSIT
+    </div>
+
+    <div class="wallet-bar">
+        <div>
+            <div style="font-size:10px; color:#888">BALANCE</div>
+            <div class="balance-amount">0.00 ETB</div>
+        </div>
+        <button class="btn-deposit btn" onclick="openDep()">
+            <img src="assets/assets/nav.jpg" style="width:18px; height:18px; border-radius:50%"> DEPOSIT
         </button>
     </div>
 
-    <div class="lobby-title">RECOMMENDED FOR YOU</div>
+    <div style="padding:15px 15px 0; font-size:12px; font-weight:bold; color:#888">FEATURED GAMES</div>
 
-    <div class="lobby-grid">
+    <div class="game-grid">
         <div class="game-card" onclick="location.href='game.html'">
             <img src="assets/assets/simba_card.jpg.jpeg.jpg">
-            <p>Simba Shuffle</p>
+            <div class="game-label">Simba Shuffle</div>
         </div>
-
         <div class="game-card">
-            <div style="height: 140px; background: #222; display: flex; align-items: center; justify-content: center; color: #444; font-weight: bold;">SLOTS</div>
-            <p style="color: #666;">Coming Soon</p>
+            <div style="height:130px; background:#222; display:flex; align-items:center; justify-content:center; font-size:30px">🎰</div>
+            <div class="game-label" style="color:#444">Coming Soon</div>
         </div>
     </div>
 
-    <div class="footer">
-        <div class="f-item">🏠<br>Home</div>
-        <div class="f-item">🏆<br>Promos</div>
-        <div class="f-item">💳<br>Wallet</div>
-        <div class="f-item">👤<br>Account</div>
-    </div>
-
+    <script>
+        function openDep() { document.getElementById('depModal').style.display = 'block'; }
+        function closeDep() { document.getElementById('depModal').style.display = 'none'; }
+    </script>
 </body>
 </html>
