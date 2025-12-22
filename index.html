@@ -5,71 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simba Casino - Home</title>
     <style>
-        body { background: #0b0d17; color: white; font-family: sans-serif; margin: 0; }
-
+        body { background: #0b0d17; color: white; font-family: sans-serif; margin: 0; padding-bottom: 70px; }
+        
         /* TOP NAV */
-        .top-nav {
-            background: #1a1d29;
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 15px;
-            border-bottom: 2px solid #fbbf24;
-            align-items: center;
-        }
-
-        .login-row button { padding: 6px 12px; border-radius: 4px; border: none; font-weight: bold; }
-        .join-btn { background: #fbbf24; color: black; }
+        .top-nav { background: #1a1d29; display: flex; justify-content: space-between; padding: 12px; border-bottom: 2px solid #fbbf24; align-items: center; }
+        .logo { font-weight: bold; color: #fbbf24; letter-spacing: 1px; }
+        .auth-btns button { padding: 6px 12px; border-radius: 4px; border: none; font-weight: bold; font-size: 11px; cursor: pointer; }
         .login-btn { background: transparent; color: #fbbf24; border: 1px solid #fbbf24 !important; }
+        .join-btn { background: #fbbf24; color: black; margin-left: 5px; }
 
-        /* BALANCE */
-        .balance-box {
-            background: #111420;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* BALANCE SECTION */
+        .balance-bar { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .amount { color: #fbbf24; font-size: 24px; font-weight: bold; }
+        .deposit-btn { background: #22c55e; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .nav-icon { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
 
-        .deposit-btn { background: #22c55e; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; }
+        /* GAME GRID */
+        .lobby-title { padding: 15px 15px 5px; font-size: 12px; color: #888; font-weight: bold; }
+        .lobby-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .game-card { background: #1a1d29; border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; cursor: pointer; transition: 0.2s; }
+        .game-card:active { transform: scale(0.95); }
+        .game-card img { width: 100%; display: block; }
+        .game-card p { margin: 10px; font-weight: bold; color: #fbbf24; font-size: 14px; }
 
-        /* LOBBY */
-        .lobby-title { padding: 15px; color: #888; font-size: 14px; }
-        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; }
-        .game-card { background: #1a1d29; border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; cursor: pointer; }
-        .game-card img { width: 100%; height: auto; display: block; }
-        .game-card p { margin: 10px 0; font-weight: bold; }
+        /* BOTTOM NAV */
+        .footer { position: fixed; bottom: 0; width: 100%; background: #1a1d29; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; }
+        .f-item { font-size: 10px; color: #888; text-align: center; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <div style="font-weight: bold; color: #fbbf24;">SIMBA CASINO</div>
-        <div class="login-row">
+        <div class="logo">SIMBA CASINO</div>
+        <div class="auth-btns">
             <button class="login-btn">LOGIN</button>
             <button class="join-btn">JOIN</button>
         </div>
     </div>
 
-    <div class="balance-box">
+    <div class="balance-bar">
         <div>
-            <div style="font-size: 10px; color: #888;">MAIN BALANCE</div>
-            <div style="font-size: 22px; color: #fbbf24; font-weight: bold;">0.00 ETB</div>
+            <div style="font-size: 10px; color: #888;">MY BALANCE</div>
+            <div class="amount">0.00 ETB</div>
         </div>
-        <button class="deposit-btn">DEPOSIT</button>
+        <button class="deposit-btn">
+            <img src="assets/assets/nav.jpg" class="nav-icon">
+            DEPOSIT
+        </button>
     </div>
 
-    <div class="lobby-title">RECOMMENDED GAMES</div>
+    <div class="lobby-title">RECOMMENDED FOR YOU</div>
 
-    <div class="game-grid">
+    <div class="lobby-grid">
         <div class="game-card" onclick="location.href='game.html'">
-            <img src="assets/simba_card.jpg.jpeg" alt="Simba Shuffle">
+            <img src="assets/assets/simba_card.jpg.jpeg.jpg">
             <p>Simba Shuffle</p>
         </div>
 
         <div class="game-card">
-            <div style="height:120px; background:#222; display:flex; align-items:center; justify-content:center; color:#555;">COMING SOON</div>
-            <p>Wild Slots</p>
+            <div style="height: 140px; background: #222; display: flex; align-items: center; justify-content: center; color: #444; font-weight: bold;">SLOTS</div>
+            <p style="color: #666;">Coming Soon</p>
         </div>
+    </div>
+
+    <div class="footer">
+        <div class="f-item">🏠<br>Home</div>
+        <div class="f-item">🏆<br>Promos</div>
+        <div class="f-item">💳<br>Wallet</div>
+        <div class="f-item">👤<br>Account</div>
     </div>
 
 </body>
