@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw | Simba Casino</title>
+    <style>
+        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .card { background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 25px; max-width: 400px; margin: auto; }
+        .bal-val { font-size: 32px; color: var(--gold); font-weight: bold; margin: 15px 0; }
+        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #000; color: white; box-sizing: border-box; }
+        .sub-btn { background: var(--gold); color: black; border: none; width: 100%; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <button onclick="location.href='index.html'" style="background:#334155; color:white; border:none; padding:10px; border-radius:8px; margin-bottom:20px;">← BACK</button>
+    <div class="card">
+        <h2 style="color:var(--gold)">CASH OUT</h2>
+        <div style="font-size: 14px; color: #888;">YOUR BALANCE</div>
+        <div class="bal-val" id="displayBal">0.00 ETB</div>
+
+        <form id="withdrawForm">
+            <input type="number" id="amount" placeholder="Amount (Min: 100 ETB)" required>
+            <select id="method" required>
+                <option value="Telebirr">Telebirr</option>
+                <option value="CBE">CBE Bank</option>
+            </select>
+            <input type="text" id="account" placeholder="Phone / Account Number" required>
+            <button type="submit" class="sub-btn">SUBMIT REQUEST</button>
+        </form>
+        <p style="font-size:12px; color:#888; margin-top:15px;">Min: 100 ETB | Max: 10,000 ETB</p>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
+        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
+        document.getElementById('displayBal').innerText = balance.toFixed(2) + " ETB";
+
+        document.getElementById('withdrawForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const amt = parseFloat(document.getElementById('amount').value);
+            const user = localStorage.getItem('simba_user') || 'User';
+
+            if (amt < 100) return alert("Minimum withdrawal is 100 ETB");
+            if (amt > 10000) return alert("Maximum withdrawal is 10,000 ETB");
+            if (amt > balance) return alert("Insufficient balance!");
+
+            // Sends to your verified Google Script URL
+            const response = await fetch(`${SCRIPT_URL}?action=withdraw&user=${encodeURIComponent(user)}&amt=${amt}&acc=${document.getElementById('account').value}&method=${document.getElementById('method').value}`);
+            
+            // Deduct balance locally for instant feedback
+            balance -= amt;
+            localStorage.setItem('simba_balance', balance);
+            
+            alert("Request sent! Admin will approve shortly.");
+            location.href = 'index.html';
+        };
+    </script>
+</body>
+</html>
