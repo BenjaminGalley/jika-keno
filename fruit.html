@@ -3,36 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Blast Pro | Simba</title>
+    <title>Simba Fruit Pro</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --win: #22c55e; --red7: #ff0000; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; --win: #22c55e; --red7: #ff1111; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; overflow-x: hidden; }
 
-        /* Header with Live Balance */
-        .header { display: flex; justify-content: space-between; padding: 10px; background: #000; border-bottom: 2px solid var(--gold); align-items: center; }
-        .bal-display { color: var(--gold); font-size: 22px; font-weight: bold; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+        /* Header & Live Balance */
+        .header { background: #000; padding: 12px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .bal-val { color: var(--gold); font-size: 22px; font-weight: bold; }
 
-        /* Machine UI */
-        .machine { background: #1a1d29; border: 4px solid var(--gold); border-radius: 20px; padding: 15px; display: inline-block; margin-top: 15px; box-shadow: 0 0 25px rgba(0,0,0,0.5); }
+        /* Slot Machine Area */
+        .machine-frame { background: #1a1d29; border: 4px solid var(--gold); border-radius: 20px; padding: 15px; display: inline-block; margin-top: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.7); }
         .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; background: #000; padding: 10px; border-radius: 12px; }
         .cell { background: #111; border-radius: 8px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 2px solid #333; transition: 0.3s; }
         
-        /* Shiny Red 7 Style */
-        .shiny-7 { color: var(--red7); font-weight: 900; text-shadow: 0 0 15px var(--red7), 2px 2px #fff; font-style: italic; }
+        /* Shiny Red 7 */
+        .red-7 { color: var(--red7); font-weight: 900; text-shadow: 0 0 15px var(--red7), 1px 1px #fff; font-style: italic; }
         
-        /* Win Effects */
-        .win-glow { border-color: var(--win) !important; box-shadow: 0 0 20px var(--win); background: #064e3b !important; animation: pulse 0.5s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+        /* Winning Line Effect */
+        .win-line { border-color: var(--win) !important; background: #064e3b !important; box-shadow: 0 0 20px var(--win); transform: scale(1.05); z-index: 10; animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.7; } }
 
-        /* Celebration Popup */
+        /* Big Win Popup */
         #winOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
-        .win-amt { font-size: 70px; color: var(--gold); font-weight: 900; text-shadow: 0 0 20px var(--gold); }
+        .win-title { color: white; font-size: 20px; letter-spacing: 5px; margin-bottom: 10px; }
+        .win-amount { font-size: 80px; color: var(--gold); font-weight: 900; text-shadow: 0 0 25px var(--gold); }
 
         /* Controls */
-        .controls { margin-top: 20px; padding: 20px; background: #1a1d29; border-top: 2px solid var(--gold); position: fixed; bottom: 0; left: 0; width: 100%; box-sizing: border-box; }
-        .spin-btn { background: var(--win); color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 22px; font-weight: bold; box-shadow: 0 5px #15803d; }
-        .adj-btn { width: 45px; height: 45px; border-radius: 50%; border: none; background: #334155; color: white; font-size: 24px; cursor: pointer; }
-
+        .controls { background: #1a1d29; border-top: 2px solid var(--gold); padding: 20px; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
+        .spin-btn { background: var(--win); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-size: 24px; font-weight: bold; cursor: pointer; box-shadow: 0 5px #15803d; }
+        .spin-btn:disabled { background: #444; box-shadow: none; }
+        
         .spinning { animation: blurMove 0.1s infinite linear; }
         @keyframes blurMove { 0% { transform: translateY(-10px); filter: blur(4px); } 100% { transform: translateY(10px); filter: blur(4px); } }
     </style>
@@ -41,34 +42,34 @@
 
     <div class="header">
         <button onclick="location.href='index.html'" style="background:var(--gold); border:none; border-radius:5px; padding:8px 15px; font-weight:bold;">LOBBY</button>
-        <div class="bal-display" id="balText">0.00 ETB</div>
+        <div class="bal-val" id="balDisplay">0.00 ETB</div>
     </div>
 
-    <div class="machine">
+    <div class="machine-frame">
         <div class="grid" id="slotGrid">
             <div class="cell">🍒</div><div class="cell">🍋</div><div class="cell">🍉</div>
-            <div class="cell">💎</div><div class="cell" id="centerCell">7</div><div class="cell">🔔</div>
+            <div class="cell">💎</div><div class="cell" style="color:red; font-style:italic; font-weight:bold;">7</div><div class="cell">🔔</div>
             <div class="cell">🍇</div><div class="cell">🍒</div><div class="cell">🍉</div>
         </div>
     </div>
 
     <div id="winOverlay" onclick="this.style.display='none'">
-        <div style="color:white; font-size:24px; letter-spacing:4px;">BIG WINNER!</div>
-        <div class="win-amt" id="totalWin">0</div>
-        <div style="color:var(--gold); font-size:20px;">ETB ADDED TO BALANCE</div>
+        <div class="win-title">BIG WINNER!</div>
+        <div class="win-amount" id="winTotal">0</div>
+        <div style="color:var(--gold); font-size:20px; margin-top:10px;">ETB ADDED TO BALANCE</div>
     </div>
 
     <div class="controls">
         <div style="display:flex; justify-content:center; align-items:center; gap:25px; margin-bottom:15px;">
-            <button class="adj-btn" onclick="changeBet(-2)">-</button>
-            <div style="font-weight:bold;">BET: <span id="betText" style="color:var(--gold)">2</span> ETB</div>
-            <button class="adj-btn" onclick="changeBet(2)">+</button>
+            <button onclick="changeBet(-2)" style="width:45px; height:45px; border-radius:50%; border:none; background:#334155; color:white; font-size:24px;">-</button>
+            <div style="font-weight:bold;">BET: <span id="betDisplay" style="color:var(--gold)">2</span> ETB</div>
+            <button onclick="changeBet(2)" style="width:45px; height:45px; border-radius:50%; border:none; background:#334155; color:white; font-size:24px;">+</button>
         </div>
         <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
 
     <script>
-        // Exact Script URL from your screenshot
+        // Verified Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
         const symbols = ['🍒', '🍋', '🍉', '🍇', '🔔', '💎', '7'];
         
@@ -77,16 +78,15 @@
         let isSpinning = false;
 
         function updateUI() {
-            document.getElementById('balText').innerText = balance.toFixed(2) + " ETB";
-            document.getElementById('betText').innerText = bet;
+            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('betDisplay').innerText = bet;
             localStorage.setItem('simba_balance', balance);
         }
 
         function changeBet(v) { if(!isSpinning) { bet = Math.max(2, bet + v); updateUI(); } }
 
-        function renderSymbol(s) {
-            if(s === '7') return `<span class="shiny-7">7</span>`;
-            return s;
+        function getSymbolHTML(s) {
+            return s === '7' ? `<span class="red-7">7</span>` : s;
         }
 
         async function spin() {
@@ -97,54 +97,54 @@
             
             const cells = document.querySelectorAll('.cell');
             cells.forEach(c => {
-                c.classList.remove('win-glow');
+                c.classList.remove('win-line');
                 c.innerHTML = `<div class="spinning">🍒</div>`;
             });
 
             setTimeout(() => {
-                const res = [];
+                const results = [];
                 cells.forEach(c => {
                     const s = symbols[Math.floor(Math.random() * symbols.length)];
-                    res.push(s);
-                    c.innerHTML = renderSymbol(s);
+                    results.push(s);
+                    c.innerHTML = getSymbolHTML(s);
                 });
-                checkAllWins(res, cells);
+                processWins(results, cells);
                 isSpinning = false;
             }, 1000);
         }
 
-        function checkAllWins(s, cells) {
+        function processWins(s, cells) {
             let winTotal = 0;
-            const winningIndices = new Set();
-
-            // Rows
+            const winners = new Set();
+            
+            // Checking All Rows and All Columns
             const lines = [
-                [0,1,2], [3,4,5], [6,7,8], // Horizontal
-                [0,3,6], [1,4,7], [2,5,8]  // Vertical
+                [0,1,2], [3,4,5], [6,7,8], // Horizontals
+                [0,3,6], [1,4,7], [2,5,8]  // Verticals
             ];
 
             lines.forEach(line => {
                 if(s[line[0]] === s[line[1]] && s[line[1]] === s[line[2]]) {
-                    let mult = 5;
+                    let mult = 5; 
                     if(s[line[0]] === '7') mult = 50;
                     else if(s[line[0]] === '💎') mult = 20;
                     else if(s[line[0]] === '🔔') mult = 10;
                     
                     winTotal += (bet * mult);
-                    line.forEach(idx => winningIndices.add(idx));
+                    line.forEach(i => winners.add(i));
                 }
             });
 
             if(winTotal > 0) {
                 balance += winTotal;
-                winningIndices.forEach(idx => cells[idx].classList.add('win-glow'));
-                document.getElementById('totalWin').innerText = winTotal;
+                winners.forEach(i => cells[i].classList.add('win-line'));
+                document.getElementById('winTotal').innerText = winTotal;
                 document.getElementById('winOverlay').style.display = 'flex';
                 updateUI();
             }
         }
 
-        // AUTO-SYNC BALANCE FROM TELEGRAM
+        // Live Balance Bridge
         setInterval(async () => {
             const user = localStorage.getItem('simba_user');
             if(!user) return;
@@ -154,7 +154,6 @@
                 if (data.status === 'accept') {
                     balance += parseFloat(data.amt);
                     updateUI();
-                    alert("Deposit confirmed: +" + data.amt + " ETB");
                 }
             } catch(e) {}
         }, 5000);
