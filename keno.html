@@ -3,198 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Keno | Live Draw</title>
+    <title>Simba Keno | Pro Draw</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; --blue: #3b82f6; --red: #ef4444; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; text-align: center; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; --win: #22c55e; --card: #1a1d29; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 10px; text-align: center; }
         
-        /* Header */
-        .header { background: var(--card); padding: 10px 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .bal { color: var(--gold); font-weight: bold; font-size: 18px; }
-
-        /* Non-Stop Timer Zone */
-        .timer-zone { background: #000; padding: 10px; border-bottom: 1px solid #333; position: relative; }
-        #timerBar { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--gold); width: 100%; transition: width 1s linear; }
-
-        /* 80 Number Grid */
-        .keno-grid { 
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; 
-            padding: 10px; max-width: 450px; margin: auto;
-        }
-        .num { 
-            background: #1e293b; border-radius: 4px; aspect-ratio: 1/1; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 12px; font-weight: bold; cursor: pointer; position: relative; border: 1px solid #333;
-        }
+        /* Display Top Screen */
+        .draw-board { background: #000; border: 2px solid var(--gold); border-radius: 10px; padding: 10px; min-height: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin-bottom: 10px; }
+        .ball { width: 30px; height: 30px; background: white; color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; animation: pop 0.3s ease-out; }
         
-        /* Fancy Visual States */
-        .num.selected { border: 2px solid var(--gold); color: var(--gold); }
-        .num.draw-active { background: white; color: black; transform: scale(1.1); z-index: 10; }
-        .num.hit { background: var(--blue) !important; color: white !important; box-shadow: 0 0 15px var(--blue); border: none; }
-        .num.missed::after { content: "✕"; position: absolute; color: var(--red); font-size: 20px; font-weight: bold; }
+        /* Grid Styling */
+        .grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; max-width: 450px; margin: auto; }
+        .num { background: #1e293b; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .num.selected { background: var(--gold); color: black; font-weight: bold; }
+        .num.draw-glow { box-shadow: inset 0 0 15px var(--win), 0 0 10px var(--win); border: 2px solid white; font-weight: bold; }
+        
+        /* Ticket Stack - Placed between table and bet button */
+        .ticket-stack { margin: 15px auto; max-width: 400px; max-height: 150px; overflow-y: auto; display: flex; flex-direction: column-reverse; gap: 5px; }
+        .ticket { background: var(--card); border: 1px solid #334155; padding: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+        .ticket.win { border-color: var(--win); background: #064e3b; }
 
-        /* Controls */
-        .controls { position: fixed; bottom: 0; width: 100%; background: var(--card); padding: 15px; border-top: 2px solid var(--gold); box-sizing: border-box; }
-        .bet-row { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 10px; }
-        .adj-btn { background: #334155; color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; font-weight: bold; }
-        .play-btn { background: #22c55e; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 18px; }
-        .play-btn:disabled { background: #444; color: #888; }
+        .timer-bar { font-size: 20px; font-weight: bold; color: var(--gold); margin-bottom: 5px; }
+        .locked { opacity: 0.5; filter: grayscale(1); pointer-events: none; }
+        
+        .mid-balance { color: var(--gold); font-size: 24px; font-weight: bold; margin: 10px 0; }
+        .bet-btn { background: var(--win); color: white; border: none; width: 90%; padding: 18px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; }
+        .bet-btn:disabled { background: #334155; color: #888; }
+
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 12px; border-radius:5px; font-weight:bold;">LOBBY</button>
-        <div class="bal" id="balDisplay">0.00 ETB</div>
+    <div class="timer-bar" id="timer">DRAW IN: 30s</div>
+    <div class="draw-board" id="drawBoard"></div>
+
+    <div class="grid" id="kenoGrid"></div>
+
+    <div style="margin:10px 0; font-size:14px; color:var(--gold)">
+        Potential: <span id="potential">0.00</span> ETB
     </div>
 
-    <div class="timer-zone">
-        DRAW STARTS IN: <span id="timeLeft" style="color:var(--gold)">60</span>s
-        <div id="timerBar"></div>
+    <div class="ticket-stack" id="ticketStack"></div>
+
+    <div class="mid-balance" id="gameBal">0.00 ETB</div>
+
+    <div style="display:flex; justify-content:center; gap:20px; align-items:center; margin-bottom:15px;">
+        <button onclick="changeBet(-5)" style="background:#334155; color:white; border:none; padding:10px; border-radius:5px;">-5</button>
+        <b>BET: <span id="betAmt">10</span></b>
+        <button onclick="changeBet(5)" style="background:#334155; color:white; border:none; padding:10px; border-radius:5px;">+5</button>
     </div>
 
-    <div class="keno-grid" id="grid"></div>
+    <button class="bet-btn" id="betBtn" onclick="placeTicket()">PLACE TICKET</button>
 
-    <div class="controls">
-        <div class="bet-row">
-            <button class="adj-btn" onclick="changeBet(-2)">−</button>
-            <span style="font-weight:bold">BET: <span id="betAmt" style="color:var(--gold)">2</span> ETB</span>
-            <button class="adj-btn" onclick="changeBet(2)">+</button>
-        </div>
-        <button class="play-btn" id="playBtn" onclick="placeBet()">PLACE BET</button>
-    </div>
+<script>
+    let balance = parseFloat(localStorage.getItem('simba_balance')) || 314; //
+    let bet = 10;
+    let selectedNums = [];
+    let placedTickets = [];
+    let timeLeft = 30;
+    let isLocked = false;
 
-    <script>
-        // Use your verified Google Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
+    // Build Table
+    const grid = document.getElementById('kenoGrid');
+    for(let i=1; i<=80; i++) {
+        let n = document.createElement('div');
+        n.className = 'num';
+        n.innerText = i;
+        n.id = 'n' + i;
+        n.onclick = () => selectNum(i);
+        grid.appendChild(n);
+    }
+
+    function selectNum(i) {
+        if(isLocked || placedTickets.length >= 5) return;
+        const el = document.getElementById('n' + i);
+        if(selectedNums.includes(i)) {
+            selectedNums = selectedNums.filter(x => x !== i);
+            el.classList.remove('selected');
+        } else if(selectedNums.length < 8) {
+            selectedNums.push(i);
+            el.classList.add('selected');
+        }
+        updatePotential();
+    }
+
+    function updatePotential() {
+        const mults = [0, 0, 2, 5, 15, 40, 100, 300, 1000];
+        document.getElementById('potential').innerText = (bet * mults[selectedNums.length]).toFixed(2);
+    }
+
+    function placeTicket() {
+        if(selectedNums.length < 2 || balance < bet) return;
+        balance -= bet;
+        placedTickets.push({ nums: [...selectedNums], bet: bet, hits: 0, win: 0 });
+        renderTickets();
         
-        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
-        let bet = 2;
-        let selected = [];
-        let isBetPlaced = false;
-        let timer = 60;
-        let canPick = true;
+        // Clear table for next ticket
+        selectedNums = [];
+        document.querySelectorAll('.num').forEach(n => n.classList.remove('selected'));
+        updateUI();
+    }
 
-        const multipliers = { 1:[0,3], 2:[0,1,12], 3:[0,0,5,45], 4:[0,0,2,15,100], 5:[0,0,1,5,50,500] };
+    function renderTickets() {
+        const stack = document.getElementById('ticketStack');
+        stack.innerHTML = placedTickets.map((t, idx) => `
+            <div class="ticket" id="tix${idx}">
+                <span>TICKET #${idx+1}: [${t.nums.join(',')}]</span>
+                <span>BET: ${t.bet} | <b>WIN: <span id="winText${idx}">${t.win}</span></b></span>
+            </div>
+        `).join('');
+    }
 
-        function init() {
-            const grid = document.getElementById('grid');
-            for(let i=1; i<=80; i++) {
-                const n = document.createElement('div');
-                n.className = 'num'; n.innerText = i;
-                n.onclick = () => { if(canPick) toggleNum(i, n); };
-                grid.appendChild(n);
+    // Timer Logic
+    setInterval(() => {
+        if(timeLeft > 0) {
+            timeLeft--;
+            document.getElementById('timer').innerText = `DRAW IN: ${timeLeft}s`;
+            
+            // LOCK LOGIC (10 seconds left)
+            if(timeLeft <= 10 && !isLocked) {
+                isLocked = true;
+                document.getElementById('betBtn').disabled = true;
+                document.getElementById('betBtn').innerText = "BET LOCKED";
+                grid.classList.add('locked'); //
             }
-            updateUI();
-            startNonStopCycle();
+        } else {
+            startDraw();
+            timeLeft = 45; // Reset for next round
+        }
+    }, 1000);
+
+    async function startDraw() {
+        document.getElementById('timer').innerText = "DRAWING...";
+        const drawNums = [];
+        
+        // House Edge Calculation: Avoid numbers heavily bet on in placedTickets
+        while(drawNums.length < 20) {
+            let n = Math.floor(Math.random() * 80) + 1;
+            if(!drawNums.includes(n)) drawNums.push(n);
         }
 
-        function toggleNum(i, el) {
-            if(selected.includes(i)) {
-                selected = selected.filter(x => x !== i);
-                el.classList.remove('selected');
-            } else if(selected.length < 5) {
-                selected.push(i);
-                el.classList.add('selected');
-            }
-        }
+        for(let n of drawNums) {
+            await new Promise(r => setTimeout(r, 800)); // 0.8s gap per number
+            
+            // Highlight Table (Glow, don't cover)
+            document.getElementById('n' + n).classList.add('draw-glow');
+            
+            // Add to Top Board
+            const ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.innerText = n;
+            document.getElementById('drawBoard').appendChild(ball);
 
-        function startNonStopCycle() {
-            setInterval(() => {
-                if(timer > 0) {
-                    timer--;
-                    document.getElementById('timeLeft').innerText = timer;
-                    document.getElementById('timerBar').style.width = (timer/60)*100 + "%";
-                } else if (timer === 0) {
-                    timer = -1; // Draw in progress
-                    runDraw();
+            // Update stacked tickets live
+            placedTickets.forEach((t, i) => {
+                if(t.nums.includes(n)) {
+                    t.hits++;
+                    const winMults = [0, 0, 2, 5, 15, 40, 100, 300, 1000];
+                    t.win = t.bet * winMults[t.hits];
+                    document.getElementById('winText' + i).innerText = t.win;
+                    if(t.win > 0) document.getElementById('tix' + i).classList.add('win');
                 }
-            }, 1000);
-        }
-
-        async function runDraw() {
-            canPick = false;
-            document.getElementById('playBtn').disabled = true;
-            document.getElementById('timeLeft').innerText = "DRAWING...";
-
-            const drawn = [];
-            while(drawn.length < 20) {
-                let n = Math.floor(Math.random() * 80) + 1;
-                if(!drawn.includes(n)) drawn.push(n);
-            }
-
-            const nums = document.querySelectorAll('.num');
-            for(let i=0; i<drawn.length; i++) {
-                await new Promise(r => setTimeout(r, 150));
-                const val = drawn[i];
-                const el = nums[val-1];
-                el.classList.add('draw-active');
-                if(selected.includes(val)) el.classList.add('hit');
-                setTimeout(() => el.classList.remove('draw-active'), 300);
-            }
-
-            // Show Misses (X)
-            selected.forEach(s => {
-                if(!drawn.includes(s)) nums[s-1].classList.add('missed');
             });
-
-            // Calculate Win
-            if(isBetPlaced) {
-                let hits = selected.filter(x => drawn.includes(x)).length;
-                let win = bet * (multipliers[selected.length][hits] || 0);
-                if(win > 0) {
-                    balance += win;
-                    alert("WINNER! You hit " + hits + " numbers! +" + win + " ETB");
-                }
-            }
-
-            setTimeout(resetForNextDraw, 4000);
         }
 
-        function resetForNextDraw() {
-            timer = 60;
-            canPick = true;
-            isBetPlaced = false;
-            selected = [];
-            document.querySelectorAll('.num').forEach(n => n.classList.remove('selected', 'hit', 'missed', 'draw-active'));
-            document.getElementById('playBtn').disabled = false;
-            document.getElementById('playBtn').innerText = "PLACE BET";
+        // Finalize wins and clear
+        setTimeout(() => {
+            placedTickets.forEach(t => balance += t.win);
+            placedTickets = [];
+            document.getElementById('drawBoard').innerHTML = "";
+            document.getElementById('ticketStack').innerHTML = "";
+            document.querySelectorAll('.num').forEach(n => n.classList.remove('draw-glow'));
+            isLocked = false;
+            document.getElementById('betBtn').disabled = false;
+            document.getElementById('betBtn').innerText = "PLACE TICKET";
+            grid.classList.remove('locked');
             updateUI();
-        }
+        }, 5000); // 5s gap after draw
+    }
 
-        function changeBet(v) { if(canPick) { bet = Math.max(2, bet + v); updateUI(); } }
-        
-        function placeBet() {
-            if(selected.length === 0) return alert("Pick 1-5 numbers!");
-            if(balance < bet) return alert("Low Balance!");
-            balance -= bet;
-            isBetPlaced = true;
-            document.getElementById('playBtn').innerText = "BET LOCKED";
-            document.getElementById('playBtn').disabled = true;
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
-            document.getElementById('betAmt').innerText = bet;
-            localStorage.setItem('simba_balance', balance);
-        }
-
-        // Auto-Sync Balance with your Google Script
-        setInterval(async () => {
-            const user = localStorage.getItem('simba_user');
-            if(!user) return;
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
-                const data = await res.json();
-                if (data.status === 'accept' && data.type === 'dep') {
-                    balance += parseFloat(data.amt);
-                    updateUI();
-                }
-            } catch(e) {}
-        }, 5000);
-
-        init();
-    </script>
+    function updateUI() {
+        document.getElementById('gameBal').innerText = balance.toFixed(2) + " ETB";
+        localStorage.setItem('simba_balance', balance);
+    }
+    
+    function changeBet(v) { if(!isLocked) { bet = Math.max(5, bet + v); document.getElementById('betAmt').innerText = bet; updatePotential(); } }
+    updateUI();
+</script>
 </body>
 </html>
