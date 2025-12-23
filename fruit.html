@@ -3,103 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Blast | Simba Casino</title>
+    <title>Fruit Blast 3x3 | Simba Casino</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; }
-        body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
-            text-align: center; margin: 0; padding: 20px;
+        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
+        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        
+        /* Header */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: rgba(0,0,0,0.5); }
+        .bal-box { color: var(--gold); font-weight: bold; font-size: 18px; }
+
+        /* 3x3 Slot Machine */
+        .slot-machine { 
+            background: linear-gradient(180deg, #2a2d3e 0%, #1a1d29 100%);
+            border: 5px solid var(--gold);
+            border-radius: 20px;
+            padding: 15px;
+            display: inline-block;
+            margin-top: 20px;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
         }
-        .slot-box { 
-            background: #1a1d29; border: 4px solid var(--gold); 
-            padding: 30px; border-radius: 20px; display: inline-block; margin-top: 50px;
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(3, 80px);
+            gap: 10px;
+            background: #000;
+            padding: 10px;
+            border-radius: 10px;
+            overflow: hidden;
         }
-        .reels { font-size: 60px; letter-spacing: 15px; background: #000; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+
+        .slot-item {
+            background: #111;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            transition: transform 0.1s ease-in-out;
+        }
+
+        /* Betting Controls */
+        .controls { margin-top: 25px; background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid #333; }
+        .bet-display { font-size: 20px; margin-bottom: 10px; color: var(--gold); font-weight: bold; }
+        .bet-buttons { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px; }
+        
+        .adj-btn { 
+            background: #334155; color: white; border: none; width: 45px; height: 45px; 
+            border-radius: 50%; font-size: 24px; font-weight: bold; cursor: pointer;
+        }
+        
         .spin-btn { 
-            background: #22c55e; color: white; border: none; padding: 15px 50px; 
-            font-size: 20px; font-weight: bold; border-radius: 10px; cursor: pointer;
+            background: #22c55e; color: white; border: none; width: 100%; padding: 15px; 
+            font-size: 22px; font-weight: bold; border-radius: 15px; cursor: pointer;
+            box-shadow: 0 5px #15803d;
         }
-        .spin-btn:disabled { background: #444; cursor: not-allowed; }
-        #status { color: var(--gold); margin-top: 15px; font-weight: bold; }
+        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px #15803d; }
+        .spin-btn:disabled { background: #444; box-shadow: none; opacity: 0.6; }
+
+        /* Animations */
+        @keyframes slideDown {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animating { animation: slideDown 0.1s infinite; }
     </style>
 </head>
 <body>
 
-    <button onclick="location.href='index.html'" style="float:left; background:var(--gold); border:none; padding:10px; border-radius:5px; font-weight:bold;">← BACK</button>
-    <div id="bal" style="float:right; font-size:20px; color:var(--gold);">0.00 ETB</div>
-    <div style="clear:both;"></div>
+    <div class="header">
+        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
+        <div class="bal-box" id="displayBal">0.00 ETB</div>
+    </div>
 
-    <div class="slot-box">
-        <h1 style="color:var(--gold); margin-top:0;">FRUIT BLAST</h1>
-        <div class="reels" id="reels">🍒 🍋 🍉</div>
-        <button class="spin-btn" id="spinBtn" onclick="play()">SPIN (10 ETB)</button>
-        <div id="status">PRESS SPIN TO START</div>
+    <div class="slot-machine">
+        <div class="grid-container" id="grid">
+            <div class="slot-item">🍒</div><div class="slot-item">🍋</div><div class="slot-item">🍉</div>
+            <div class="slot-item">🍇</div><div class="slot-item">7️⃣</div><div class="slot-item">💎</div>
+            <div class="slot-item">🔔</div><div class="slot-item">🍒</div><div class="slot-item">🍋</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-display">BET: <span id="currentBet">2</span> ETB</div>
+        <div class="bet-buttons">
+            <button class="adj-btn" onclick="changeBet(-2)">−</button>
+            <div style="font-size:12px; color:#888;">MIN 2 | MAX 100</div>
+            <button class="adj-btn" onclick="changeBet(2)">+</button>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
+        <div id="status" style="margin-top:15px; color:var(--gold); font-weight:bold;">WIN UP TO 50X!</div>
     </div>
 
     <script>
         const symbols = ['🍒', '🍋', '🍉', '🍇', '🔔', '💎', '7️⃣'];
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
+        
         let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
+        let bet = 2;
+        let isSpinning = false;
 
         function updateUI() {
-            document.getElementById('bal').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('displayBal').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('currentBet').innerText = bet;
             localStorage.setItem('simba_balance', balance);
         }
 
-        async function play() {
-            if (balance < 10) {
-                alert("You need at least 10 ETB to spin!");
-                return;
-            }
+        function changeBet(val) {
+            if(isSpinning) return;
+            bet += val;
+            if (bet < 2) bet = 2;
+            if (bet > 100) bet = 100;
+            updateUI();
+        }
 
+        async function spin() {
+            if (balance < bet) return alert("Insufficient Balance!");
+            if (isSpinning) return;
+
+            isSpinning = true;
+            balance -= bet;
+            updateUI();
+            
             const btn = document.getElementById('spinBtn');
             const status = document.getElementById('status');
-            const reelDisplay = document.getElementById('reels');
-
-            // 1. Deduct Money
-            balance -= 10;
-            updateUI();
+            const slots = document.querySelectorAll('.slot-item');
+            
             btn.disabled = true;
             status.innerText = "SPINNING...";
 
-            // 2. Animation (Fast random shuffle)
-            let spins = 0;
-            const timer = setInterval(() => {
-                const s1 = symbols[Math.floor(Math.random() * symbols.length)];
-                const s2 = symbols[Math.floor(Math.random() * symbols.length)];
-                const s3 = symbols[Math.floor(Math.random() * symbols.length)];
-                reelDisplay.innerText = `${s1} ${s2} ${s3}`;
-                spins++;
-                if (spins > 20) {
-                    clearInterval(timer);
-                    finishGame(reelDisplay, status, btn);
-                }
-            }, 50);
+            // Start "Drop Down" animation
+            slots.forEach(slot => slot.classList.add('animating'));
+
+            setTimeout(() => {
+                slots.forEach(slot => {
+                    slot.classList.remove('animating');
+                    slot.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                });
+
+                checkWin(slots, status);
+                isSpinning = false;
+                btn.disabled = false;
+                updateUI();
+            }, 1200);
         }
 
-        function finishGame(display, status, btn) {
-            const r1 = symbols[Math.floor(Math.random() * symbols.length)];
-            const r2 = symbols[Math.floor(Math.random() * symbols.length)];
-            const r3 = symbols[Math.floor(Math.random() * symbols.length)];
-            display.innerText = `${r1} ${r2} ${r3}`;
+        function checkWin(slots, status) {
+            const s = Array.from(slots).map(el => el.innerText);
+            
+            // Check rows (Middle row is index 3,4,5)
+            let winMultiplier = 0;
 
-            if (r1 === r2 && r2 === r3) {
-                let win = r1 === '7️⃣' ? 500 : 100;
-                balance += win;
-                status.innerText = "JACKPOT! YOU WON " + win + " ETB";
-            } else if (r1 === r2 || r2 === r3 || r1 === r3) {
-                balance += 20;
-                status.innerText = "WIN! YOU WON 20 ETB";
+            // Row Wins (Horizontal)
+            if(s[3] === s[4] && s[4] === s[5]) winMultiplier = 10; // Middle Row
+            else if(s[0] === s[1] && s[1] === s[2]) winMultiplier = 5; // Top Row
+            else if(s[6] === s[7] && s[7] === s[8]) winMultiplier = 5; // Bottom Row
+            
+            // Special 777 Bonus
+            if(s[3] === '7️⃣' && s[4] === '7️⃣' && s[5] === '7️⃣') winMultiplier = 50;
+
+            if(winMultiplier > 0) {
+                let winAmount = bet * winMultiplier;
+                balance += winAmount;
+                status.innerText = "🎉 BIG WIN: " + winAmount + " ETB!";
             } else {
                 status.innerText = "TRY AGAIN!";
             }
-
-            updateUI();
-            btn.disabled = false;
         }
 
-        // Initial Load
+        // Live Balance Bridge
+        setInterval(async () => {
+            const user = localStorage.getItem('simba_user');
+            if(!user) return;
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
+                const data = await res.json();
+                if (data.status === 'accept' && data.type === 'dep') {
+                    balance += parseFloat(data.amt);
+                    updateUI();
+                    alert("Deposit Added!");
+                }
+            } catch(e){}
+        }, 5000);
+
         updateUI();
-        console.log("Fruit Game Loaded. Current Balance: " + balance);
     </script>
 </body>
 </html>
