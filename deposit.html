@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit | Simba Casino</title>
+    <style>
+        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .card { background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 20px; max-width: 400px; margin: auto; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #000; color: white; box-sizing: border-box; }
+        .btn { background: #22c55e; color: white; border: none; width: 100%; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .details { background: #000; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; border-left: 4px solid var(--gold); }
+    </style>
+</head>
+<body>
+    <button onclick="location.href='index.html'" style="background:#334155; color:white; border:none; padding:10px; border-radius:8px; margin-bottom:20px;">← BACK</button>
+    <div class="card">
+        <h2 style="color:var(--gold)">ADD FUNDS</h2>
+        <div class="details">
+            <div style="font-size:12px; color:#888;">TELEBIRR / CBE NAME:</div>
+            <div style="font-weight:bold;">BINYAM GEBREHIWOT</div>
+            <div style="font-size:12px; color:#888; margin-top:10px;">NUMBER:</div>
+            <div style="font-weight:bold; font-size:18px;">0912345678</div>
+        </div>
+        <form id="depForm">
+            <input type="number" id="amt" placeholder="Amount (Min: 100 ETB)" required min="100">
+            <input type="text" id="ref" placeholder="Transaction ID / Ref" required>
+            <button type="submit" class="btn">NOTIFY ADMIN</button>
+        </form>
+    </div>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
+        document.getElementById('depForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const amount = document.getElementById('amt').value;
+            if(amount < 100) return alert("Minimum deposit is 100 ETB");
+            const user = localStorage.getItem('simba_user') || 'User';
+            await fetch(`${SCRIPT_URL}?action=deposit&user=${encodeURIComponent(user)}&amt=${amount}&ref=${document.getElementById('ref').value}`);
+            alert("Deposit notification sent to Admin!");
+            location.href = 'index.html';
+        };
+    </script>
+</body>
+</html>
