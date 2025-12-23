@@ -3,96 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Casino | Ethiopia</title>
+    <title>Simba Casino</title>
     <style>
-        :root { --gold: #fbbf24; --dark-bg: #0b0d17; --card-bg: #1a1d29; --green: #22c55e; }
-        body { background: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
-
-        /* HEADER & WALLET */
-        .header { background: var(--card-bg); display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 2px solid var(--gold); }
-        .brand { font-weight: 900; color: var(--gold); font-size: 20px; }
-        .wallet-bar { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .balance-amount { font-size: 22px; font-weight: bold; color: var(--gold); }
-        
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-deposit { background: var(--green); color: white; display: flex; align-items: center; gap: 8px; }
-
-        /* DEPOSIT MODAL */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: var(--card-bg); margin: 15% auto; padding: 20px; border: 1px solid var(--gold); width: 85%; border-radius: 15px; }
-        .method { background: #0b0d17; padding: 12px; margin: 10px 0; border-radius: 8px; border-left: 4px solid var(--gold); }
-        .method-name { color: var(--gold); font-weight: bold; font-size: 14px; display: block; }
-        .method-acc { font-family: monospace; font-size: 16px; color: white; letter-spacing: 1px; }
-        .close { float: right; color: white; font-size: 28px; cursor: pointer; }
-
-        /* GAME GRID */
-        .game-grid { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .game-card { background: var(--card-bg); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
-        .game-card img { width: 100%; display: block; }
-        .game-label { padding: 10px; font-weight: bold; color: var(--gold); }
+        body { background: #0b0d17; color: white; font-family: sans-serif; margin: 0; text-align: center; }
+        .header { background: #1a1d29; padding: 15px; border-bottom: 2px solid #fbbf24; display: flex; justify-content: space-between; align-items: center; }
+        .wallet { background: #111420; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-dep { background: #22c55e; color: white; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .card { background: #1a1d29; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+        .card img { width: 100%; display: block; }
     </style>
 </head>
 <body>
-
-    <div id="depModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDep()">&times;</span>
-            <h3 style="margin-top:0">DEPOSIT FUNDS</h3>
-            <p style="font-size: 11px; color: #888;">Transfer to any account below and send screenshot to support.</p>
-            
-            <div class="method">
-                <span class="method-name">TELEBIRR</span>
-                <span class="method-acc">0943595090</span>
-            </div>
-            
-            <div class="method">
-                <span class="method-name">CBE BIRR</span>
-                <span class="method-acc">0911045825</span>
-            </div>
-
-            <div class="method">
-                <span class="method-name">AWASH BANK</span>
-                <span class="method-acc">01320459472600</span>
-            </div>
-
-            <button class="btn" style="width:100%; background:var(--gold); color:black; margin-top:10px;">I HAVE PAID</button>
-        </div>
-    </div>
-
     <div class="header">
-        <div class="brand">SIMBA</div>
-        <div style="display:flex; gap:5px;">
-            <button class="btn" style="background:transparent; color:var(--gold); border:1px solid var(--gold)">LOGIN</button>
-            <button class="btn" style="background:var(--gold); color:black">JOIN</button>
-        </div>
+        <div style="color:#fbbf24; font-weight:bold; font-size:20px;">SIMBA</div>
+        <button class="btn" style="background:#fbbf24; color:black;">JOIN</button>
     </div>
-
-    <div class="wallet-bar">
+    <div class="wallet">
         <div>
-            <div style="font-size:10px; color:#888">BALANCE</div>
-            <div class="balance-amount">0.00 ETB</div>
+            <div style="font-size:10px; color:#888;">BALANCE</div>
+            <div style="font-size:22px; color:#fbbf24; font-weight:bold;">0.00 ETB</div>
         </div>
-        <button class="btn-deposit btn" onclick="openDep()">
-            <img src="assets/assets/nav.jpg" style="width:18px; height:18px; border-radius:50%"> DEPOSIT
-        </button>
+        <button class="btn btn-dep">DEPOSIT</button>
     </div>
-
-    <div style="padding:15px 15px 0; font-size:12px; font-weight:bold; color:#888">FEATURED GAMES</div>
-
-    <div class="game-grid">
-        <div class="game-card" onclick="location.href='game.html'">
+    <div class="grid">
+        <div class="card" onclick="location.href='game.html'">
             <img src="assets/assets/simba_card.jpg.jpeg.jpg">
-            <div class="game-label">Simba Shuffle</div>
-        </div>
-        <div class="game-card">
-            <div style="height:130px; background:#222; display:flex; align-items:center; justify-content:center; font-size:30px">🎰</div>
-            <div class="game-label" style="color:#444">Coming Soon</div>
+            <div style="padding:10px; color:#fbbf24; font-weight:bold;">Simba Shuffle</div>
         </div>
     </div>
-
-    <script>
-        function openDep() { document.getElementById('depModal').style.display = 'block'; }
-        function closeDep() { document.getElementById('depModal').style.display = 'none'; }
-    </script>
 </body>
 </html>
