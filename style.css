@@ -4,45 +4,52 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url('assets/bg.jpg.jpeg') no-repeat center center/cover; /* Matches your folder */
-    font-family: Arial, sans-serif;
+    /* Use your specific filename from the folder */
+    background: url('assets/bg.jpg.jpeg') no-repeat center center/cover;
+    font-family: 'Arial Black', sans-serif;
+    color: white;
+    overflow: hidden;
 }
 
 .game-container {
     position: relative;
-    width: 360px;
-    height: 600px;
-    background: url('assets/grid_3x3.jpg') no-repeat center center/contain; /* Matches your folder */
-    display: flex;
-    padding-top: 50px;
+    width: 380px;
+    height: 680px;
+    /* This is your main golden frame asset */
+    background: url('assets/grid_3x3.jpg') no-repeat center center;
+    background-size: contain;
 }
 
+/* ADJUSTED: Multiplier Window positioning */
 .multiplier-window {
     position: absolute;
-    left: 25px;
-    top: 110px;
-    width: 50px;
-    height: 150px;
+    left: 14px;      /* Fine-tuned for the left strip */
+    top: 158px;     /* Aligned with the top of the grid boxes */
+    width: 58px;
+    height: 172px;  /* Shows exactly one multiplier at a time */
     overflow: hidden;
-    border: 2px solid gold;
+    border-radius: 5px;
+    z-index: 5;
 }
 
 .reel-strip {
     width: 100%;
-    height: 500%; /* Strip has 5 numbers */
+    /* 5 multipliers total, each 172px high */
     background: url('assets/multiplier.jpg') repeat-y;
-    background-size: contain;
+    background-size: 100% auto;
     position: absolute;
     top: 0;
-    transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    transition: top 2s cubic-bezier(0.15, 0.85, 0.35, 1);
 }
 
-.grid-main {
+/* ADJUSTED: 3x3 Grid Area positioning */
+.grid-area {
     display: flex;
-    margin-left: 90px;
-    width: 240px;
-    height: 240px;
-    margin-top: 60px;
+    position: absolute;
+    left: 82px;     /* Moves symbols inside the 3 boxes */
+    top: 158px;     /* Aligns with the Multiplier window height */
+    width: 284px;
+    height: 258px;
 }
 
 .reel {
@@ -54,39 +61,67 @@ body {
 }
 
 .symbol {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    height: 86px;   /* Fits 3 symbols perfectly in the 258px height */
     object-fit: contain;
+    padding: 2px;
 }
 
+/* UI Panel: Buttons and Balance */
 .ui-panel {
     position: absolute;
-    bottom: 20px;
+    bottom: 40px;
     width: 100%;
-    text-align: center;
-    color: gold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.balance-info {
+    display: flex;
+    gap: 20px;
+    background: rgba(0, 50, 0, 0.8);
+    padding: 10px 20px;
+    border: 2px solid #27ae60;
+    border-radius: 15px;
+    font-size: 14px;
 }
 
 #spin-button {
-    background: #27ae60;
-    border: 3px solid gold;
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(#2ecc71, #27ae60);
+    border: 4px solid gold;
+    border-radius: 50%;
     color: white;
-    padding: 10px 30px;
-    font-size: 20px;
-    border-radius: 50px;
+    font-weight: bold;
+    font-size: 18px;
     cursor: pointer;
+    box-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
 }
 
-.big-win {
+#spin-button:active {
+    transform: scale(0.95);
+}
+
+/* Big Win Animation Overlay */
+#win-overlay {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.9);
-    border: 5px solid gold;
-    color: #f1c40f;
+    background: rgba(0, 0, 0, 0.9);
+    border: 4px solid gold;
     padding: 40px;
     text-align: center;
-    z-index: 100;
-    border-radius: 20px;
+    border-radius: 25px;
+    z-index: 1000;
+    display: none; /* Hidden by default */
+    animation: popIn 0.5s ease;
+}
+
+@keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
