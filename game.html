@@ -3,92 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Shuffle - Play</title>
+    <title>Simba Shuffle</title>
     <style>
-        body {
-            margin: 0;
-            background: url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: Arial, sans-serif;
-            color: white;
-            height: 100vh;
-            overflow: hidden;
-            text-align: center;
+        body { 
+            margin: 0; 
+            background: #000 url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed; 
+            background-size: cover; 
+            font-family: sans-serif; 
+            color: white; 
+            text-align: center; 
         }
-
-        .game-header { padding: 15px; display: flex; align-items: center; background: rgba(0,0,0,0.6); }
-        .back-btn { background: #fbbf24; color: black; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 20px;
-            max-width: 380px;
-            margin: 10px auto;
+        .header { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #fbbf24; }
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 360px; margin: auto; }
+        .tile { 
+            background: url('assets/assets/tile.jpg') no-repeat center; 
+            background-size: contain; 
+            aspect-ratio: 1/1; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; color: #fbbf24; font-size: 1.2rem; 
+            text-shadow: 2px 2px 4px #000;
         }
-
-        .tile {
-            background: url('assets/assets/tile.jpg') no-repeat center;
-            background-size: contain;
-            aspect-ratio: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #fbbf24;
-            font-size: 1.3rem;
-            text-shadow: 2px 2px 4px black;
-            cursor: pointer;
-        }
-
-        .tile:active { transform: scale(0.9); }
-
-        .footer-controls {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #1a1d29;
-            padding: 25px 0;
-            border-top: 2px solid #fbbf24;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
-        }
-
-        .shuffle-btn {
-            background: #22c55e;
-            color: white;
-            border: none;
-            padding: 15px 70px;
-            font-size: 20px;
-            border-radius: 35px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-        }
+        .footer { position: fixed; bottom: 0; width: 100%; background: #1a1d29; padding: 25px 0; border-top: 2px solid #fbbf24; }
+        .shuffle-btn { background: #22c55e; color: white; padding: 15px 70px; border-radius: 35px; border: none; font-weight: bold; font-size: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="game-header">
-        <button class="back-btn" onclick="location.href='index.html'">⬅ LOBBY</button>
-        <div style="flex-grow: 1; color: #fbbf24; font-weight: bold; letter-spacing: 1px;">SIMBA SHUFFLE</div>
+    <div class="header">
+        <button onclick="location.href='index.html'" style="background:#fbbf24; border:none; border-radius:5px; font-weight:bold; padding:8px 15px;">LOBBY</button>
+        <div style="color:#fbbf24; font-weight:bold;">SIMBA SHUFFLE</div>
     </div>
-
-    <div class="grid-container" id="grid">
-        </div>
-
-    <div class="footer-controls">
-        <button class="shuffle-btn">SHUFFLE</button>
+    <div class="grid" id="gameGrid"></div>
+    <div class="footer">
+        <button class="shuffle-btn" onclick="shuffleTiles()">SHUFFLE</button>
     </div>
-
     <script>
-        const grid = document.getElementById('grid');
-        for (let i = 1; i <= 16; i++) {
-            const t = document.createElement('div');
-            t.className = 'tile';
-            t.innerText = i < 10 ? '0' + i : i;
-            grid.appendChild(t);
+        function shuffleTiles() {
+            const container = document.getElementById('gameGrid');
+            container.innerHTML = '';
+            let nums = Array.from({length: 16}, (_, i) => i + 1);
+            nums.sort(() => Math.random() - 0.5); 
+            nums.forEach(n => {
+                const div = document.createElement('div');
+                div.className = 'tile';
+                div.innerText = n < 10 ? '0' + n : n;
+                container.appendChild(div);
+            });
         }
+        shuffleTiles();
     </script>
 </body>
 </html>
