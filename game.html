@@ -3,53 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Shuffle</title>
+    <title>Simba Shuffle | Game</title>
     <style>
+        :root { --gold: #fbbf24; --bg: #0b0d17; }
         body { 
-            margin: 0; 
-            background: #000 url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed; 
-            background-size: cover; 
-            font-family: sans-serif; 
-            color: white; 
-            text-align: center; 
+            background: var(--bg) url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed; 
+            background-size: cover; color: white; font-family: sans-serif; text-align: center; margin: 0;
         }
-        .header { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid #fbbf24; }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 360px; margin: auto; }
-        .tile { 
-            background: url('assets/assets/tile.jpg') no-repeat center; 
-            background-size: contain; 
-            aspect-ratio: 1/1; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; color: #fbbf24; font-size: 1.2rem; 
-            text-shadow: 2px 2px 4px #000;
+        .header { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); }
+        
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 400px; margin: auto; }
+        .box { 
+            background: rgba(26, 29, 41, 0.9); border: 2px solid var(--gold); border-radius: 10px;
+            aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s;
         }
-        .footer { position: fixed; bottom: 0; width: 100%; background: #1a1d29; padding: 25px 0; border-top: 2px solid #fbbf24; }
-        .shuffle-btn { background: #22c55e; color: white; padding: 15px 70px; border-radius: 35px; border: none; font-weight: bold; font-size: 20px; cursor: pointer; }
+        .box.revealed { background: #000; border-color: #444; color: #888; cursor: default; }
+        .box.win { background: #22c55e; color: white; border-color: #fff; }
+
+        .controls { margin: 20px; }
+        .btn-shuffle { background: #22c55e; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 20px; cursor: pointer; }
+        .bet-select { background: #1a1d29; color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 5px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:#fbbf24; border:none; border-radius:5px; font-weight:bold; padding:8px 15px;">LOBBY</button>
-        <div style="color:#fbbf24; font-weight:bold;">SIMBA SHUFFLE</div>
+        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; font-weight:bold; border-radius:5px;">LOBBY</button>
+        <div id="gameBalance" style="color:var(--gold); font-weight:bold;">0.00 ETB</div>
     </div>
-    <div class="grid" id="gameGrid"></div>
-    <div class="footer">
-        <button class="shuffle-btn" onclick="shuffleTiles()">SHUFFLE</button>
+
+    <h2 style="color:var(--gold); margin-top:20px;">SIMBA SHUFFLE</h2>
+    <p id="status">Select your bet and press SHUFFLE</p>
+
+    <div class="controls">
+        <select id="betAmount" class="bet-select">
+            <option value="10">BET: 10 ETB</option>
+            <option value="50">BET: 50 ETB</option>
+            <option value="100">BET: 100 ETB</option>
+        </select>
+        <br>
+        <button class="btn-shuffle" id="shuffleBtn" onclick="startGame()">SHUFFLE</button>
     </div>
+
+    <div class="grid" id="grid">
+        </div>
+
     <script>
-        function shuffleTiles() {
-            const container = document.getElementById('gameGrid');
-            container.innerHTML = '';
-            let nums = Array.from({length: 16}, (_, i) => i + 1);
-            nums.sort(() => Math.random() - 0.5); 
-            nums.forEach(n => {
-                const div = document.createElement('div');
-                div.className = 'tile';
-                div.innerText = n < 10 ? '0' + n : n;
-                container.appendChild(div);
-            });
+        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
+        let winningBox = -1;
+        let gameActive = false;
+
+        function updateUI() {
+            document.getElementById('gameBalance').innerText = balance.toFixed(2) + " ETB";
+            localStorage.setItem('simba_balance', balance);
         }
-        shuffleTiles();
+
+        function createGrid() {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 16; i++) {
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.innerText = i < 10 ? '0' + i : i;
+                box.onclick = () => revealBox(i, box);
+                grid.appendChild(box);
+            }
+        }
+
+        function startGame() {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            if (balance < bet) return alert("Insufficient Balance!");
+
+            balance -= bet;
+            updateUI();
+            
+            winningBox = Math.floor(Math.random() * 16) + 1;
+            gameActive = true;
+            createGrid();
+            document.getElementById('status').innerText = "Find the Hidden Prize!";
+            document.getElementById('shuffleBtn').disabled = true;
+        }
+
+        function revealBox(num, element) {
+            if (!gameActive) return;
+            
+            gameActive = false;
+            element.classList.add('revealed');
+            const bet = parseFloat(document.getElementById('betAmount').value);
+
+            if (num === winningBox) {
+                const win = bet * 12; // 12x Payout for finding the 1/16 box
+                balance += win;
+                element.classList.add('win');
+                element.innerText = "🦁";
+                document.getElementById('status').innerText = "JACKPOT! YOU WON " + win + " ETB";
+            } else {
+                element.innerText = "❌";
+                document.getElementById('status').innerText = "Try Again! The prize was in box " + winningBox;
+            }
+
+            updateUI();
+            document.getElementById('shuffleBtn').disabled = false;
+        }
+
+        createGrid();
+        updateUI();
     </script>
 </body>
 </html>
