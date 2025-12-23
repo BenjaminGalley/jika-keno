@@ -10,75 +10,77 @@
         .header { background: var(--card); padding: 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         .wallet { background: #111420; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
         .balance-amount { font-size: 28px; color: var(--gold); font-weight: bold; }
-        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .section-title { padding: 20px; color: var(--gold); font-weight: bold; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 15px; }
-        .card { background: var(--card); border-radius: 15px; border: 1px solid #333; overflow: hidden; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .card img { width: 100%; height: 120px; object-fit: cover; display: block; filter: brightness(0.8); }
-        .card-label { padding: 12px; font-weight: bold; font-size: 14px; }
+        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); }
-        .modal-content { background: var(--card); margin: 20% auto; padding: 30px; border: 1px solid var(--gold); width: 85%; border-radius: 20px; text-align: center; box-shadow: 0 0 30px rgba(251, 191, 36, 0.2); }
-        input { width: 100%; padding: 14px; margin: 12px 0; border-radius: 10px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 16px; }
+        .modal-content { background: var(--card); margin: 15% auto; padding: 25px; border: 1px solid var(--gold); width: 85%; border-radius: 20px; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 16px;}
+        label { display: block; text-align: left; font-size: 12px; color: var(--gold); margin-top: 5px;}
     </style>
 </head>
 <body>
 
     <div class="header">
         <div style="color:var(--gold); font-weight:bold; font-size:22px;">SIMBA CASINO</div>
-        <div id="userDisplay" style="font-size: 12px; color: #888; background: #000; padding: 5px 10px; border-radius: 20px;">Guest</div>
+        <div id="userDisplay" style="font-size: 12px; color: #888;">Guest</div>
     </div>
 
     <div class="wallet">
         <div>
-            <div style="font-size:10px; color:#888; letter-spacing:1px;">LIVE BALANCE</div>
+            <div style="font-size:10px; color:#888;">LIVE BALANCE</div>
             <div class="balance-amount" id="displayBalance">0.00 ETB</div>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn" style="background:#ef4444; color:white;" onclick="openModal('withModal')">CASH OUT</button>
+        <div style="display:flex; gap:8px;">
+            <button class="btn" style="background:#ef4444; color:white;" onclick="openModal('withModal')">WITHDRAW</button>
             <button class="btn" style="background:#22c55e; color:white;" onclick="openModal('depModal')">DEPOSIT</button>
         </div>
     </div>
 
-    <div class="section-title">Exclusive Games</div>
     <div class="grid">
-        <div class="card" onclick="location.href='game.html'">
-            <div style="height:120px; background:#111; display:flex; align-items:center; justify-content:center; font-size:50px;">🦁</div>
-            <div class="card-label">SIMBA SHUFFLE</div>
-        </div>
-        <div class="card" onclick="location.href='fruit.html'">
-            <div style="height:120px; background:#111; display:flex; align-items:center; justify-content:center; font-size:50px;">🍒</div>
-            <div class="card-label">FRUIT BLAST</div>
-        </div>
+        <div class="card" onclick="location.href='fruit.html'"><div style="font-size:40px; padding:20px;">🍒</div><div style="padding:10px;">FRUIT BLAST</div></div>
+        <div class="card" onclick="location.href='game.html'"><div style="font-size:40px; padding:20px;">🦁</div><div style="padding:10px;">SIMBA SHUFFLE</div></div>
     </div>
 
     <div id="joinModal" class="modal"><div class="modal-content">
-        <h2 style="color:var(--gold); margin-top:0;">JOIN SIMBA</h2>
-        <p style="font-size:14px; color:#ccc;">Enter your name to request access.</p>
+        <h2 style="color:var(--gold)">CREATE ACCOUNT</h2>
         <input type="text" id="regName" placeholder="Full Name">
-        <button class="btn" style="background:var(--gold); width:100%; margin-top:10px; color:#000;" onclick="registerUser()">REQUEST ACCESS</button>
+        <input type="text" id="regPhone" placeholder="Phone Number">
+        <button class="btn" style="background:var(--gold); width:100%" onclick="registerUser()">REQUEST ACCESS</button>
     </div></div>
 
     <div id="depModal" class="modal"><div class="modal-content">
-        <h2 style="color:var(--gold); margin-top:0;">DEPOSIT</h2>
-        <input type="number" id="depAmount" placeholder="Amount (Min 100 ETB)">
-        <button class="btn" style="background:#22c55e; color:white; width:100%; margin-top:10px;" onclick="notifyDeposit()">SEND REQUEST</button>
-        <button class="btn" style="background:transparent; color:#888; width:100%; margin-top:10px;" onclick="closeModal()">Cancel</button>
+        <h2 style="color:var(--gold)">DEPOSIT ETB</h2>
+        <label>Payment Method</label>
+        <select id="depMethod">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE">CBE (Commercial Bank)</option>
+        </select>
+        <label>Your Transfer Phone/Account</label>
+        <input type="text" id="depPhone" placeholder="09... or Account No.">
+        <label>Amount Sent</label>
+        <input type="number" id="depAmount" placeholder="Min 100 ETB">
+        <button class="btn" style="background:#22c55e; color:white; width:100%; margin-top:10px;" onclick="notifyDeposit()">CONFIRM DEPOSIT</button>
+        <button class="btn" style="background:transparent; color:#888; width:100%" onclick="closeModal()">Cancel</button>
     </div></div>
 
     <div id="withModal" class="modal"><div class="modal-content">
-        <h2 style="color:var(--gold); margin-top:0;">WITHDRAW</h2>
-        <input type="number" id="withAmount" placeholder="Amount">
-        <input type="text" id="withInfo" placeholder="Telebirr Number">
-        <button class="btn" style="background:#ef4444; color:white; width:100%; margin-top:10px;" onclick="notifyWithdraw()">CASH OUT</button>
-        <button class="btn" style="background:transparent; color:#888; width:100%; margin-top:10px;" onclick="closeModal()">Cancel</button>
+        <h2 style="color:var(--gold)">WITHDRAW</h2>
+        <label>Withdraw To</label>
+        <select id="withMethod">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE">CBE</option>
+        </select>
+        <input type="text" id="withPhone" placeholder="Receiver Phone Number">
+        <input type="number" id="withAmount" placeholder="Amount to Withdraw">
+        <button class="btn" style="background:#ef4444; color:white; width:100%; margin-top:10px;" onclick="notifyWithdraw()">SEND REQUEST</button>
+        <button class="btn" style="background:transparent; color:#888; width:100%" onclick="closeModal()">Cancel</button>
     </div></div>
 
     <script>
-        // CORE CONFIGURATION
         const BOT_TOKEN = '8048151095:AAHHJfE21m9JIcGTNOLdzvG8lMfWM16TJOY';
         const CHAT_ID = '5900337528';
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec'; 
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
 
         let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
         let currentUser = localStorage.getItem('simba_user') || null;
@@ -92,14 +94,12 @@
         function openModal(id) { document.getElementById(id).style.display='block'; }
         function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 
-        // Send Request to Telegram with ACCEPT/REJECT buttons pointing to Google Script
         async function sendTelegram(msg, name, amount, type) {
             const acceptUrl = `${SCRIPT_URL}?user=${encodeURIComponent(name)}&amt=${amount}&type=${type}&action=accept`;
             const rejectUrl = `${SCRIPT_URL}?user=${encodeURIComponent(name)}&amt=${amount}&type=${type}&action=reject`;
-            
             const replyMarkup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: "✅ ACCEPT", url: acceptUrl },
+                    { text: "✅ APPROVE", url: acceptUrl },
                     { text: "❌ REJECT", url: rejectUrl }
                 ]]
             });
@@ -108,9 +108,10 @@
 
         function registerUser() {
             const name = document.getElementById('regName').value;
-            if(name) {
-                sendTelegram(`🆕 *REGISTRATION REQUEST*\nName: ${name}`, name, 0, 'reg');
-                alert("Request sent! Keep this page open while I approve you in Telegram.");
+            const phone = document.getElementById('regPhone').value;
+            if(name && phone) {
+                sendTelegram(`🆕 *REGISTRATION*\n👤 Name: ${name}\n📞 Phone: ${phone}`, name, 0, 'reg');
+                alert("Request sent! Admin is verifying your details.");
                 closeModal();
                 listenForAdmin(name);
             }
@@ -118,54 +119,51 @@
 
         function notifyDeposit() {
             const amt = document.getElementById('depAmount').value;
-            if(amt >= 100 && currentUser) {
-                sendTelegram(`💰 *DEPOSIT REQUEST*\nUser: ${currentUser}\nAmount: ${amt} ETB`, currentUser, amt, 'dep');
-                alert("Deposit request sent! I will approve it shortly.");
+            const phone = document.getElementById('depPhone').value;
+            const method = document.getElementById('depMethod').value;
+            if(amt >= 100 && phone && currentUser) {
+                sendTelegram(`💰 *DEPOSIT REQUEST*\n👤 User: ${currentUser}\n💵 Amount: ${amt} ETB\n🏦 Method: ${method}\n📱 From Phone: ${phone}`, currentUser, amt, 'dep');
+                alert("Deposit info sent! Verification in progress.");
                 closeModal();
                 listenForAdmin(currentUser);
-            }
+            } else { alert("Please fill all details!"); }
         }
 
         function notifyWithdraw() {
             const amt = parseFloat(document.getElementById('withAmount').value);
-            const info = document.getElementById('withInfo').value;
-            if(amt <= balance && amt > 0) {
-                balance -= amt; 
+            const phone = document.getElementById('withPhone').value;
+            const method = document.getElementById('withMethod').value;
+            if(amt > 0 && amt <= balance && phone) {
+                balance -= amt;
                 updateUI();
-                sendTelegram(`⚠️ *WITHDRAWAL REQUEST*\nUser: ${currentUser}\nAmount: ${amt} ETB\nPay to: ${info}`, currentUser, amt, 'with');
+                sendTelegram(`⚠️ *WITHDRAWAL REQUEST*\n👤 User: ${currentUser}\n💵 Amount: ${amt} ETB\n🏦 Method: ${method}\n📱 Send to: ${phone}`, currentUser, amt, 'with');
                 alert("Withdrawal request sent!");
                 closeModal();
-            } else { alert("Insufficient Balance!"); }
+            } else { alert("Check balance or phone number!"); }
         }
 
-        // Live Checker: Looks for your "Accept" click in Google Script database
         function listenForAdmin(userName) {
             const interval = setInterval(async () => {
-                try {
-                    const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(userName)}`);
-                    const data = await res.json();
-                    
-                    if (data.status === 'accept') {
-                        clearInterval(interval);
-                        if (data.type === 'reg') {
-                            currentUser = userName;
-                            localStorage.setItem('simba_user', userName);
-                            alert("✅ Access Approved! Welcome to Simba.");
-                        } else if (data.type === 'dep') {
-                            balance += parseFloat(data.amt);
-                            alert("✅ Deposit of " + data.amt + " ETB Approved!");
-                        }
-                        updateUI();
-                        location.reload(); // Refresh to ensure everything syncs
-                    } else if (data.status === 'reject') {
-                        clearInterval(interval);
-                        alert("❌ Your request was declined by Admin.");
+                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(userName)}`);
+                const data = await res.json();
+                if (data.status === 'accept') {
+                    clearInterval(interval);
+                    if (data.type === 'reg') {
+                        currentUser = userName;
+                        localStorage.setItem('simba_user', userName);
+                    } else if (data.type === 'dep') {
+                        balance += parseFloat(data.amt);
                     }
-                } catch (e) { console.log("Waiting for Admin..."); }
-            }, 4000); // Check every 4 seconds
+                    updateUI();
+                    alert("Admin has APPROVED your request!");
+                    location.reload();
+                } else if (data.status === 'reject') {
+                    clearInterval(interval);
+                    alert("Admin has REJECTED your request.");
+                }
+            }, 5000);
         }
 
-        // Auto-show Join modal for new players
         if(!currentUser) openModal('joinModal');
         updateUI();
     </script>
