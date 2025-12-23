@@ -1,41 +1,92 @@
-/* Container for the glowing lines */
-#line-canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url('assets/bg.jpg.jpeg') no-repeat center center/cover; /* Matches your folder */
+    font-family: Arial, sans-serif;
 }
 
-/* Popups */
-.win-popup {
+.game-container {
+    position: relative;
+    width: 360px;
+    height: 600px;
+    background: url('assets/grid_3x3.jpg') no-repeat center center/contain; /* Matches your folder */
+    display: flex;
+    padding-top: 50px;
+}
+
+.multiplier-window {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0);
-    padding: 20px;
-    border-radius: 20px;
+    left: 25px;
+    top: 110px;
+    width: 50px;
+    height: 150px;
+    overflow: hidden;
+    border: 2px solid gold;
+}
+
+.reel-strip {
+    width: 100%;
+    height: 500%; /* Strip has 5 numbers */
+    background: url('assets/multiplier.jpg') repeat-y;
+    background-size: contain;
+    position: absolute;
+    top: 0;
+    transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.grid-main {
+    display: flex;
+    margin-left: 90px;
+    width: 240px;
+    height: 240px;
+    margin-top: 60px;
+}
+
+.reel {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.symbol {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.ui-panel {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
     text-align: center;
-    z-index: 100;
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: gold;
+}
+
+#spin-button {
+    background: #27ae60;
+    border: 3px solid gold;
+    color: white;
+    padding: 10px 30px;
+    font-size: 20px;
+    border-radius: 50px;
+    cursor: pointer;
 }
 
 .big-win {
-    background: radial-gradient(circle, #f1c40f, #e67e22);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9);
     border: 5px solid gold;
-    color: white;
-    font-size: 3rem;
-    text-shadow: 2px 2px 10px black;
-    box-shadow: 0 0 50px gold;
+    color: #f1c40f;
+    padding: 40px;
+    text-align: center;
+    z-index: 100;
+    border-radius: 20px;
 }
-
-.small-win {
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #2ecc71;
-    color: #2ecc71;
-    font-size: 1.5rem;
-}
-
-.show-win { transform: translate(-50%, -50%) scale(1); }
