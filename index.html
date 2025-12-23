@@ -5,32 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simba Casino</title>
     <style>
-        body { background: #0b0d17; color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        .header { background: #1a1d29; padding: 15px; border-bottom: 2px solid #fbbf24; display: flex; justify-content: space-between; align-items: center; }
-        .wallet { background: #111420; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { padding: 10px 20px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-dep { background: #22c55e; color: white; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; }
+        .header { background: var(--card); padding: 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .wallet { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .btn { padding: 8px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .card { background: #1a1d29; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
-        .card img { width: 100%; display: block; }
+        .card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
+        .card img { width: 100%; display: block; min-height: 100px; background: #222; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div style="color:#fbbf24; font-weight:bold; font-size:20px;">SIMBA</div>
-        <button class="btn" style="background:#fbbf24; color:black;">JOIN</button>
+        <div style="color:var(--gold); font-weight:bold; font-size:20px;">SIMBA</div>
+        <button class="btn" style="background:var(--gold);">JOIN</button>
     </div>
     <div class="wallet">
-        <div>
-            <div style="font-size:10px; color:#888;">BALANCE</div>
-            <div style="font-size:22px; color:#fbbf24; font-weight:bold;">0.00 ETB</div>
-        </div>
-        <button class="btn btn-dep">DEPOSIT</button>
+        <div><div style="font-size:10px; color:#888;">BALANCE</div><div style="font-size:20px; color:var(--gold); font-weight:bold;">0.00 ETB</div></div>
+        <button class="btn" style="background:#22c55e; color:white;">DEPOSIT</button>
     </div>
     <div class="grid">
         <div class="card" onclick="location.href='game.html'">
-            <img src="assets/assets/simba_card.jpg.jpeg.jpg">
-            <div style="padding:10px; color:#fbbf24; font-weight:bold;">Simba Shuffle</div>
+            <img src="assets/assets/simba_card.jpg.jpeg.jpg" alt="Simba Shuffle">
+            <div style="padding:10px; color:var(--gold); font-weight:bold;">Simba Shuffle</div>
+        </div>
+        <div class="card">
+            <div style="height:120px; display:flex; align-items:center; justify-content:center; font-size:40px;">🎰</div>
+            <div style="padding:10px; color:#444;">Coming Soon</div>
         </div>
     </div>
 </body>
