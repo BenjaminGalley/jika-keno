@@ -3,206 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Casino | Ethiopia</title>
+    <title>Simba Casino | Live Bridge</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; --green: #22c55e; --red: #ef4444; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 50px; overflow-x: hidden; }
-        
-        /* HEADER & SIDE NAV */
-        .header { background: var(--card); padding: 15px; border-bottom: 2px solid var(--gold); display: flex; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .menu-btn { font-size: 24px; color: var(--gold); cursor: pointer; margin-right: 15px; }
-        .brand { color: var(--gold); font-weight: bold; font-size: 22px; flex-grow: 1; }
-        
-        .sidenav { height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; left: 0; background-color: #111; overflow-x: hidden; transition: 0.5s; padding-top: 60px; }
-        .sidenav a { padding: 15px 32px; text-decoration: none; font-size: 18px; color: #818181; display: block; transition: 0.3s; }
-        .sidenav a:hover { color: var(--gold); }
-        .sidenav .closebtn { position: absolute; top: 10px; right: 25px; font-size: 36px; }
-
-        /* WALLET */
-        .wallet { background: #111420; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
-        .balance-amount { font-size: 24px; color: var(--gold); font-weight: bold; }
-        
-        .btn { padding: 10px 18px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-dep { background: var(--green); color: white; }
-        .btn-with { background: var(--red); color: white; }
-
-        /* GAME GRID */
-        .section-title { padding: 20px 20px 10px; color: var(--gold); font-weight: bold; font-size: 14px; text-transform: uppercase; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 20px; }
-        .card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; position: relative; }
-        .card img { width: 100%; display: block; filter: brightness(0.8); }
-        .card-label { padding: 10px; font-size: 12px; font-weight: bold; }
-        .coming-soon { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); font-size: 8px; padding: 3px 6px; border-radius: 4px; color: #aaa; }
-
-        /* MODALS */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
-        .modal-content { background: var(--card); margin: 10% auto; padding: 25px; border: 1px solid var(--gold); width: 85%; border-radius: 20px; text-align: center; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; --red: #ef4444; --green: #22c55e; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 20px; }
+        .header { background: var(--card); padding: 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .wallet { background: #111420; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; }
+        .balance-amount { font-size: 28px; color: var(--gold); font-weight: bold; }
+        .btn { padding: 12px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+        .section-title { padding: 20px; color: var(--gold); font-weight: bold; text-transform: uppercase; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px; }
+        .card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
+        .card img { width: 100%; display: block; filter: brightness(0.7); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--card); margin: 20% auto; padding: 25px; border: 1px solid var(--gold); width: 85%; border-radius: 20px; text-align: center; }
         input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; }
-        
-        /* HISTORY TABLE */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-        th { color: #888; text-align: left; padding: 8px; border-bottom: 1px solid #333; }
-        td { padding: 8px; border-bottom: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <div style="padding: 0 32px 20px; color: var(--gold); font-weight: bold; font-size: 24px;">SIMBA MENU</div>
-        <a href="#" onclick="closeNav()">🏠 Home</a>
-        <a href="#" onclick="openModal('historyModal'); closeNav()">📜 History</a>
-        <a href="#" onclick="openModal('joinModal'); closeNav()">👤 Profile</a>
-        <a href="https://t.me/Benjamin" target="_blank">📞 Support</a>
-        <div style="padding: 30px 32px 10px; color: #444; font-size: 12px;">AVAILABLE GAMES</div>
-        <a href="game.html">🦁 Simba Shuffle</a>
-        <a href="#">🍒 Fruit Blast (Soon)</a>
-        <a href="#">🃏 Poker Classic (Soon)</a>
-    </div>
-
     <div class="header">
-        <span class="menu-btn" onclick="openNav()">&#9776;</span>
-        <div class="brand">SIMBA CASINO</div>
-        <button class="btn" style="background:var(--gold); color:black;" onclick="openModal('joinModal')">JOIN</button>
+        <div style="color:var(--gold); font-weight:bold; font-size:22px;">SIMBA CASINO</div>
+        <div id="userDisplay" style="font-size: 12px; color: #888;">Guest</div>
     </div>
 
     <div class="wallet">
         <div>
-            <div style="font-size:10px; color:#888;">MY BALANCE</div>
+            <div style="font-size:10px; color:#888;">LIVE BALANCE</div>
             <div class="balance-amount" id="displayBalance">0.00 ETB</div>
         </div>
         <div style="display:flex; gap:8px;">
-            <button class="btn btn-with" onclick="openModal('withModal')">WITHDRAW</button>
-            <button class="btn btn-dep" onclick="openModal('depModal')">DEPOSIT</button>
+            <button class="btn" style="background:var(--red); color:white;" onclick="openModal('withModal')">WITHDRAW</button>
+            <button class="btn" style="background:var(--green); color:white;" onclick="openModal('depModal')">DEPOSIT</button>
         </div>
     </div>
 
-    <div class="section-title">Featured Games</div>
+    <div class="section-title">Games</div>
     <div class="grid">
         <div class="card" onclick="location.href='game.html'">
             <img src="assets/assets/simba_card.jpg.jpeg.jpg">
-            <div class="card-label">SIMBA SHUFFLE</div>
+            <div style="padding:10px; font-weight:bold;">SIMBA SHUFFLE</div>
         </div>
-        <div class="card">
-            <div class="coming-soon">COMING SOON</div>
+        <div class="card" onclick="location.href='fruit.html'">
             <div style="height:120px; display:flex; align-items:center; justify-content:center; font-size:40px; background:#222;">🍒</div>
-            <div class="card-label" style="color:#555">FRUIT BASH</div>
+            <div style="padding:10px; font-weight:bold;">FRUIT BLAST</div>
         </div>
     </div>
-
-    <div class="section-title">Classic Casino</div>
-    <div class="grid">
-        <div class="card">
-            <div class="coming-soon">LOCKED</div>
-            <div style="height:100px; display:flex; align-items:center; justify-content:center; font-size:35px; background:#1a1a1a;">🃏</div>
-            <div class="card-label" style="color:#444">POKER</div>
-        </div>
-        <div class="card">
-            <div class="coming-soon">LOCKED</div>
-            <div style="height:100px; display:flex; align-items:center; justify-content:center; font-size:35px; background:#1a1a1a;">🎡</div>
-            <div class="card-label" style="color:#444">ROULETTE</div>
-        </div>
-    </div>
-
-    <div id="historyModal" class="modal"><div class="modal-content">
-        <h2 style="color:var(--gold)">TRANSACTION HISTORY</h2>
-        <table id="historyTable">
-            <thead><tr><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
-            <tbody id="historyBody"></tbody>
-        </table>
-        <button class="btn" style="background:#444; color:white; margin-top:20px; width:100%" onclick="closeModal()">CLOSE</button>
-    </div></div>
 
     <div id="joinModal" class="modal"><div class="modal-content">
-        <h2 style="color:var(--gold)">USER PROFILE</h2>
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="text" id="regPhone" placeholder="Phone Number">
-        <button class="btn btn-dep" style="width:100%" onclick="registerUser()">SAVE PROFILE</button>
-        <button class="btn" style="background:#444; width:100%; margin-top:5px;" onclick="closeModal()">BACK</button>
+        <h2 style="color:var(--gold)">JOIN SIMBA</h2>
+        <input type="text" id="regName" placeholder="Enter Your Name">
+        <button class="btn" style="background:var(--gold); width:100%" onclick="registerUser()">REQUEST ACCESS</button>
     </div></div>
 
     <div id="depModal" class="modal"><div class="modal-content">
         <h2 style="color:var(--gold)">DEPOSIT</h2>
-        <div style="background:#000; padding:10px; margin-bottom:10px; text-align:left; font-size:12px;">
-            Telebirr: 0943595090<br>CBE: 0911045825
-        </div>
         <input type="number" id="depAmount" placeholder="Amount (Min 100)">
-        <button class="btn btn-dep" style="width:100%" onclick="notifyDeposit()">I HAVE SENT MONEY</button>
+        <button class="btn" style="background:var(--green); color:white; width:100%" onclick="notifyDeposit()">SEND REQUEST</button>
     </div></div>
 
     <div id="withModal" class="modal"><div class="modal-content">
         <h2 style="color:var(--gold)">WITHDRAW</h2>
-        <input type="number" id="withAmount" placeholder="Amount (Min 100)">
-        <input type="text" id="bankInfo" placeholder="Telebirr # or Bank Info">
-        <button class="btn btn-with" style="width:100%" onclick="notifyWithdraw()">REQUEST CASH OUT</button>
+        <input type="number" id="withAmount" placeholder="Amount">
+        <input type="text" id="withInfo" placeholder="Telebirr Number">
+        <button class="btn" style="background:var(--red); color:white; width:100%" onclick="notifyWithdraw()">CASH OUT</button>
     </div></div>
 
     <script>
         const BOT_TOKEN = '8048151095:AAHHJfE21m9JIcGTNOLdzvG8lMfWM16TJOY';
         const CHAT_ID = '5900337528';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec'; 
 
         let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
-        let history = JSON.parse(localStorage.getItem('simba_history')) || [];
+        let currentUser = localStorage.getItem('simba_user') || null;
 
         function updateUI() {
             document.getElementById('displayBalance').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('userDisplay').innerText = currentUser || "Not Logged In";
             localStorage.setItem('simba_balance', balance);
-            
-            const hBody = document.getElementById('historyBody');
-            hBody.innerHTML = history.map(h => `<tr><td>${h.type}</td><td>${h.amt}</td><td style="color:var(--gold)">${h.status}</td></tr>`).join('');
-            localStorage.setItem('simba_history', JSON.stringify(history));
         }
 
-        function openNav() { document.getElementById("mySidenav").style.width = "250px"; }
-        function closeNav() { document.getElementById("mySidenav").style.width = "0"; }
         function openModal(id) { document.getElementById(id).style.display='block'; }
         function closeModal() { document.querySelectorAll('.modal').forEach(m => m.style.display='none'); }
 
         async function sendTelegram(msg, name, amount, type) {
-            const adminBase = `https://benjamingalley.github.io/jika-keno/admin.html?user=${encodeURIComponent(name)}&amt=${amount}&type=${type}`;
+            const acceptUrl = `${SCRIPT_URL}?user=${encodeURIComponent(name)}&amt=${amount}&type=${type}&action=accept`;
+            const rejectUrl = `${SCRIPT_URL}?user=${encodeURIComponent(name)}&amt=${amount}&type=${type}&action=reject`;
             const replyMarkup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: "✅ ACCEPT", url: adminBase + "&action=accept" },
-                    { text: "❌ REJECT", url: adminBase + "&action=reject" }
+                    { text: "✅ ACCEPT", url: acceptUrl },
+                    { text: "❌ REJECT", url: rejectUrl }
                 ]]
             });
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(msg)}&parse_mode=Markdown&reply_markup=${encodeURIComponent(replyMarkup)}`);
         }
 
         function registerUser() {
-            const n = document.getElementById('regName').value;
-            const p = document.getElementById('regPhone').value;
-            if(n && p) {
-                localStorage.setItem('simba_user', n);
-                sendTelegram(`🆕 *REGISTRATION*\nName: ${n}\nPhone: ${p}`, n, 0, 'reg');
-                alert("Profile Updated!"); closeModal();
+            const name = document.getElementById('regName').value;
+            if(name) {
+                sendTelegram(`🆕 *REGISTRATION REQUEST*\nName: ${name}`, name, 0, 'reg');
+                alert("Request sent! Keep this page open while I approve you.");
+                closeModal();
+                listenForAdmin(name);
             }
         }
 
         function notifyDeposit() {
-            const amt = parseFloat(document.getElementById('depAmount').value);
-            const name = localStorage.getItem('simba_user') || "Unknown";
-            if(amt >= 100) {
-                history.unshift({type: 'Deposit', amt: amt, status: 'Pending'});
-                updateUI();
-                sendTelegram(`💰 *DEPOSIT*\nUser: ${name}\nAmount: ${amt} ETB`, name, amt, 'dep');
-                alert("Request Sent!"); closeModal();
-            } else { alert("Min 100 ETB"); }
+            const amt = document.getElementById('depAmount').value;
+            if(amt >= 100 && currentUser) {
+                sendTelegram(`💰 *DEPOSIT*\nUser: ${currentUser}\nAmount: ${amt} ETB`, currentUser, amt, 'dep');
+                alert("Deposit request sent!");
+                closeModal();
+                listenForAdmin(currentUser);
+            }
         }
 
         function notifyWithdraw() {
             const amt = parseFloat(document.getElementById('withAmount').value);
-            const info = document.getElementById('bankInfo').value;
-            const name = localStorage.getItem('simba_user') || "Unknown";
-            if(amt < 100 || amt > balance) return alert("Check balance/minimum.");
-            if(amt && info) {
-                balance -= amt;
-                history.unshift({type: 'Withdraw', amt: amt, status: 'Pending'});
+            const info = document.getElementById('withInfo').value;
+            if(amt <= balance && amt > 0) {
+                balance -= amt; // Deduct immediately
                 updateUI();
-                sendTelegram(`⚠️ *WITHDRAW*\nUser: ${name}\nAmount: ${amt}\nPay: ${info}`, name, amt, 'with');
-                alert("Request Sent!"); closeModal();
-            }
+                sendTelegram(`⚠️ *WITHDRAWAL*\nUser: ${currentUser}\nAmount: ${amt} ETB\nPay to: ${info}`, currentUser, amt, 'with');
+                alert("Withdrawal request sent!");
+                closeModal();
+            } else { alert("Insufficient Balance!"); }
         }
+
+        function listenForAdmin(userName) {
+            const interval = setInterval(async () => {
+                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(userName)}`);
+                const data = await res.json();
+                if (data.status === 'accept') {
+                    clearInterval(interval);
+                    if (data.type === 'reg') {
+                        currentUser = userName;
+                        localStorage.setItem('simba_user', userName);
+                        alert("✅ Approved! Welcome.");
+                    } else if (data.type === 'dep') {
+                        balance += parseFloat(data.amt);
+                        alert("✅ Deposit Approved!");
+                    }
+                    updateUI();
+                } else if (data.status === 'reject') {
+                    clearInterval(interval);
+                    alert("❌ Admin rejected your request.");
+                }
+            }, 4000);
+        }
+
+        if(!currentUser) openModal('joinModal');
         updateUI();
     </script>
 </body>
