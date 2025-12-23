@@ -1,65 +1,70 @@
-/* HD Casino Premium Theme */
 body {
-    background: radial-gradient(circle, #1a1a2e 0%, #0f0f1a 100%);
-    color: #f1c40f; /* Premium Gold */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    align-items: center;
+    height: 100vh;
+    background: url('assets/bg.jpg.jpeg') no-content center/cover; /* Using your bg file */
+    overflow: hidden;
 }
 
-h1 {
-    text-shadow: 0px 0px 15px rgba(241, 196, 15, 0.6);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-}
-
-#timer {
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #f1c40f;
-    box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
-    font-weight: bold;
-    color: #fff;
-}
-
-.keno-grid {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
+.game-container {
+    position: relative;
+    display: flex;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.03);
     padding: 20px;
-    border-radius: 20px;
-    border: 1px solid rgba(241, 196, 15, 0.2);
+    background: url('assets/grid_3x3.jpg') no-repeat center/contain; /* Your grid asset */
+    width: 90vw;
+    height: 60vh;
 }
 
-.number-btn {
-    width: 45px;
-    height: 45px;
-    background: #2e2e4e;
-    border: 1px solid #444;
-    border-radius: 50%;
+/* The Multiplier Column on the Left */
+.multiplier-window {
+    width: 60px;
+    height: 100%;
+    overflow: hidden;
+    border: 2px solid gold;
+    position: relative;
+}
+
+.reel-strip {
+    width: 100%;
+    background: url('assets/multiplier.jpg') repeat-y;
+    background-size: contain;
+    position: absolute;
+    top: 0;
+}
+
+/* The 3x3 Reels Area */
+.grid-container {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+}
+
+.slot-reel {
+    width: 30%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.symbol {
+    width: 100%;
+    height: 33.33%; /* Makes 3 symbols fit perfectly in a row */
+    object-fit: contain;
+}
+
+#spin-button {
+    position: absolute;
+    bottom: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 40px;
+    background: linear-gradient(to bottom, #2ecc71, #27ae60);
     color: white;
     font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
-
-.number-btn:hover {
-    background: #f1c40f;
-    color: #000;
-    transform: scale(1.1);
-    box-shadow: 0 0 10px #f1c40f;
-}
-
-.selected {
-    background: #27ae60 !important; /* Green for selected */
-    color: white !important;
-    border-color: #fff !important;
-    box-shadow: 0 0 15px #27ae60;
-      }
