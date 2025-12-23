@@ -12,27 +12,107 @@
         .btn { padding: 8px 15px; border-radius: 5px; border: none; font-weight: bold; cursor: pointer; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .card { background: var(--card); border-radius: 12px; border: 1px solid #333; overflow: hidden; text-align: center; }
-        .card img { width: 100%; display: block; min-height: 100px; background: #222; }
+        .card img { width: 100%; display: block; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: var(--card); margin: 15% auto; padding: 20px; border: 1px solid var(--gold); width: 85%; border-radius: 15px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; }
+        .method { background: #000; padding: 10px; margin: 8px 0; border-radius: 5px; border-left: 3px solid var(--gold); text-align: left; font-size: 14px; }
     </style>
 </head>
 <body>
+
+    <div id="joinModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--gold)">CREATE ACCOUNT</h3>
+            <input type="text" id="regName" placeholder="Full Name">
+            <input type="text" id="regPhone" placeholder="Phone Number">
+            <button class="btn" style="background:var(--gold); width:100%" onclick="registerUser()">REGISTER</button>
+            <p onclick="closeModal('joinModal')" style="font-size:12px; margin-top:15px; color:#888">Cancel</p>
+        </div>
+    </div>
+
+    <div id="depModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--gold)">DEPOSIT</h3>
+            <div class="method"><b>Telebirr:</b> 0943595090</div>
+            <div class="method"><b>CBE Birr:</b> 0911045825</div>
+            <div class="method"><b>Awash:</b> 01320459472600</div>
+            <input type="number" id="depAmount" placeholder="Amount Sent (ETB)">
+            <button class="btn" style="background:#22c55e; color:white; width:100%" onclick="notifyDeposit()">I HAVE PAID</button>
+            <p onclick="closeModal('depModal')" style="font-size:12px; margin-top:15px; color:#888">Close</p>
+        </div>
+    </div>
+
+    <div id="withModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color:var(--gold)">WITHDRAW</h3>
+            <input type="number" id="withAmount" placeholder="Amount (ETB)">
+            <input type="text" id="bankInfo" placeholder="Bank Name & Account #">
+            <button class="btn" style="background:#ef4444; color:white; width:100%" onclick="notifyWithdraw()">REQUEST WITHDRAWAL</button>
+            <p onclick="closeModal('withModal')" style="font-size:12px; margin-top:15px; color:#888">Cancel</p>
+        </div>
+    </div>
+
     <div class="header">
         <div style="color:var(--gold); font-weight:bold; font-size:20px;">SIMBA</div>
-        <button class="btn" style="background:var(--gold);">JOIN</button>
+        <button class="btn" style="background:var(--gold);" onclick="openModal('joinModal')">JOIN</button>
     </div>
+
     <div class="wallet">
         <div><div style="font-size:10px; color:#888;">BALANCE</div><div style="font-size:20px; color:var(--gold); font-weight:bold;">0.00 ETB</div></div>
-        <button class="btn" style="background:#22c55e; color:white;">DEPOSIT</button>
+        <div style="display:flex; gap:5px;">
+            <button class="btn" style="background:#374151; color:white;" onclick="openModal('withModal')">WITHDRAW</button>
+            <button class="btn" style="background:#22c55e; color:white;" onclick="openModal('depModal')">DEPOSIT</button>
+        </div>
     </div>
+
     <div class="grid">
         <div class="card" onclick="location.href='game.html'">
-            <img src="assets/assets/simba_card.jpg.jpeg.jpg" alt="Simba Shuffle">
+            <img src="assets/assets/simba_card.jpg.jpeg.jpg">
             <div style="padding:10px; color:var(--gold); font-weight:bold;">Simba Shuffle</div>
         </div>
-        <div class="card">
-            <div style="height:120px; display:flex; align-items:center; justify-content:center; font-size:40px;">🎰</div>
-            <div style="padding:10px; color:#444;">Coming Soon</div>
-        </div>
     </div>
+
+    <script>
+        const BOT_TOKEN = '8048151095:AAHHJfE21m9JIcGTNOLdzvG8lMfWM16TJOY';
+        const CHAT_ID = '5900337528';
+
+        function openModal(id) { document.getElementById(id).style.display='block'; }
+        function closeModal(id) { document.getElementById(id).style.display='none'; }
+
+        async function sendTelegram(message) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(message)}`;
+            try { await fetch(url); } catch(e) { console.error(e); }
+        }
+
+        function registerUser() {
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            if(name && phone) {
+                sendTelegram(`🆕 NEW REGISTRATION\nName: ${name}\nPhone: ${phone}`);
+                alert("Registration sent to Admin!");
+                closeModal('joinModal');
+            }
+        }
+
+        function notifyDeposit() {
+            const amount = document.getElementById('depAmount').value;
+            if(amount) {
+                sendTelegram(`💰 DEPOSIT REQUEST\nAmount: ${amount} ETB\nAction: Check your bank!`);
+                alert("Request sent!");
+                closeModal('depModal');
+            }
+        }
+
+        function notifyWithdraw() {
+            const amount = document.getElementById('withAmount').value;
+            const info = document.getElementById('bankInfo').value;
+            if(amount && info) {
+                sendTelegram(`⚠️ WITHDRAWAL REQUEST\nAmount: ${amount} ETB\nDetails: ${info}`);
+                alert("Request sent!");
+                closeModal('withModal');
+            }
+        }
+    </script>
 </body>
 </html>
