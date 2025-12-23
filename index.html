@@ -3,98 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Casino | Lobby</title>
-    <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; text-align: center; }
-
-        /* Top Bar */
-        .header { background: #000; padding: 20px; border-bottom: 3px solid var(--gold); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .logo { font-size: 28px; font-weight: 900; color: var(--gold); letter-spacing: 2px; }
-        .balance-container { background: var(--card); padding: 10px 30px; border-radius: 50px; border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
-        .bal-val { font-size: 24px; font-weight: bold; color: var(--gold); }
-
-        /* Game Grid */
-        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; max-width: 500px; margin: 0 auto; }
-        .game-card { background: var(--card); border-radius: 15px; border: 2px solid #334155; padding: 20px; text-decoration: none; transition: 0.3s; position: relative; overflow: hidden; }
-        .game-card:active { transform: scale(0.95); }
-        .game-card.featured { border-color: var(--gold); box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
-        
-        .game-icon { font-size: 40px; margin-bottom: 10px; display: block; }
-        .game-title { font-weight: bold; color: white; font-size: 16px; }
-        .game-tag { background: var(--gold); color: black; font-size: 10px; font-weight: bold; padding: 2px 8px; border-radius: 5px; position: absolute; top: 10px; right: 10px; }
-
-        /* Bottom Menu */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around; padding: 15px 0; border-top: 2px solid #334155; }
-        .nav-item { color: #888; text-decoration: none; font-size: 12px; }
-        .nav-item.active { color: var(--gold); }
-    </style>
+    <title>SmartSoft Style Slot</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="header">
-        <div class="logo">SIMBA CASINO</div>
-        <div class="balance-container">
-            <div style="font-size: 10px; color: #888;">CURRENT BALANCE</div>
-            <div class="bal-val" id="mainBal">0.00 ETB</div>
+    <div class="game-container">
+        <div class="multiplier-window">
+            <div id="multiplier-reel" class="reel-strip"></div>
         </div>
+
+        <div class="grid-container">
+            <div class="slot-reel" id="reel1"></div>
+            <div class="slot-reel" id="reel2"></div>
+            <div class="slot-reel" id="reel3"></div>
+        </div>
+
+        <button id="spin-button">SPIN</button>
     </div>
-
-    <div class="game-grid">
-        <a href="lion.html" class="game-card featured">
-            <span class="game-tag">NEW</span>
-            <span class="game-icon">🦁</span>
-            <span class="game-title">LION KING</span>
-        </a>
-
-        <a href="fruit.html" class="game-card">
-            <span class="game-icon">🍒</span>
-            <span class="game-title">FRUIT BLAST</span>
-        </a>
-
-        <a href="keno.html" class="game-card">
-            <span class="game-icon">🎱</span>
-            <span class="game-title">KENO 24/7</span>
-        </a>
-
-        <a href="#" class="game-card" style="opacity: 0.5;">
-            <span class="game-icon">💎</span>
-            <span class="game-title">COMING SOON</span>
-        </a>
-    </div>
-
-    <div class="nav-bar">
-        <a href="index.html" class="nav-item active">🏠 HOME</a>
-        <a href="deposit.html" class="nav-item">💰 DEPOSIT</a>
-        <a href="withdraw.html" class="nav-item">🏦 CASH OUT</a>
-    </div>
-
-    <script>
-        // Use your verified Script URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
-        
-        function updateLobbyBalance() {
-            const balance = localStorage.getItem('simba_balance') || "0.00";
-            document.getElementById('mainBal').innerText = parseFloat(balance).toFixed(2) + " ETB";
-        }
-
-        // Auto-refresh balance from Google Script
-        setInterval(async () => {
-            const user = localStorage.getItem('simba_user');
-            if(!user) return;
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
-                const data = await res.json();
-                if (data.status === 'accept') {
-                    let currentBal = parseFloat(localStorage.getItem('simba_balance')) || 0;
-                    currentBal += parseFloat(data.amt);
-                    localStorage.setItem('simba_balance', currentBal);
-                    updateLobbyBalance();
-                }
-            } catch(e) {}
-        }, 5000);
-
-        updateLobbyBalance();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
