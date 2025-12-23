@@ -1,70 +1,41 @@
-body {
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: url('assets/bg.jpg.jpeg') no-content center/cover; /* Using your bg file */
-    overflow: hidden;
-}
-
-.game-container {
-    position: relative;
-    display: flex;
-    gap: 10px;
-    padding: 20px;
-    background: url('assets/grid_3x3.jpg') no-repeat center/contain; /* Your grid asset */
-    width: 90vw;
-    height: 60vh;
-}
-
-/* The Multiplier Column on the Left */
-.multiplier-window {
-    width: 60px;
-    height: 100%;
-    overflow: hidden;
-    border: 2px solid gold;
-    position: relative;
-}
-
-.reel-strip {
-    width: 100%;
-    background: url('assets/multiplier.jpg') repeat-y;
-    background-size: contain;
+/* Container for the glowing lines */
+#line-canvas {
     position: absolute;
     top: 0;
-}
-
-/* The 3x3 Reels Area */
-.grid-container {
-    display: flex;
-    flex: 1;
-    justify-content: space-around;
-}
-
-.slot-reel {
-    width: 30%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.symbol {
+    left: 0;
     width: 100%;
-    height: 33.33%; /* Makes 3 symbols fit perfectly in a row */
-    object-fit: contain;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
 }
 
-#spin-button {
+/* Popups */
+.win-popup {
     position: absolute;
-    bottom: -80px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 40px;
-    background: linear-gradient(to bottom, #2ecc71, #27ae60);
-    color: white;
-    font-weight: bold;
-    border-radius: 10px;
-    cursor: pointer;
+    transform: translate(-50%, -50%) scale(0);
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 100;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+
+.big-win {
+    background: radial-gradient(circle, #f1c40f, #e67e22);
+    border: 5px solid gold;
+    color: white;
+    font-size: 3rem;
+    text-shadow: 2px 2px 10px black;
+    box-shadow: 0 0 50px gold;
+}
+
+.small-win {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #2ecc71;
+    color: #2ecc71;
+    font-size: 1.5rem;
+}
+
+.show-win { transform: translate(-50%, -50%) scale(1); }
