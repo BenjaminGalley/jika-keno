@@ -6,115 +6,68 @@
     <title>Fruit Blast | Simba Casino</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; --win: #22c55e; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         
-        .header { display: flex; justify-content: space-between; padding: 10px; }
+        .header { display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); }
+        .bal-val { color: var(--gold); font-size: 20px; font-weight: bold; }
+
+        /* Slot Grid */
+        .machine-wrap { position: relative; display: inline-block; margin-top: 15px; padding: 10px; background: #222; border-radius: 15px; border: 4px solid #334155; }
+        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 8px; background: #000; padding: 10px; border-radius: 10px; }
+        .cell { background: #111; border-radius: 8px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 45px; transition: 0.3s; border: 2px solid transparent; }
         
-        /* Slot Machine Body */
-        .machine-container { 
-            background: linear-gradient(180deg, #334155 0%, #0f172a 100%);
-            border: 4px solid var(--gold);
-            border-radius: 20px;
-            padding: 15px;
-            display: inline-block;
-            box-shadow: 0 0 40px rgba(0,0,0,0.8);
-            margin-top: 10px;
-        }
+        /* Win Line Highlight */
+        .win-glow { border-color: var(--win) !important; box-shadow: 0 0 20px var(--win); background: #064e3b !important; transform: scale(1.05); z-index: 5; }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, 90px);
-            grid-template-rows: repeat(3, 90px);
-            gap: 8px;
-            background: #000;
-            padding: 10px;
-            border-radius: 10px;
-            border: 2px solid #333;
-        }
-
-        .cell {
-            background: #1e293b;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 45px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Player Balance below machine */
-        .player-stats {
-            margin: 15px 0;
-            padding: 10px;
-            background: rgba(0,0,0,0.6);
-            border-radius: 10px;
-            border: 1px solid var(--gold);
-            display: inline-block;
-            min-width: 200px;
-        }
-        .balance-val { color: var(--gold); font-size: 24px; font-weight: bold; }
-
-        /* Payline / Result Info */
-        .payline-info { height: 30px; margin: 10px 0; font-weight: bold; color: #94a3b8; font-size: 14px; }
+        /* Paytable */
+        .paytable { margin: 15px auto; max-width: 320px; background: var(--card); border-radius: 10px; padding: 10px; font-size: 12px; border: 1px solid #333; }
+        .pay-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #222; color: #888; }
+        .pay-active { color: var(--win) !important; font-weight: bold; background: rgba(34, 197, 94, 0.1); }
 
         /* Controls */
-        .controls { background: var(--card); padding: 20px; border-radius: 20px 20px 0 0; border-top: 3px solid var(--gold); position: fixed; bottom: 0; left: 0; width: 100%; box-sizing: border-box; }
-        .bet-box { display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .adj-btn { background: #334155; color: white; border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; }
-        .spin-btn { background: var(--win); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 22px; font-weight: bold; box-shadow: 0 6px #15803d; }
-        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px #15803d; }
-
-        /* Celebration Popup */
-        #winPopup {
-            display: none;
-            position: fixed;
-            top: 40%; left: 50%; transform: translate(-50%, -50%);
-            z-index: 100; text-align: center; width: 100%;
-        }
-        .win-text { font-size: 60px; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px #000, 0 0 40px var(--gold); animation: bounce 0.5s infinite alternate; }
+        .footer-controls { background: var(--card); padding: 20px; border-top: 2px solid var(--gold); position: fixed; bottom: 0; left: 0; width: 100%; box-sizing: border-box; }
+        .spin-btn { background: var(--win); color: white; border: none; width: 100%; padding: 15px; font-size: 20px; font-weight: bold; border-radius: 12px; box-shadow: 0 4px #15803d; }
+        .spin-btn:active { transform: translateY(2px); box-shadow: 0 2px #15803d; }
         
-        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.2); } }
-        .spinning { animation: slideDown 0.1s infinite linear; }
-        @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+        /* Animations */
+        .spinning { animation: blurMove 0.1s infinite linear; }
+        @keyframes blurMove { 0% { transform: translateY(-20px); filter: blur(5px); } 100% { transform: translateY(20px); filter: blur(5px); } }
+        
+        #winMsg { font-size: 24px; font-weight: bold; color: var(--win); height: 30px; margin: 10px 0; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
+        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; border-radius:5px; padding:5px 15px; font-weight:bold;">LOBBY</button>
+        <div class="bal-val" id="displayBal">0.00 ETB</div>
     </div>
 
-    <div class="machine-container">
+    <div class="machine-wrap">
         <div class="grid" id="slotGrid">
             <div class="cell">🍒</div><div class="cell">🍉</div><div class="cell">🍋</div>
-            <div class="cell">💎</div><div class="cell">7️⃣</div><div class="cell">🍇</div>
-            <div class="cell">🔔</div><div class="cell">🍒</div><div class="cell">🍉</div>
+            <div class="cell">🔔</div><div class="cell">7️⃣</div><div class="cell">💎</div>
+            <div class="cell">🍇</div><div class="cell">🍒</div><div class="cell">🍉</div>
         </div>
     </div>
 
-    <div class="player-stats">
-        <div style="font-size: 12px; color: #888;">YOUR BALANCE</div>
-        <div class="balance-val" id="balDisplay">0.00 ETB</div>
+    <div id="winMsg"></div>
+
+    <div class="paytable">
+        <div style="color:var(--gold); margin-bottom:5px; font-weight:bold;">PAYTABLE (3 OF A KIND)</div>
+        <div class="pay-row" id="p7"><span>7️⃣ 7️⃣ 7️⃣ (Jackpot)</span> <span>50x</span></div>
+        <div class="pay-row" id="pD"><span>💎 💎 💎</span> <span>20x</span></div>
+        <div class="pay-row" id="pB"><span>🔔 🔔 🔔</span> <span>10x</span></div>
+        <div class="pay-row" id="pF"><span>Fruits (Any)</span> <span>5x</span></div>
     </div>
 
-    <div class="payline-info" id="payline">READY TO SPIN</div>
-
-    <div class="controls">
-        <div class="bet-box">
-            <button class="adj-btn" onclick="changeBet(-2)">-</button>
-            <div style="text-align:center">
-                <div style="font-size:10px; color:#888;">BET AMOUNT</div>
-                <div style="font-size:20px; font-weight:bold;"><span id="betDisplay">2</span> ETB</div>
-            </div>
-            <button class="adj-btn" onclick="changeBet(2)">+</button>
+    <div class="footer-controls">
+        <div style="display:flex; justify-content:center; align-items:center; gap:20px; margin-bottom:15px;">
+            <button onclick="changeBet(-2)" style="width:40px; height:40px; border-radius:50%; background:#334155; border:none; color:white;">-</button>
+            <span style="font-weight:bold;">BET: <span id="betAmt" style="color:var(--gold)">2</span> ETB</span>
+            <button onclick="changeBet(2)" style="width:40px; height:40px; border-radius:50%; background:#334155; border:none; color:white;">+</button>
         </div>
-        <button class="spin-btn" id="spinBtn" onclick="startSpin()">SPIN</button>
-    </div>
-
-    <div id="winPopup">
-        <div id="bigWinLabel" style="color:white; font-size:20px; letter-spacing:5px;">BIG WIN!</div>
-        <div class="win-text" id="winAmountLabel">+100</div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
 
     <script>
@@ -126,96 +79,71 @@
         let isSpinning = false;
 
         function updateUI() {
-            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
-            document.getElementById('betDisplay').innerText = bet;
+            document.getElementById('displayBal').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('betAmt').innerText = bet;
             localStorage.setItem('simba_balance', balance);
         }
 
-        function changeBet(v) {
-            if(isSpinning) return;
-            bet = Math.max(2, Math.min(100, bet + v));
-            updateUI();
-        }
+        function changeBet(v) { if(!isSpinning) { bet = Math.max(2, bet + v); updateUI(); } }
 
-        async function startSpin() {
-            if (balance < bet) return alert("Low Balance!");
-            if (isSpinning) return;
-
+        async function spin() {
+            if (balance < bet || isSpinning) return;
             isSpinning = true;
             balance -= bet;
             updateUI();
             
-            document.getElementById('spinBtn').disabled = true;
-            document.getElementById('payline').innerText = "SPINNING...";
-            document.getElementById('winPopup').style.display = "none";
-
-            const cells = document.querySelectorAll('.cell');
-            cells.forEach(c => c.innerHTML = `<div class="spinning">${symbols[Math.floor(Math.random()*7)]}</div>`);
+            document.getElementById('winMsg').innerText = "";
+            document.querySelectorAll('.cell').forEach(c => {
+                c.classList.remove('win-glow');
+                c.innerHTML = `<div class="spinning">🍒</div>`;
+            });
+            document.querySelectorAll('.pay-row').forEach(r => r.classList.remove('pay-active'));
 
             setTimeout(() => {
-                const results = [];
-                cells.forEach(c => {
-                    const res = symbols[Math.floor(Math.random()*7)];
-                    results.push(res);
-                    c.innerHTML = res;
+                const res = [];
+                document.querySelectorAll('.cell').forEach(c => {
+                    const s = symbols[Math.floor(Math.random() * symbols.length)];
+                    res.push(s);
+                    c.innerText = s;
                 });
-                checkResults(results);
+                checkWin(res);
+                isSpinning = false;
             }, 1000);
         }
 
-        function checkResults(s) {
+        function checkWin(s) {
             let winMult = 0;
-            let matchType = "";
+            let winIndices = [];
+            let payId = "";
 
-            // Check Row 2 (Middle Line) - Highest Priority
+            // Logic: Check Middle Row (3, 4, 5)
             if(s[3] === s[4] && s[4] === s[5]) {
-                winMult = s[3] === '7️⃣' ? 50 : 10;
-                matchType = `MIDDLE LINE: ${s[3]} x3`;
-            } 
-            // Check Row 1
-            else if(s[0] === s[1] && s[1] === s[2]) {
-                winMult = 5;
-                matchType = `TOP LINE: ${s[0]} x3`;
-            }
-            // Check Row 3
-            else if(s[6] === s[7] && s[7] === s[8]) {
-                winMult = 5;
-                matchType = `BOTTOM LINE: ${s[6]} x3`;
+                winIndices = [3, 4, 5];
+                if(s[3] === '7️⃣') { winMult = 50; payId = "p7"; }
+                else if(s[3] === '💎') { winMult = 20; payId = "pD"; }
+                else if(s[3] === '🔔') { winMult = 10; payId = "pB"; }
+                else { winMult = 5; payId = "pF"; }
             }
 
             if(winMult > 0) {
-                const winAmt = bet * winMult;
-                balance += winAmt;
-                showCelebration(winAmt, winMult >= 20);
-                document.getElementById('payline').innerText = matchType;
-            } else {
-                document.getElementById('payline').innerText = "NO MATCH";
+                const totalWin = bet * winMult;
+                balance += totalWin;
+                document.getElementById('winMsg').innerText = "WIN: " + totalWin + " ETB!";
+                winIndices.forEach(idx => document.querySelectorAll('.cell')[idx].classList.add('win-glow'));
+                if(payId) document.getElementById(payId).classList.add('pay-active');
+                updateUI();
             }
-
-            isSpinning = false;
-            document.getElementById('spinBtn').disabled = false;
-            updateUI();
         }
 
-        function showCelebration(amt, isBig) {
-            const popup = document.getElementById('winPopup');
-            const label = document.getElementById('bigWinLabel');
-            const amtLabel = document.getElementById('winAmountLabel');
-            
-            label.innerText = isBig ? "JACKPOT! 🔥" : "WINNER!";
-            amtLabel.innerText = "+" + amt + " ETB";
-            popup.style.display = "block";
-            
-            setTimeout(() => { popup.style.display = "none"; }, 3000);
-        }
-
-        // Bridge Sync
+        // Live Balance Sync
         setInterval(async () => {
             const user = localStorage.getItem('simba_user');
             if(!user) return;
-            const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
-            const data = await res.json();
-            if (data.status === 'accept' && data.type === 'dep') { balance += parseFloat(data.amt); updateUI(); }
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
+                const data = await res.json();
+                if (data.status === 'accept' && data.type === 'dep') { balance += parseFloat(data.amt); updateUI(); }
+            } catch(e) {}
         }, 5000);
 
         updateUI();
