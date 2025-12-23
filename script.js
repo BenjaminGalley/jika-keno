@@ -1,66 +1,50 @@
-const fruitValues = {
-    'assets/gold_7.jpg': 100,
-    'assets/diamond.jpg': 50,
-    'assets/melon.jpg': 30,
-    'assets/grapes.jpg': 20,
-    'assets/cherry.jpg': 10,
-    'assets/orange.jpg': 5,
-    'assets/lemon.jpg': 5
-};
-
-const paylines = [
-    [0, 0, 0], // Top row
-    [1, 1, 1], // Middle row
-    [2, 2, 2], // Bottom row
-    [0, 1, 2], // Diagonal down
-    [2, 1, 0]  // Diagonal up
+const fruitAssets = [
+    'assets/gold_7.jpg', 'assets/cherry.jpg', 'assets/diamond.jpg',
+    'assets/grapes.jpg', 'assets/lemon.jpg', 'assets/melon.jpg', 'assets/orange.jpg'
 ];
 
-function checkWins() {
-    let totalWin = 0;
-    let currentGrid = [
-        getReelSymbols(1),
-        getReelSymbols(2),
-        getReelSymbols(3)
-    ];
+let balance = 10049;
 
-    paylines.forEach((line, index) => {
-        const s1 = currentGrid[0][line[0]];
-        const s2 = currentGrid[1][line[1]];
-        const s3 = currentGrid[2][line[2]];
+document.getElementById('spin-button').addEventListener('click', () => {
+    if (balance < 200) return alert("Not enough Birr!");
+    
+    balance -= 200;
+    document.getElementById('balance').innerText = balance;
+    
+    startSpin();
+});
 
-        if (s1 === s2 && s2 === s3) {
-            const val = fruitValues[s1] || 0;
-            totalWin += val;
-            highlightLine(index);
+function startSpin() {
+    // 1. Spin Multiplier
+    const multiReel = document.getElementById('multiplier-reel');
+    const randomStop = Math.floor(Math.random() * 5); // 0 to 4
+    multiReel.style.top = `-${randomStop * 150}px`;
+
+    // 2. Spin Fruit Reels
+    for (let i = 1; i <= 3; i++) {
+        const reel = document.getElementById(`reel${i}`);
+        reel.innerHTML = ''; 
+        for (let j = 0; j < 3; j++) {
+            const img = document.createElement('img');
+            img.src = fruitAssets[Math.floor(Math.random() * fruitAssets.length)];
+            img.className = 'symbol';
+            reel.appendChild(img);
         }
-    });
-
-    if (totalWin > 0) {
-        // Multiply by the random multiplier (1-5)
-        const activeMultiplier = Math.floor(Math.random() * 5) + 1;
-        const finalAmount = totalWin * activeMultiplier;
-        showPopup(finalAmount);
     }
-}
 
-function showPopup(amount) {
-    const popup = document.createElement('div');
-    popup.className = 'win-popup ' + (amount >= 100 ? 'big-win' : 'small-win');
-    popup.innerHTML = amount >= 100 ? `BIG WIN!<br>${amount} ETB` : `WIN<br>${amount} ETB`;
-    
-    document.body.appendChild(popup);
-    setTimeout(() => popup.classList.add('show-win'), 100);
-    
-    // Remove after 3 seconds
+    // 3. Fake a Win for testing
     setTimeout(() => {
-        popup.classList.remove('show-win');
-        setTimeout(() => popup.remove(), 500);
-    }, 3000);
+        showBigWin(8000);
+    }, 2000);
 }
 
-// Helper to get image paths from the reels
-function getReelSymbols(id) {
-    const reel = document.getElementById(`reel${id}`);
-    return Array.from(reel.querySelectorAll('img')).map(img => img.getAttribute('src'));
+function showBigWin(amount) {
+    const overlay = document.getElementById('win-overlay');
+    overlay.innerHTML = `<div class="big-win"><h1>BIG WIN</h1><h2>${amount} ETB</h2></div>`;
+    overlay.classList.remove('hidden');
+    
+    balance += amount;
+    document.getElementById('balance').innerText = balance;
+
+    setTimeout(() => overlay.classList.add('hidden'), 4000);
 }
