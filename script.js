@@ -1,21 +1,13 @@
-// Side Menu Toggle (if you add one later)
-function toggleMenu() {
-    console.log("Menu Toggled");
+// Function to handle game selection
+function startApp() {
+    console.log("Simba Bet Loaded");
 }
 
-// Ensure the page loads at the top
-window.onload = function() {
-    window.scrollTo(0, 0);
-};
-
-// Handle Join/Deposit Button clicks
-document.querySelectorAll('.auth-btns button').forEach(btn => {
-    btn.addEventListener('click', () => {
-        alert(btn.innerText + " feature coming soon!");
+// Redirect logic for placeholders
+document.querySelectorAll('.placeholder').forEach(card => {
+    card.addEventListener('click', () => {
+        alert("This game is coming soon to Simba Bet!");
     });
 });
 
-// Logic to navigate to games
-function openGame(gameName) {
-    window.location.href = gameName + ".html";
-}
+window.onload = startApp;
