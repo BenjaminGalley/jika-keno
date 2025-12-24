@@ -37,9 +37,14 @@
     <div id="toast" class="toast-hidden"></div>
     <script src="script.js"></script>
     <script>
+        // Load balance on start
         window.onload = function() {
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
-            if(user) document.getElementById('currentBal').innerText = parseFloat(user.balance).toFixed(2);
+            if(user) {
+                document.getElementById('currentBal').innerText = parseFloat(user.balance).toFixed(2);
+            } else {
+                location.href='index.html';
+            }
         };
 
         function processWithdraw() {
@@ -49,12 +54,21 @@
             const amount = parseFloat(document.getElementById('witAmount').value);
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
+            if(!user) return;
             if(!phone || !name || !amount) return showToast("Fill all fields");
             if(amount < 100) return showToast("Minimum 100 ETB");
             if(amount > user.balance) return showToast("Insufficient Balance");
 
+            // Subtract from balance temporarily so they can't double-withdraw
+            user.balance -= amount;
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+            localStorage.setItem('user_' + user.phone, JSON.stringify(user));
+
             const msg = `<b>💸 WITHDRAWAL REQUEST</b>\n<b>Player:</b> ${user.name}\n<b>User ID:</b> ${user.phone}\n<b>Pay To:</b> ${method}\n<b>Phone:</b> ${phone}\n<b>Account Name:</b> ${name}\n<b>Amount:</b> ${amount} ETB`;
+            
+            // Notify Bot
             notifyAdmin(msg, 'wit', amount, user.phone);
+            
             showToast("Withdrawal requested!");
             setTimeout(() => location.href='index.html', 2000);
         }
