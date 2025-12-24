@@ -3,18 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Bet</title>
+    <title>Simba Bet | Official</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="top-nav">
-        <div class="brand">
-            <span class="x-logo">X</span> SIMBA BET
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">
+            <span id="menuUserName">Guest Player</span>
+            <button class="close-btn" onclick="toggleMenu()">×</button>
         </div>
-        <div class="auth-btns">
+        <nav class="menu-links">
+            <a href="#" onclick="openModal('withdrawModal'); toggleMenu();">💸 Withdraw Funds</a>
+            <a href="#" onclick="showToast('Loading History...'); toggleMenu();">📜 Transaction History</a>
+            <hr style="border: 0.5px solid #333; margin: 10px 0;">
+            <a href="#" class="logout-link" onclick="logout()">🚪 Logout</a>
+        </nav>
+    </div>
+
+    <header class="top-nav">
+        <div class="left-section">
+            <button class="menu-toggle" id="menuToggleBtn" style="display:none;" onclick="toggleMenu()">☰</button>
+            <div class="brand"><span class="x-logo">X</span> SIMBA</div>
+        </div>
+        
+        <div class="top-balance-area" id="topBalanceArea" style="display:none;">
+            <span class="balance-label">BALANCE</span>
+            <span class="balance-value" id="headerBalance">0.00</span> <small>ETB</small>
+        </div>
+
+        <div class="auth-btns" id="auth-section">
             <button class="login-btn" onclick="openModal('loginModal')">LOGIN</button>
             <button class="register-btn" onclick="openModal('registerModal')">REGISTER</button>
-            <button class="dep-btn" onclick="openModal('depModal')">DEPOSIT</button>
         </div>
     </header>
 
@@ -29,60 +48,65 @@
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg" alt="Multi Hot 5"></div>
             <p class="game-name">Multi Hot 5</p>
         </div>
-        <div class="game-card" onclick="location.href='keno.html'">
-            <div class="img-wrap keno-bg">K6</div>
-            <p class="game-name">Keno</p>
-        </div>
-        <div class="game-card" onclick="location.href='sba.html'">
-            <div class="img-wrap sba-bg">SBA</div>
-            <p class="game-name">SBA</p>
-        </div>
-        <div class="game-card placeholder">
-            <div class="img-wrap"><img src="assets/assets/cherry.jpg" alt="Fruit Mania"></div>
-            <p class="game-name">Fruit Mania</p>
-        </div>
-        <div class="game-card placeholder">
-            <div class="img-wrap"><img src="assets/assets/melon.jpg" alt="Hot Fruit"></div>
-            <p class="game-name">Hot Fruit</p>
-        </div>
-        <div class="game-card placeholder">
-            <div class="img-wrap spin-bg">?</div>
-            <p class="game-name">SpinBora</p>
+        <div class="game-card" onclick="location.href='keno.html'"><div class="img-wrap keno-bg">K6</div><p>Keno</p></div>
+        <div class="game-card" onclick="location.href='sba.html'"><div class="img-wrap sba-bg">SBA</div><p>SBA</p></div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h3>Player Registration</h3>
+            <input type="text" id="regFullName" placeholder="Full Name">
+            <input type="text" id="regPhone" placeholder="Phone Number">
+            <input type="password" id="regPass" placeholder="Password">
+            <input type="password" id="regPassRepeat" placeholder="Repeat Password">
+            <button class="submit-btn" onclick="submitRegister()">Create Account</button>
+            <button class="back-btn" onclick="closeModal('registerModal')">Cancel</button>
         </div>
     </div>
 
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <h3>Login</h3>
-            <input type="text" id="loginPhone" placeholder="Phone Number">
+            <input type="text" id="loginName" placeholder="Phone Number">
             <input type="password" id="loginPass" placeholder="Password">
             <button class="submit-btn" onclick="submitLogin()">Login</button>
-            <button class="back-btn" onclick="closeModal('loginModal')">Back</button>
-        </div>
-    </div>
-
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <h3>Register</h3>
-            <input type="text" id="regPhone" placeholder="Phone Number (09...)">
-            <input type="password" id="regPass" placeholder="Create Password">
-            <button class="submit-btn" onclick="submitRegister()">Register</button>
-            <button class="back-btn" onclick="closeModal('registerModal')">Back</button>
+            <button class="back-btn" onclick="closeModal('loginModal')">Cancel</button>
         </div>
     </div>
 
     <div id="depModal" class="modal">
         <div class="modal-content">
-            <h3>Deposit</h3>
-            <input type="number" id="depAmount" placeholder="Amount (ETB)">
-            <button class="submit-btn" onclick="submitDep()">Pay with Telebirr</button>
-            <button class="back-btn" onclick="closeModal('depModal')">Back</button>
+            <h3>Deposit Funds</h3>
+            <select id="depMethod" class="modal-select">
+                <option value="Telebirr">Telebirr</option>
+                <option value="CBE">CBE (Bank)</option>
+            </select>
+            <input type="text" id="depPhone" placeholder="Sender Phone Number">
+            <input type="number" id="depAmount" placeholder="Amount (100 - 10k)">
+            <button class="submit-btn" onclick="submitDep()">Deposit Now</button>
+            <button class="back-btn" onclick="closeModal('depModal')">Cancel</button>
         </div>
     </div>
 
+    <div id="withdrawModal" class="modal">
+        <div class="modal-content">
+            <h3>Withdraw</h3>
+            <select id="witMethod" class="modal-select">
+                <option value="Telebirr">Telebirr</option>
+                <option value="CBE">CBE (Bank)</option>
+            </select>
+            <input type="text" id="witPhone" placeholder="Receiving Phone">
+            <input type="number" id="witAmount" placeholder="Amount (100 - 10k)">
+            <button class="submit-btn" style="background:#f1c40f" onclick="submitWithdraw()">Withdraw Now</button>
+            <button class="back-btn" onclick="closeModal('withdrawModal')">Cancel</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast-hidden"></div>
+
     <footer class="footer-stats">
-        <div class="stat-item">BALANCE: 10049.01 ETB</div>
-        <div class="stat-item">BET: 200.00 ETB</div>
+        <div class="stat-item">ID: <span id="displayUserID">0000</span></div>
+        <div class="stat-item">MIN BET: 10.00 ETB</div>
     </footer>
 
     <script src="script.js"></script>
