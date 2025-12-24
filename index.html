@@ -12,8 +12,9 @@
             <span class="x-logo">X</span> SIMBA BET
         </div>
         <div class="auth-btns">
-            <button class="join-btn" id="join-btn">JOIN</button>
-            <button class="dep-btn" id="deposit-btn">DEPOSIT</button>
+            <button class="login-btn" onclick="openModal('loginModal')">LOGIN</button>
+            <button class="register-btn" onclick="openModal('registerModal')">REGISTER</button>
+            <button class="dep-btn" onclick="openModal('depModal')">DEPOSIT</button>
         </div>
     </header>
 
@@ -28,30 +29,54 @@
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg" alt="Multi Hot 5"></div>
             <p class="game-name">Multi Hot 5</p>
         </div>
-
         <div class="game-card" onclick="location.href='keno.html'">
             <div class="img-wrap keno-bg">K6</div>
             <p class="game-name">Keno</p>
         </div>
-
         <div class="game-card" onclick="location.href='sba.html'">
             <div class="img-wrap sba-bg">SBA</div>
             <p class="game-name">SBA</p>
         </div>
-
         <div class="game-card placeholder">
             <div class="img-wrap"><img src="assets/assets/cherry.jpg" alt="Fruit Mania"></div>
             <p class="game-name">Fruit Mania</p>
         </div>
-
         <div class="game-card placeholder">
             <div class="img-wrap"><img src="assets/assets/melon.jpg" alt="Hot Fruit"></div>
             <p class="game-name">Hot Fruit</p>
         </div>
-
         <div class="game-card placeholder">
             <div class="img-wrap spin-bg">?</div>
             <p class="game-name">SpinBora</p>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <h3>Login</h3>
+            <input type="text" id="loginPhone" placeholder="Phone Number">
+            <input type="password" id="loginPass" placeholder="Password">
+            <button class="submit-btn" onclick="submitLogin()">Login</button>
+            <button class="back-btn" onclick="closeModal('loginModal')">Back</button>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <h3>Register</h3>
+            <input type="text" id="regPhone" placeholder="Phone Number (09...)">
+            <input type="password" id="regPass" placeholder="Create Password">
+            <button class="submit-btn" onclick="submitRegister()">Register</button>
+            <button class="back-btn" onclick="closeModal('registerModal')">Back</button>
+        </div>
+    </div>
+
+    <div id="depModal" class="modal">
+        <div class="modal-content">
+            <h3>Deposit</h3>
+            <input type="number" id="depAmount" placeholder="Amount (ETB)">
+            <button class="submit-btn" onclick="submitDep()">Pay with Telebirr</button>
+            <button class="back-btn" onclick="closeModal('depModal')">Back</button>
         </div>
     </div>
 
