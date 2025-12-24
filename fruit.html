@@ -3,115 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fruit Blast | Simba Casino</title>
+    <title>Fruit Mania | Simba Bet</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --win: #22c55e; }
-        body { background: var(--bg); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 10px; }
-        .header { display: flex; justify-content: space-between; padding: 10px; border-bottom: 2px solid var(--gold); }
-        .machine { background: #1a1d29; border: 4px solid #334155; border-radius: 15px; display: inline-block; padding: 15px; margin-top: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 90px); gap: 10px; background: #000; padding: 10px; border-radius: 10px; }
-        .cell { background: #111; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 45px; border-radius: 8px; border: 1px solid #222; }
-        
-        /* The requested balance position */
-        .mid-balance { color: var(--gold); font-size: 24px; font-weight: bold; margin: 20px 0 10px 0; letter-spacing: 1px; }
-        
-        .controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px; }
-        .btn-round { width: 45px; height: 45px; border-radius: 50%; border: none; background: #334155; color: white; font-size: 20px; }
-        .spin-btn { background: #22c55e; color: white; border: none; width: 90%; max-width: 350px; padding: 18px; border-radius: 12px; font-size: 22px; font-weight: bold; cursor: pointer; }
-        .win-glow { border-color: var(--win) !important; box-shadow: 0 0 15px var(--win); background: #064e3b !important; }
+        body { background: #111; color: white; text-align: center; }
+        .slot-machine { background: #222; padding: 20px; border: 2px solid gold; border-radius: 15px; margin: 20px auto; max-width: 400px; }
+        .reels { display: flex; justify-content: space-around; margin: 20px 0; background: black; padding: 10px; border-radius: 10px; }
+        .reel { font-size: 50px; }
+        .spin-btn { background: gold; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; width: 100%; }
+        .spin-btn:disabled { background: #555; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
-        <div style="color:var(--gold); font-weight:bold;" id="topBal">0.00 ETB</div>
+    <div style="padding: 10px; display:flex; justify-content:space-between; align-items:center;">
+        <button onclick="location.href='index.html'" style="background:none; border:none; color:gold; font-size:24px;">←</button>
+        <div style="color:gold; font-weight:bold;">BAL: <span id="gameBalance">0.00</span> ETB</div>
     </div>
 
-    <div class="machine">
-        <div class="grid" id="slotGrid">
-            <div class="cell">🍒</div><div class="cell">🍋</div><div class="cell">🍇</div>
-            <div class="cell">🍉</div><div class="cell">🔔</div><div class="cell">💎</div>
-            <div class="cell">7️⃣</div><div class="cell">🍒</div><div class="cell">🍉</div>
+    <div class="slot-machine">
+        <h2 style="color:gold; margin:0;">FRUIT MANIA</h2>
+        <div class="reels">
+            <div class="reel" id="r1">🍒</div>
+            <div class="reel" id="r2">🍒</div>
+            <div class="reel" id="r3">🍒</div>
         </div>
+        
+        <div style="margin: 15px 0;">
+            <label>BET:</label>
+            <select id="betAmount" style="padding: 5px; background: #333; color: white; border: 1px solid gold;">
+                <option value="10">10 ETB</option>
+                <option value="20">20 ETB</option>
+                <option value="50">50 ETB</option>
+            </select>
+        </div>
+
+        <div id="status" style="height:25px; color:#2ecc71; font-weight:bold;"></div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
-
-    <div class="mid-balance" id="gameBal">0.00 ETB</div>
-
-    <div class="controls">
-        <button class="btn-round" onclick="changeBet(-2)">-</button>
-        <div style="font-weight:bold;">BET: <span id="betAmt" style="color:var(--gold)">4</span> ETB</div>
-        <button class="btn-round" onclick="changeBet(2)">+</button>
-    </div>
-
-    <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
-        const symbols = ['🍒', '🍋', '🍇', '🍉', '🔔', '💎', '7️⃣'];
-        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
-        let bet = 4;
-        let isSpinning = false;
-
+        const symbols = ['🍒', '🍋', '🍉', '⭐', '💎', '7️⃣'];
+        
         function updateUI() {
-            const formatted = balance.toFixed(2) + " ETB";
-            document.getElementById('topBal').innerText = formatted;
-            document.getElementById('gameBal').innerText = formatted;
-            document.getElementById('betAmt').innerText = bet;
-            localStorage.setItem('simba_balance', balance);
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            if(user) document.getElementById('gameBalance').innerText = parseFloat(user.balance).toFixed(2);
+            else location.href = 'index.html';
         }
 
-        function changeBet(v) { if(!isSpinning) { bet = Math.max(2, bet + v); updateUI(); } }
-
-        async function spin() {
-            if (balance < bet || isSpinning) return;
-            isSpinning = true;
-            balance -= bet;
-            updateUI();
+        function spin() {
+            let user = JSON.parse(localStorage.getItem('simba_active_user'));
+            const bet = parseInt(document.getElementById('betAmount').value);
             
-            const cells = document.querySelectorAll('.cell');
+            if(user.balance < bet) return alert("Insufficient Balance");
+            
+            // 1. Deduct Money
+            user.balance -= bet;
+            saveUser(user);
+            updateUI();
+
+            // 2. Animate
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            document.getElementById('status').innerText = "";
+            
+            let spins = 0;
             const interval = setInterval(() => {
-                cells.forEach(c => c.innerText = symbols[Math.floor(Math.random() * symbols.length)]);
-            }, 50);
-
-            setTimeout(() => {
-                clearInterval(interval);
-                const results = [];
-                cells.forEach(c => {
-                    const s = symbols[Math.floor(Math.random() * symbols.length)];
-                    results.push(s);
-                    c.innerText = s;
-                    c.classList.remove('win-glow');
-                });
-                checkWins(results, cells);
-                isSpinning = false;
-            }, 1000);
-        }
-
-        function checkWins(res, cells) {
-            let win = 0;
-            const lines = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8]];
-            lines.forEach(line => {
-                if(res[line[0]] === res[line[1]] && res[line[1]] === res[line[2]]) {
-                    win += (bet * 5);
-                    line.forEach(i => cells[i].classList.add('win-glow'));
+                document.getElementById('r1').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                document.getElementById('r2').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                document.getElementById('r3').innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                spins++;
+                if(spins > 10) {
+                    clearInterval(interval);
+                    checkWin(user, bet);
+                    btn.disabled = false;
                 }
-            });
-            if(win > 0) { balance += win; updateUI(); }
+            }, 100);
         }
 
-        // Auto-Sync Balance
-        setInterval(async () => {
-            const user = localStorage.getItem('simba_user');
-            if(!user) return;
-            try {
-                const r = await fetch(`${SCRIPT_URL}?action=check&user=${encodeURIComponent(user)}`);
-                const d = await r.json();
-                if (d.status === 'accept') { balance += parseFloat(d.amt); updateUI(); }
-            } catch(e) {}
-        }, 5000);
+        function checkWin(user, bet) {
+            const r1 = document.getElementById('r1').innerText;
+            const r2 = document.getElementById('r2').innerText;
+            const r3 = document.getElementById('r3').innerText;
 
-        updateUI();
+            if(r1 === r2 && r2 === r3) {
+                const win = bet * 10;
+                user.balance += win;
+                saveUser(user);
+                updateUI();
+                document.getElementById('status').innerText = `WIN! +${win} ETB`;
+            } else if(r1 === r2 || r2 === r3 || r1 === r3) {
+                 const win = bet * 2;
+                 user.balance += win;
+                 saveUser(user);
+                 updateUI();
+                 document.getElementById('status').innerText = `SMALL WIN! +${win} ETB`;
+            }
+        }
+
+        function saveUser(user) {
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+            localStorage.setItem('user_' + user.phone, JSON.stringify(user));
+        }
+
+        window.onload = updateUI;
     </script>
 </body>
 </html>
