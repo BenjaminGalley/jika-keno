@@ -17,7 +17,10 @@ function registerUser() {
     // Log them in immediately
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     showToast("Registration Successful!");
-    setTimeout(() => location.href = 'index.html', 1500);
+    
+    // Close modal and refresh UI
+    if(typeof closeModal === 'function') closeModal('registerModal');
+    setTimeout(() => updateDisplay(), 1000);
 }
 
 function loginUser() {
@@ -28,29 +31,48 @@ function loginUser() {
     if (!user || user.pass !== pass) return showToast("Invalid Phone or Password");
 
     localStorage.setItem('simba_active_user', JSON.stringify(user));
-    location.href = 'index.html';
+    showToast("Login Successful!");
+    
+    // Close modal and refresh UI
+    if(typeof closeModal === 'function') closeModal('loginModal');
+    setTimeout(() => updateDisplay(), 1000);
 }
 
 function logout() {
     localStorage.removeItem('simba_active_user');
-    location.href = 'login.html';
+    location.reload(); // Refresh to show login buttons again
 }
 
-// --- 2. BALANCE SYSTEM & NOTIFICATIONS ---
+// --- 2. UI SYNCING (Matches your index.html IDs) ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-    const balEl = document.getElementById('balanceAmount') || document.getElementById('gameBalance');
     
+    const authSection = document.getElementById('auth-section');
+    const balanceArea = document.getElementById('topBalanceArea');
+    const headerBal = document.getElementById('headerBalance');
+    const menuName = document.getElementById('menuUserName');
+    const menuBtn = document.getElementById('menuToggleBtn');
+
     if (activeUser) {
-        // Sync header name if exists
-        const nameEl = document.getElementById('userName');
-        if(nameEl) nameEl.innerText = activeUser.name;
+        // User is logged in: Show balance and menu, hide login buttons
+        if(authSection) authSection.style.display = 'none';
+        if(balanceArea) balanceArea.style.display = 'flex';
+        if(menuBtn) menuBtn.style.display = 'block';
+        if(menuName) menuName.innerText = activeUser.name;
+        if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
         
-        // Update balance text
-        if (balEl) balEl.innerText = parseFloat(activeUser.balance).toFixed(2);
+        // Update game page balance if on a game page
+        const gameBal = document.getElementById('gameBalance') || document.getElementById('gameBal');
+        if(gameBal) gameBal.innerText = parseFloat(activeUser.balance).toFixed(2);
+    } else {
+        // User is logged out: Show login buttons, hide balance
+        if(authSection) authSection.style.display = 'flex';
+        if(balanceArea) balanceArea.style.display = 'none';
+        if(menuBtn) menuBtn.style.display = 'none';
     }
 }
 
+// --- 3. NOTIFICATIONS & WATCHER ---
 function notifyAdmin(message, type, amount, phone) {
     const inlineKeyboard = {
         inline_keyboard: [[
@@ -71,7 +93,6 @@ function notifyAdmin(message, type, amount, phone) {
     }).catch(err => console.log("Telegram Error:", err));
 }
 
-// Check for balance updates every 3 seconds
 function startBalanceWatcher() {
     setInterval(() => {
         const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
@@ -86,7 +107,7 @@ function startBalanceWatcher() {
     }, 3000);
 }
 
-// --- 3. UTILITIES ---
+// --- 4. UTILITIES ---
 function showToast(msg) {
     let toast = document.getElementById('toast');
     if (!toast) {
