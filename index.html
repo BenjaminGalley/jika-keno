@@ -8,65 +8,53 @@
 </head>
 <body>
     <header class="top-nav">
-        <div class="brand-area">
+        <div class="brand">
             <span class="x-logo">X</span> SIMBA BET
         </div>
-        <div class="auth-buttons">
-            <button class="btn-join">JOIN</button>
-            <button class="btn-deposit">DEPOSIT</button>
+        <div class="auth-btns">
+            <button class="join-btn">JOIN</button>
+            <button class="dep-btn">DEPOSIT</button>
         </div>
     </header>
 
-    <div class="hero-box">
-        <img src="assets/assets/simba_bg.jpg" alt="Simba Lion" class="hero-image">
-        <div class="hero-overlay">
-            <h2>Games</h2>
-        </div>
+    <div class="hero-section">
+        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-banner-img">
     </div>
 
-    <div class="games-grid">
+    <div class="section-label">Games</div>
+
+    <div class="games-container">
         <div class="game-card" onclick="location.href='game.html'">
-            <img src="assets/assets/gold_7.jpg" class="game-icon" alt="Multi Hot 5">
+            <div class="img-wrap"><img src="assets/assets/gold_7.jpg" alt="Multi Hot 5"></div>
             <p>Multi Hot 5</p>
         </div>
-
         <div class="game-card" onclick="location.href='keno.html'">
-            <div class="placeholder-icon keno-icon">K6</div>
+            <div class="img-wrap keno-bg">K6</div>
             <p>Keno</p>
         </div>
-
         <div class="game-card" onclick="location.href='sba.html'">
-            <div class="placeholder-icon sba-icon">SBA</div>
+            <div class="img-wrap sba-bg">SBA</div>
             <p>SBA</p>
         </div>
 
-        <div class="game-card">
-            <div class="placeholder-icon spin-icon">♠♥</div>
-            <p>SpinBora</p>
-        </div>
-
-        <div class="game-card">
-            <img src="assets/assets/cherry.jpg" class="game-icon" alt="Fruit">
+        <div class="game-card placeholder">
+            <div class="img-wrap"><img src="assets/assets/cherry.jpg" alt="Fruit"></div>
             <p>Fruit Mania</p>
         </div>
-
-        <div class="game-card">
-            <img src="assets/assets/melon.jpg" class="game-icon" alt="Hot Fruit">
-            <p>Hot Hot Fruit</p>
+        <div class="game-card placeholder">
+            <div class="img-wrap"><img src="assets/assets/melon.jpg" alt="Hot"></div>
+            <p>Hot Fruit</p>
+        </div>
+        <div class="game-card placeholder">
+            <div class="img-wrap">?</div>
+            <p>SpinBora</p>
         </div>
     </div>
 
-    <div class="bottom-menu">
-        <div class="menu-item active">Home</div>
-        <div class="menu-item">Live</div>
-        <div class="menu-item">Casino</div>
-        <div class="menu-item">Chat</div>
-    </div>
-
-    <div class="footer-balance">
-        <div class="bal-box">BALANCE: 10049.01 ETB</div>
-        <div class="bal-box">BET: 200.00</div>
-    </div>
+    <footer class="footer-stats">
+        <div class="stat-item">BALANCE: 10049.01 ETB</div>
+        <div class="stat-item">BET: 200.00 ETB</div>
+    </footer>
 
     <script src="script.js"></script>
 </body>
