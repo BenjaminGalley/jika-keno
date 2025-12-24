@@ -1,4 +1,4 @@
-/* Mobile First Reset */
+/* Mobile Optimization */
 * { box-sizing: border-box; }
 body, html {
     margin: 0; padding: 0;
@@ -9,7 +9,7 @@ body, html {
     overflow-x: hidden;
 }
 
-/* Fixed Header */
+/* Header Styling */
 .top-nav {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px; background: #111; border-bottom: 2px solid #f1c40f;
@@ -20,77 +20,82 @@ body, html {
 .auth-btns button { padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 .join-btn, .dep-btn { background: #fff; color: #000; margin-left: 5px; }
 
-/* Banner Styling - No oversized images */
+/* Fixed Banner Size */
 .hero-section {
     width: 100%;
-    max-height: 220px;
+    height: 180px; /* Forces the banner to be smaller */
     overflow: hidden;
     background: #000;
 }
 .hero-banner-img {
     width: 100%;
-    height: auto;
-    display: block;
+    height: 100%;
+    object-fit: cover; /* Ensures the Lion shows properly without stretching */
 }
 
 .section-label {
     padding: 15px 10px 5px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
+    text-transform: uppercase;
+    color: #f1c40f;
 }
 
-/* Grid Layout for Mobile */
+/* Fancy Games Grid */
 .games-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Exactly 3 per row */
-    gap: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
     padding: 10px;
-    padding-bottom: 80px; /* Space for footer */
+    padding-bottom: 80px;
 }
 
 .game-card {
-    background: #1a1a1a;
-    border: 1px solid #d4af37; /* Gold border */
-    border-radius: 8px;
+    background: linear-gradient(145deg, #222, #111);
+    border: 1px solid #d4af37;
+    border-radius: 12px;
     text-align: center;
-    padding: 8px 4px;
+    padding: 10px 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
     cursor: pointer;
 }
 
 .img-wrap {
     width: 100%;
-    height: 65px; /* Fixed height to keep it small */
+    height: 60px; /* Strictly controls the height of game icons like the 7 */
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #222;
-    border-radius: 5px;
-    margin-bottom: 5px;
+    border-radius: 8px;
+    margin-bottom: 8px;
     overflow: hidden;
+    background: #000;
 }
 
 .img-wrap img {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 90%;
+    max-height: 90%;
     object-fit: contain;
 }
 
-.game-card p {
+.game-name {
     margin: 0;
     font-size: 0.65rem;
-    color: #ccc;
+    color: #f1c40f;
+    text-shadow: 1px 1px #000;
 }
 
-/* Colors for Placeholders */
-.keno-bg { background: #003366; font-size: 1.2rem; }
-.sba-bg { background: #660000; font-size: 1.2rem; color: #f1c40f; }
+/* Placeholder Backgrounds */
+.keno-bg { background: radial-gradient(circle, #003366, #001a33); font-size: 1rem; }
+.sba-bg { background: radial-gradient(circle, #660000, #330000); font-size: 1rem; color: #f1c40f; }
+.spin-bg { background: #000; border: 1px solid #333; font-size: 1rem; }
 
 /* Sticky Footer */
 .footer-stats {
     position: fixed; bottom: 0; width: 100%;
     display: flex; justify-content: space-between;
-    padding: 12px 15px; background: rgba(0,0,0,0.9);
-    border-top: 1px solid #f1c40f;
+    padding: 15px; background: rgba(0,0,0,0.95);
+    border-top: 2px solid #f1c40f;
     font-size: 0.8rem; z-index: 1000;
 }
-.stat-item { color: #f1c40f; }
+.stat-item { color: #f1c40f; font-weight: bold; }
