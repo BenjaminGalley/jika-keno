@@ -2,44 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit | Simba Casino</title>
-    <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
-        .card { background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 20px; max-width: 400px; margin: auto; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #000; color: white; box-sizing: border-box; }
-        .btn { background: #22c55e; color: white; border: none; width: 100%; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .details { background: #000; padding: 15px; border-radius: 10px; text-align: left; margin-bottom: 20px; border-left: 4px solid var(--gold); }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deposit | Simba Bet</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <button onclick="location.href='index.html'" style="background:#334155; color:white; border:none; padding:10px; border-radius:8px; margin-bottom:20px;">← BACK</button>
-    <div class="card">
-        <h2 style="color:var(--gold)">ADD FUNDS</h2>
-        <div class="details">
-            <div style="font-size:12px; color:#888;">TELEBIRR / CBE NAME:</div>
-            <div style="font-weight:bold;">BINYAM GEBREHIWOT</div>
-            <div style="font-size:12px; color:#888; margin-top:10px;">NUMBER:</div>
-            <div style="font-weight:bold; font-size:18px;">0912345678</div>
+<body style="padding: 10px; background: #000;">
+    <div class="modal-content" style="display:block; margin: 10px auto; width: 100%; max-width: 400px; border: 1px solid gold; padding: 20px; border-radius: 10px;">
+        <h3 style="color: gold; text-align: center; margin-top: 0;">💰 DEPOSIT FUNDS</h3>
+        
+        <div style="background: #111; padding: 10px; border: 1px border: 1px dashed gold; margin-bottom: 15px; font-size: 0.8rem;">
+            <p style="margin: 5px 0;"><strong>Option 1: Telebirr</strong><br>0943595090 - Tesfaye Sheno</p>
+            <p style="margin: 5px 0;"><strong>Option 2: CBE Birr</strong><br>0911045825 - Binyam Gebrehiwot</p>
         </div>
-        <form id="depForm">
-            <input type="number" id="amt" placeholder="Amount (Min: 100 ETB)" required min="100">
-            <input type="text" id="ref" placeholder="Transaction ID / Ref" required>
-            <button type="submit" class="btn">NOTIFY ADMIN</button>
-        </form>
+
+        <label style="font-size: 0.75rem; color: #888;">1. Choose where you sent the money:</label>
+        <select id="depMethod" style="width:100%; padding:12px; background:#222; color:white; border:1px solid #444; margin: 8px 0; border-radius:5px;">
+            <option value="Telebirr (Tesfaye)">Telebirr</option>
+            <option value="CBE Birr (Binyam)">CBE Birr</option>
+        </select>
+
+        <label style="font-size: 0.75rem; color: #888;">2. Your Paid-from Phone Number:</label>
+        <input type="text" id="depPhone" placeholder="09..." style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <label style="font-size: 0.75rem; color: #888;">3. Your Account Name (Sender Name):</label>
+        <input type="text" id="depSenderName" placeholder="Full Name used for payment" style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <label style="font-size: 0.75rem; color: #888;">4. Amount Sent (100 - 10,000 ETB):</label>
+        <input type="number" id="depAmount" placeholder="Amount" style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <button class="submit-btn" onclick="processDeposit()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px;">SEND TO ADMIN</button>
+        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:15px; cursor:pointer;">← Cancel</button>
     </div>
+
+    <div id="toast" class="toast-hidden"></div>
+    <script src="script.js"></script>
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
-        document.getElementById('depForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const amount = document.getElementById('amt').value;
-            if(amount < 100) return alert("Minimum deposit is 100 ETB");
-            const user = localStorage.getItem('simba_user') || 'User';
-            await fetch(`${SCRIPT_URL}?action=deposit&user=${encodeURIComponent(user)}&amt=${amount}&ref=${document.getElementById('ref').value}`);
-            alert("Deposit notification sent to Admin!");
-            location.href = 'index.html';
-        };
+        function processDeposit() {
+            const method = document.getElementById('depMethod').value;
+            const phone = document.getElementById('depPhone').value;
+            const name = document.getElementById('depSenderName').value;
+            const amount = document.getElementById('depAmount').value;
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+
+            if(!phone || !name || !amount) {
+                showToast("Please fill all details");
+                return;
+            }
+            if(amount < 100 || amount > 10000) {
+                showToast("Limit 100 - 10,000 ETB");
+                return;
+            }
+
+            const msg = `<b>💰 DEPOSIT REQUEST</b>\n<b>Player:</b> ${user.name}\n<b>User ID:</b> ${user.phone}\n<b>Method:</b> ${method}\n<b>Paid From:</b> ${phone}\n<b>Sender Name:</b> ${name}\n<b>Amount:</b> ${amount} ETB`;
+            notifyAdmin(msg, 'dep', amount, user.phone);
+            showToast("Request sent to Admin!");
+            setTimeout(() => location.href='index.html', 2000);
+        }
     </script>
 </body>
 </html>
