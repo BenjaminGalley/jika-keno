@@ -1,56 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet</title>
-    <link rel="stylesheet" href="style.css">
-</head>
 <body>
-    <header class="top-nav">
-        <div class="logo-area">
-            <span class="x-logo">X</span> SIMBA BET
+    <div class="top-nav">
+        <div class="brand">
+            <span class="x-icon">X</span> SIMBA BET
         </div>
-        <div class="nav-buttons">
+        <div class="auth-buttons">
             <button class="btn-join">JOIN</button>
-            <button class="btn-deposit">DEPOSIT</button>
+            <button class="btn-dep">DEPOSIT</button>
         </div>
-    </header>
+    </div>
 
-    <main class="lobby-container">
-        <div class="hero-section">
-            <img src="assets/simba_bg.jpg" alt="Simba" class="hero-lion">
-            <h2 class="section-title">Games</h2>
+    <div class="hero-box">
+        <img src="assets/assets/simba_bg.jpg" alt="Simba Lion" class="hero-image">
+        <div class="hero-overlay">
+            <h2>Games</h2>
+        </div>
+    </div>
+
+    <div class="games-grid">
+        <div class="game-card" onclick="location.href='game.html'">
+            <img src="assets/assets/gold_7.jpg" class="game-icon">
+            <p>Multi Hot 5</p>
+        </div>
+        
+        <div class="game-card" onclick="location.href='keno.html'">
+            <div class="placeholder-icon" style="background:#003366; color:white;">KN6</div> 
+            <p>Keno</p>
         </div>
 
-        <div class="games-grid">
-            <div class="game-box" onclick="location.href='keno.html'">
-                <div class="game-img"><img src="assets/keno_icon.jpg" alt="Keno"></div>
-                <p>Keno</p>
-            </div>
-            <div class="game-box" onclick="location.href='sba.html'">
-                <div class="game-img"><img src="assets/sba_icon.jpg" alt="SBA"></div>
-                <p>SBA</p>
-            </div>
-            <div class="game-box" onclick="location.href='slot.html'">
-                <div class="game-img"><img src="assets/gold_7.jpg" alt="Multi Hot 5"></div>
-                <p>Multi Hot 5</p>
-            </div>
-            <div class="game-box placeholder">
-                <div class="game-img"><span>Coming Soon</span></div>
-            </div>
-            <div class="game-box placeholder">
-                <div class="game-img"><span>Coming Soon</span></div>
-            </div>
-            <div class="game-box placeholder">
-                <div class="game-img"><span>Coming Soon</span></div>
-            </div>
+        <div class="game-card" onclick="location.href='sba.html'">
+            <div class="placeholder-icon" style="background:#660000; color:gold;">SBA</div>
+            <p>SBA</p>
         </div>
-    </main>
+        
+        <div class="game-card">
+             <div class="placeholder-icon" style="background:#000; border:1px solid gold;">♠♥</div>
+            <p>SpinBora</p>
+        </div>
+    </div>
 
-    <footer class="bottom-bar">
-        <div class="stat">BALANCE: 10049.01 ETB</div>
-        <div class="stat">BET: 200.00 ETB</div>
-    </footer>
+    <div class="bottom-menu">
+        <div class="menu-item active">Home</div>
+        <div class="menu-item">Live</div>
+        <div class="menu-item">Casino</div>
+        <div class="menu-item">Chat</div>
+    </div>
+
+    <div class="footer-balance">
+        <span>BALANCE: 10049.01 ETB</span>
+        <span>BET: 200.00</span>
+    </div>
+
+    <script src="script.js"></script>
 </body>
-</html>
