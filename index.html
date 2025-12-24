@@ -13,8 +13,9 @@
             <button class="close-btn" onclick="toggleMenu()">×</button>
         </div>
         <nav class="menu-links">
-            <a href="#" onclick="openModal('withdrawModal'); toggleMenu();">💸 Withdraw Funds</a>
-            <a href="#" onclick="showToast('Loading History...'); toggleMenu();">📜 Transaction History</a>
+            <a href="deposit.html">💰 Deposit Funds</a>
+            <a href="withdraw.html">💸 Withdraw Funds</a>
+            <a href="#" onclick="showToast('Loading History...'); toggleMenu();">📜 History</a>
             <hr style="border: 0.5px solid #333; margin: 10px 0;">
             <a href="#" class="logout-link" onclick="logout()">🚪 Logout</a>
         </nav>
@@ -37,70 +38,55 @@
         </div>
     </header>
 
-    <div class="hero-section">
-        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-banner-img">
+    <div class="hero-container">
+        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-img">
     </div>
 
     <div class="section-label">GAMES</div>
 
     <div class="games-container">
         <div class="game-card" onclick="location.href='game.html'">
-            <div class="img-wrap"><img src="assets/assets/gold_7.jpg" alt="Multi Hot 5"></div>
-            <p class="game-name">Multi Hot 5</p>
+            <div class="img-wrap"><img src="assets/assets/gold_7.jpg"></div>
+            <p>Multi Hot 5</p>
         </div>
-        <div class="game-card" onclick="location.href='keno.html'"><div class="img-wrap keno-bg">K6</div><p>Keno</p></div>
-        <div class="game-card" onclick="location.href='sba.html'"><div class="img-wrap sba-bg">SBA</div><p>SBA</p></div>
-    </div>
-
-    <div id="registerModal" class="modal">
-        <div class="modal-content">
-            <h3>Player Registration</h3>
-            <input type="text" id="regFullName" placeholder="Full Name">
-            <input type="text" id="regPhone" placeholder="Phone Number">
-            <input type="password" id="regPass" placeholder="Password">
-            <input type="password" id="regPassRepeat" placeholder="Repeat Password">
-            <button class="submit-btn" onclick="submitRegister()">Create Account</button>
-            <button class="back-btn" onclick="closeModal('registerModal')">Cancel</button>
+        <div class="game-card" onclick="location.href='keno.html'">
+            <div class="img-wrap blue-bg">K6</div>
+            <p>Keno</p>
         </div>
-    </div>
-
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <h3>Login</h3>
-            <input type="text" id="loginName" placeholder="Phone Number">
-            <input type="password" id="loginPass" placeholder="Password">
-            <button class="submit-btn" onclick="submitLogin()">Login</button>
-            <button class="back-btn" onclick="closeModal('loginModal')">Cancel</button>
+        <div class="game-card" onclick="location.href='sba.html'">
+            <div class="img-wrap red-bg">SBA</div>
+            <p>SBA</p>
+        </div>
+        <div class="game-card">
+            <div class="img-wrap"><img src="assets/assets/cherry.jpg"></div>
+            <p>Fruit Mania</p>
+        </div>
+        <div class="game-card">
+            <div class="img-wrap"><img src="assets/assets/melon.jpg"></div>
+            <p>Hot Fruit</p>
+        </div>
+        <div class="game-card">
+            <div class="img-wrap gray-bg">?</div>
+            <p>SpinBora</p>
         </div>
     </div>
 
-    <div id="depModal" class="modal">
-        <div class="modal-content">
-            <h3>Deposit Funds</h3>
-            <select id="depMethod" class="modal-select">
-                <option value="Telebirr">Telebirr</option>
-                <option value="CBE">CBE (Bank)</option>
-            </select>
-            <input type="text" id="depPhone" placeholder="Sender Phone Number">
-            <input type="number" id="depAmount" placeholder="Amount (100 - 10k)">
-            <button class="submit-btn" onclick="submitDep()">Deposit Now</button>
-            <button class="back-btn" onclick="closeModal('depModal')">Cancel</button>
-        </div>
-    </div>
+    <div id="registerModal" class="modal"><div class="modal-content">
+        <h3>Register</h3>
+        <input type="text" id="regFullName" placeholder="Full Name">
+        <input type="text" id="regPhone" placeholder="Phone Number">
+        <input type="password" id="regPass" placeholder="Password">
+        <button class="submit-btn" onclick="submitRegister()">Create Account</button>
+        <button class="back-btn" onclick="closeModal('registerModal')">Cancel</button>
+    </div></div>
 
-    <div id="withdrawModal" class="modal">
-        <div class="modal-content">
-            <h3>Withdraw</h3>
-            <select id="witMethod" class="modal-select">
-                <option value="Telebirr">Telebirr</option>
-                <option value="CBE">CBE (Bank)</option>
-            </select>
-            <input type="text" id="witPhone" placeholder="Receiving Phone">
-            <input type="number" id="witAmount" placeholder="Amount (100 - 10k)">
-            <button class="submit-btn" style="background:#f1c40f" onclick="submitWithdraw()">Withdraw Now</button>
-            <button class="back-btn" onclick="closeModal('withdrawModal')">Cancel</button>
-        </div>
-    </div>
+    <div id="loginModal" class="modal"><div class="modal-content">
+        <h3>Login</h3>
+        <input type="text" id="loginName" placeholder="Phone Number">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button class="submit-btn" onclick="submitLogin()">Login</button>
+        <button class="back-btn" onclick="closeModal('loginModal')">Cancel</button>
+    </div></div>
 
     <div id="toast" class="toast-hidden"></div>
 
