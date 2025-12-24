@@ -1,4 +1,3 @@
-/* Mobile Optimization */
 * { box-sizing: border-box; }
 body, html {
     margin: 0; padding: 0;
@@ -9,7 +8,6 @@ body, html {
     overflow-x: hidden;
 }
 
-/* Header Styling */
 .top-nav {
     display: flex; justify-content: space-between; align-items: center;
     padding: 10px; background: #111; border-bottom: 2px solid #f1c40f;
@@ -20,28 +18,26 @@ body, html {
 .auth-btns button { padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 .join-btn, .dep-btn { background: #fff; color: #000; margin-left: 5px; }
 
-/* Fixed Banner Size */
 .hero-section {
     width: 100%;
-    height: 180px; /* Forces the banner to be smaller */
+    height: 190px;
     overflow: hidden;
     background: #000;
 }
 .hero-banner-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Ensures the Lion shows properly without stretching */
+    object-fit: cover;
 }
 
 .section-label {
-    padding: 15px 10px 5px;
+    padding: 15px 10px 10px;
     font-size: 1.1rem;
     font-weight: bold;
-    text-transform: uppercase;
     color: #f1c40f;
+    text-transform: uppercase;
 }
 
-/* Fancy Games Grid */
 .games-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -51,18 +47,17 @@ body, html {
 }
 
 .game-card {
-    background: linear-gradient(145deg, #222, #111);
-    border: 1px solid #d4af37;
+    background: linear-gradient(145deg, #1a1a1a, #000);
+    border: 1.5px solid #d4af37;
     border-radius: 12px;
     text-align: center;
     padding: 10px 5px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
     cursor: pointer;
 }
 
 .img-wrap {
     width: 100%;
-    height: 60px; /* Strictly controls the height of game icons like the 7 */
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,30 +67,20 @@ body, html {
     background: #000;
 }
 
-.img-wrap img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-}
+.img-wrap img { max-width: 90%; max-height: 90%; object-fit: contain; }
 
-.game-name {
-    margin: 0;
-    font-size: 0.65rem;
-    color: #f1c40f;
-    text-shadow: 1px 1px #000;
-}
+.game-name { margin: 0; font-size: 0.7rem; color: #fff; }
 
-/* Placeholder Backgrounds */
-.keno-bg { background: radial-gradient(circle, #003366, #001a33); font-size: 1rem; }
-.sba-bg { background: radial-gradient(circle, #660000, #330000); font-size: 1rem; color: #f1c40f; }
-.spin-bg { background: #000; border: 1px solid #333; font-size: 1rem; }
+.keno-bg { background: #003366; }
+.sba-bg { background: #660000; }
+.spin-bg { background: #111; }
 
-/* Sticky Footer */
 .footer-stats {
     position: fixed; bottom: 0; width: 100%;
     display: flex; justify-content: space-between;
     padding: 15px; background: rgba(0,0,0,0.95);
-    border-top: 2px solid #f1c40f;
-    font-size: 0.8rem; z-index: 1000;
+    border-top: 1px solid #f1c40f;
+    font-size: 0.85rem; z-index: 1000;
+    box-sizing: border-box;
 }
 .stat-item { color: #f1c40f; font-weight: bold; }
