@@ -2,60 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Withdraw | Simba Casino</title>
-    <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --card: #1a1d29; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
-        .card { background: var(--card); border: 2px solid var(--gold); border-radius: 20px; padding: 25px; max-width: 400px; margin: auto; }
-        .bal-val { font-size: 32px; color: var(--gold); font-weight: bold; margin: 15px 0; }
-        input, select { width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #334155; background: #000; color: white; box-sizing: border-box; }
-        .sub-btn { background: var(--gold); color: black; border: none; width: 100%; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Withdraw | Simba Bet</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <button onclick="location.href='index.html'" style="background:#334155; color:white; border:none; padding:10px; border-radius:8px; margin-bottom:20px;">← BACK</button>
-    <div class="card">
-        <h2 style="color:var(--gold)">CASH OUT</h2>
-        <div style="font-size: 14px; color: #888;">YOUR BALANCE</div>
-        <div class="bal-val" id="displayBal">0.00 ETB</div>
+<body style="padding: 10px; background: #000;">
+    <div class="modal-content" style="display:block; margin: 10px auto; width: 100%; max-width: 400px; border: 1px solid gold; padding: 20px; border-radius: 10px;">
+        <h3 style="color: gold; text-align: center; margin-top: 0;">💸 WITHDRAW FUNDS</h3>
+        
+        <div style="background: #222; padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 15px;">
+            <span style="font-size: 0.7rem; color: #888;">YOUR BALANCE</span><br>
+            <span id="currentBal" style="font-size: 1.2rem; color: gold; font-weight: bold;">0.00</span> <small>ETB</small>
+        </div>
 
-        <form id="withdrawForm">
-            <input type="number" id="amount" placeholder="Amount (Min: 100 ETB)" required>
-            <select id="method" required>
-                <option value="Telebirr">Telebirr</option>
-                <option value="CBE">CBE Bank</option>
-            </select>
-            <input type="text" id="account" placeholder="Phone / Account Number" required>
-            <button type="submit" class="sub-btn">SUBMIT REQUEST</button>
-        </form>
-        <p style="font-size:12px; color:#888; margin-top:15px;">Min: 100 ETB | Max: 10,000 ETB</p>
+        <label style="font-size: 0.75rem; color: #888;">1. Receive Money Via:</label>
+        <select id="witMethod" style="width:100%; padding:12px; background:#222; color:white; border:1px solid #444; margin: 8px 0; border-radius:5px;">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE Birr">CBE Birr</option>
+        </select>
+
+        <label style="font-size: 0.75rem; color: #888;">2. Receiver Phone Number:</label>
+        <input type="text" id="witPhone" placeholder="09..." style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <label style="font-size: 0.75rem; color: #888;">3. Full Account Name:</label>
+        <input type="text" id="witName" placeholder="Name on your account" style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <label style="font-size: 0.75rem; color: #888;">4. Amount to Withdraw:</label>
+        <input type="number" id="witAmount" placeholder="Min 100 ETB" style="width:100%; padding:12px; margin:8px 0; background:#222; border:1px solid #444; color:white; border-radius:5px;">
+
+        <button class="submit-btn" onclick="processWithdraw()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px;">REQUEST WITHDRAWAL</button>
+        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:15px; cursor:pointer;">← Cancel</button>
     </div>
 
+    <div id="toast" class="toast-hidden"></div>
+    <script src="script.js"></script>
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn1zFZR_nLWrRt-_t1QHJGXUbOtpAvl9xJPh4MgJ-U0vHc-gAufrNf1abnFksBzGc/exec';
-        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
-        document.getElementById('displayBal').innerText = balance.toFixed(2) + " ETB";
-
-        document.getElementById('withdrawForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const amt = parseFloat(document.getElementById('amount').value);
-            const user = localStorage.getItem('simba_user') || 'User';
-
-            if (amt < 100) return alert("Minimum withdrawal is 100 ETB");
-            if (amt > 10000) return alert("Maximum withdrawal is 10,000 ETB");
-            if (amt > balance) return alert("Insufficient balance!");
-
-            // Sends to your verified Google Script URL
-            const response = await fetch(`${SCRIPT_URL}?action=withdraw&user=${encodeURIComponent(user)}&amt=${amt}&acc=${document.getElementById('account').value}&method=${document.getElementById('method').value}`);
-            
-            // Deduct balance locally for instant feedback
-            balance -= amt;
-            localStorage.setItem('simba_balance', balance);
-            
-            alert("Request sent! Admin will approve shortly.");
-            location.href = 'index.html';
+        window.onload = function() {
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            if(user) document.getElementById('currentBal').innerText = parseFloat(user.balance).toFixed(2);
         };
+
+        function processWithdraw() {
+            const method = document.getElementById('witMethod').value;
+            const phone = document.getElementById('witPhone').value;
+            const name = document.getElementById('witName').value;
+            const amount = parseFloat(document.getElementById('witAmount').value);
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+
+            if(!phone || !name || !amount) return showToast("Fill all fields");
+            if(amount < 100) return showToast("Minimum 100 ETB");
+            if(amount > user.balance) return showToast("Insufficient Balance");
+
+            const msg = `<b>💸 WITHDRAWAL REQUEST</b>\n<b>Player:</b> ${user.name}\n<b>User ID:</b> ${user.phone}\n<b>Pay To:</b> ${method}\n<b>Phone:</b> ${phone}\n<b>Account Name:</b> ${name}\n<b>Amount:</b> ${amount} ETB`;
+            notifyAdmin(msg, 'wit', amount, user.phone);
+            showToast("Withdrawal requested!");
+            setTimeout(() => location.href='index.html', 2000);
+        }
     </script>
 </body>
 </html>
