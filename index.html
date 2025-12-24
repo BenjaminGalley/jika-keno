@@ -3,14 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Multi Hot 5</title>
+    <title>Multi Hot 5 - Ethiopia</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <header class="main-nav">
+        <div id="menu-open">☰</div>
+        <div class="logo">SLOT-ET</div>
+        <div class="auth-section">
+            <button class="join-btn" onclick="openModal('reg')">JOIN</button>
+            <button class="dep-btn" onclick="openModal('dep')">DEPOSIT</button>
+        </div>
+    </header>
+
+    <div id="side-menu" class="side-menu">
+        <div class="side-header">MENU <span id="menu-close">×</span></div>
+        <nav>
+            <a href="#" onclick="alert('Profile coming soon')">My Profile</a>
+            <a href="#" onclick="openModal('withdraw')">Withdraw (Telebirr)</a>
+            <a href="#" onclick="alert('Mini Games coming soon')">Mini Games</a>
+            <a href="#">Transaction History</a>
+        </nav>
+    </div>
+
     <div id="entry-screen">
-        <div class="logo-container">
+        <div class="entry-card">
             <h1 class="game-title">MULTI<br>HOT 5</h1>
-            <button id="start-button">CONTINUE</button>
+            <button id="start-btn">CONTINUE</button>
+            <div class="balance-status">BALANCE: 10049.01 ETB</div>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="modal-overlay">
+        <div id="reg-modal" class="modal-box">
+            <h3>Create Account</h3>
+            <input type="text" placeholder="Phone Number (09...)">
+            <input type="password" placeholder="Password">
+            <button class="action-btn">Register</button>
+            <button class="close-btn" onclick="closeModal()">Back</button>
+        </div>
+        <div id="dep-modal" class="modal-box">
+            <h3>Deposit ETB</h3>
+            <input type="number" placeholder="Amount">
+            <button class="action-btn">Pay with Telebirr</button>
+            <button class="close-btn" onclick="closeModal()">Back</button>
         </div>
     </div>
 
@@ -19,23 +55,20 @@
             <div class="multiplier-window">
                 <div id="multiplier-reel" class="reel-strip"></div>
             </div>
-
             <div class="grid-area">
                 <div class="reel" id="reel1"></div>
                 <div class="reel" id="reel2"></div>
                 <div class="reel" id="reel3"></div>
             </div>
-
             <div class="ui-panel">
-                <div class="stat-box">BALANCE: <span id="balance">10049.01</span> ETB</div>
+                <div class="stat-tag">BALANCE: <span id="balance">10049.01</span> ETB</div>
                 <button id="spin-button">SPIN</button>
-                <div class="stat-box">BET: 200.00 ETB</div>
+                <div class="stat-tag">BET: 200.00 ETB</div>
             </div>
         </div>
     </div>
 
     <div id="win-overlay" class="hidden"></div>
-
     <script src="script.js"></script>
 </body>
 </html>
