@@ -10,7 +10,7 @@
     <div class="modal-content" style="display:block; margin: 10px auto; width: 100%; max-width: 400px; border: 1px solid gold; padding: 20px; border-radius: 10px;">
         <h3 style="color: gold; text-align: center; margin-top: 0;">💰 DEPOSIT FUNDS</h3>
         
-        <div style="background: #111; padding: 10px; border: 1px border: 1px dashed gold; margin-bottom: 15px; font-size: 0.8rem;">
+        <div style="background: #111; padding: 10px; border: 1px dashed gold; margin-bottom: 15px; font-size: 0.8rem; color: white;">
             <p style="margin: 5px 0;"><strong>Option 1: Telebirr</strong><br>0943595090 - Tesfaye Sheno</p>
             <p style="margin: 5px 0;"><strong>Option 2: CBE Birr</strong><br>0911045825 - Binyam Gebrehiwot</p>
         </div>
@@ -44,6 +44,12 @@
             const amount = document.getElementById('depAmount').value;
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
+            if(!user) {
+                alert("Session expired. Please login again.");
+                location.href='index.html';
+                return;
+            }
+
             if(!phone || !name || !amount) {
                 showToast("Please fill all details");
                 return;
@@ -54,7 +60,10 @@
             }
 
             const msg = `<b>💰 DEPOSIT REQUEST</b>\n<b>Player:</b> ${user.name}\n<b>User ID:</b> ${user.phone}\n<b>Method:</b> ${method}\n<b>Paid From:</b> ${phone}\n<b>Sender Name:</b> ${name}\n<b>Amount:</b> ${amount} ETB`;
+            
+            // This calls the notifyAdmin function in your script.js
             notifyAdmin(msg, 'dep', amount, user.phone);
+            
             showToast("Request sent to Admin!");
             setTimeout(() => location.href='index.html', 2000);
         }
