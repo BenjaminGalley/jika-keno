@@ -10,7 +10,7 @@
             background: var(--bg) url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed; 
             background-size: cover; color: white; font-family: sans-serif; text-align: center; margin: 0;
         }
-        .header { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); }
+        .header { background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--gold); align-items: center; }
         
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 20px; max-width: 400px; margin: auto; }
         .box { 
@@ -19,18 +19,19 @@
             font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s;
         }
         .box.revealed { background: #000; border-color: #444; color: #888; cursor: default; }
-        .box.win { background: #22c55e; color: white; border-color: #fff; }
+        .box.win { background: #22c55e; color: white; border-color: #fff; box-shadow: 0 0 15px #22c55e; }
 
         .controls { margin: 20px; }
         .btn-shuffle { background: #22c55e; color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; font-size: 20px; cursor: pointer; }
-        .bet-select { background: #1a1d29; color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+        .btn-shuffle:disabled { background: #444; cursor: not-allowed; }
+        .bet-select { background: #1a1d29; color: var(--gold); border: 1px solid var(--gold); padding: 10px; border-radius: 5px; margin-bottom: 15px; width: 80%; max-width: 200px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; font-weight:bold; border-radius:5px;">LOBBY</button>
-        <div id="gameBalance" style="color:var(--gold); font-weight:bold;">0.00 ETB</div>
+        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; font-weight:bold; border-radius:5px; cursor:pointer;">LOBBY</button>
+        <div id="gameBalance" style="color:var(--gold); font-weight:bold; font-size: 1.1rem;">0.00 ETB</div>
     </div>
 
     <h2 style="color:var(--gold); margin-top:20px;">SIMBA SHUFFLE</h2>
@@ -41,22 +42,31 @@
             <option value="10">BET: 10 ETB</option>
             <option value="50">BET: 50 ETB</option>
             <option value="100">BET: 100 ETB</option>
+            <option value="500">BET: 500 ETB</option>
         </select>
         <br>
         <button class="btn-shuffle" id="shuffleBtn" onclick="startGame()">SHUFFLE</button>
     </div>
 
-    <div class="grid" id="grid">
-        </div>
+    <div class="grid" id="grid"></div>
 
     <script>
-        let balance = parseFloat(localStorage.getItem('simba_balance')) || 0;
+        // --- AUTOMATIC BALANCE SYNC ---
+        let activeUserData = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = activeUserData ? parseFloat(activeUserData.balance) : 0.00;
+        
         let winningBox = -1;
         let gameActive = false;
 
         function updateUI() {
             document.getElementById('gameBalance').innerText = balance.toFixed(2) + " ETB";
-            localStorage.setItem('simba_balance', balance);
+            
+            // Save to Global Storage (Sync with Home Page)
+            if (activeUserData) {
+                activeUserData.balance = balance;
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUserData));
+                localStorage.setItem(`user_${activeUserData.phone}`, JSON.stringify(activeUserData));
+            }
         }
 
         function createGrid() {
@@ -72,16 +82,22 @@
         }
 
         function startGame() {
-            const bet = parseFloat(document.getElementById('betAmount').value);
-            if (balance < bet) return alert("Insufficient Balance!");
+            // Re-check balance from storage to prevent multi-tab cheating
+            activeUserData = JSON.parse(localStorage.getItem('simba_active_user'));
+            balance = activeUserData ? parseFloat(activeUserData.balance) : 0;
 
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            if (balance < bet) return alert("Insufficient Balance! Please deposit.");
+
+            // DEDUCT MONEY AUTOMATICALLY
             balance -= bet;
             updateUI();
             
             winningBox = Math.floor(Math.random() * 16) + 1;
             gameActive = true;
             createGrid();
-            document.getElementById('status').innerText = "Find the Hidden Prize!";
+            document.getElementById('status').innerText = "Find the Hidden Simba!";
+            document.getElementById('status').style.color = "white";
             document.getElementById('shuffleBtn').disabled = true;
         }
 
@@ -93,22 +109,36 @@
             const bet = parseFloat(document.getElementById('betAmount').value);
 
             if (num === winningBox) {
-                const win = bet * 12; // 12x Payout for finding the 1/16 box
+                const win = bet * 12; // 12x Payout
                 balance += win;
                 element.classList.add('win');
                 element.innerText = "🦁";
-                document.getElementById('status').innerText = "JACKPOT! YOU WON " + win + " ETB";
+                document.getElementById('status').innerText = "JACKPOT! WON " + win + " ETB";
+                document.getElementById('status').style.color = "#22c55e";
             } else {
                 element.innerText = "❌";
-                document.getElementById('status').innerText = "Try Again! The prize was in box " + winningBox;
+                document.getElementById('status').innerText = "LOSE! Simba was in Box " + winningBox;
+                document.getElementById('status').style.color = "#ef4444";
+                
+                // Highlight where the winning box actually was
+                const boxes = document.getElementsByClassName('box');
+                boxes[winningBox - 1].innerText = "🦁";
+                boxes[winningBox - 1].style.borderColor = "white";
             }
 
             updateUI();
             document.getElementById('shuffleBtn').disabled = false;
         }
 
-        createGrid();
-        updateUI();
+        // Initialize
+        window.onload = () => {
+            if (!activeUserData) {
+                alert("Please login first");
+                location.href = 'index.html';
+            }
+            createGrid();
+            updateUI();
+        };
     </script>
 </body>
 </html>
