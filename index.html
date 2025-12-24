@@ -1,13 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simba Bet</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div class="top-nav">
-        <div class="brand">
-            <span class="x-icon">X</span> SIMBA BET
+    <header class="top-nav">
+        <div class="brand-area">
+            <span class="x-logo">X</span> SIMBA BET
         </div>
         <div class="auth-buttons">
             <button class="btn-join">JOIN</button>
-            <button class="btn-dep">DEPOSIT</button>
+            <button class="btn-deposit">DEPOSIT</button>
         </div>
-    </div>
+    </header>
 
     <div class="hero-box">
         <img src="assets/assets/simba_bg.jpg" alt="Simba Lion" class="hero-image">
@@ -18,23 +26,33 @@
 
     <div class="games-grid">
         <div class="game-card" onclick="location.href='game.html'">
-            <img src="assets/assets/gold_7.jpg" class="game-icon">
+            <img src="assets/assets/gold_7.jpg" class="game-icon" alt="Multi Hot 5">
             <p>Multi Hot 5</p>
         </div>
-        
+
         <div class="game-card" onclick="location.href='keno.html'">
-            <div class="placeholder-icon" style="background:#003366; color:white;">KN6</div> 
+            <div class="placeholder-icon keno-icon">K6</div>
             <p>Keno</p>
         </div>
 
         <div class="game-card" onclick="location.href='sba.html'">
-            <div class="placeholder-icon" style="background:#660000; color:gold;">SBA</div>
+            <div class="placeholder-icon sba-icon">SBA</div>
             <p>SBA</p>
         </div>
-        
+
         <div class="game-card">
-             <div class="placeholder-icon" style="background:#000; border:1px solid gold;">♠♥</div>
+            <div class="placeholder-icon spin-icon">♠♥</div>
             <p>SpinBora</p>
+        </div>
+
+        <div class="game-card">
+            <img src="assets/assets/cherry.jpg" class="game-icon" alt="Fruit">
+            <p>Fruit Mania</p>
+        </div>
+
+        <div class="game-card">
+            <img src="assets/assets/melon.jpg" class="game-icon" alt="Hot Fruit">
+            <p>Hot Hot Fruit</p>
         </div>
     </div>
 
@@ -46,9 +64,10 @@
     </div>
 
     <div class="footer-balance">
-        <span>BALANCE: 10049.01 ETB</span>
-        <span>BET: 200.00</span>
+        <div class="bal-box">BALANCE: 10049.01 ETB</div>
+        <div class="bal-box">BET: 200.00</div>
     </div>
 
     <script src="script.js"></script>
 </body>
+</html>
