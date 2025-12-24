@@ -11,16 +11,15 @@ function registerUser() {
     if(!name || !phone || !pass) return showToast("Please fill all fields");
     if(localStorage.getItem('user_' + phone)) return showToast("User already exists");
 
-    const user = { name, phone, pass, balance: 0.00 };
+    const user = { name, phone, pass, balance: 0.00, id: Math.floor(1000 + Math.random() * 9000) };
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     
-    // Log them in immediately
+    // Log in and Notify Admin
     localStorage.setItem('simba_active_user', JSON.stringify(user));
-    showToast("Registration Successful!");
+    notifyAdmin(`🆕 <b>NEW REGISTRATION</b>\nName: ${name}\nPhone: ${phone}\nID: ${user.id}`, "reg", 0, phone);
     
-    // Close modal and refresh UI
-    if(typeof closeModal === 'function') closeModal('registerModal');
-    setTimeout(() => updateDisplay(), 1000);
+    showToast("Registration Successful!");
+    setTimeout(() => location.reload(), 1500);
 }
 
 function loginUser() {
@@ -32,18 +31,15 @@ function loginUser() {
 
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     showToast("Login Successful!");
-    
-    // Close modal and refresh UI
-    if(typeof closeModal === 'function') closeModal('loginModal');
-    setTimeout(() => updateDisplay(), 1000);
+    setTimeout(() => location.reload(), 1000);
 }
 
 function logout() {
     localStorage.removeItem('simba_active_user');
-    location.reload(); // Refresh to show login buttons again
+    location.reload();
 }
 
-// --- 2. UI SYNCING (Matches your index.html IDs) ---
+// --- 2. UI & BALANCE SYSTEM ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
     
@@ -52,31 +48,29 @@ function updateDisplay() {
     const headerBal = document.getElementById('headerBalance');
     const menuName = document.getElementById('menuUserName');
     const menuBtn = document.getElementById('menuToggleBtn');
+    const footerID = document.getElementById('displayUserID');
 
     if (activeUser) {
-        // User is logged in: Show balance and menu, hide login buttons
-        if(authSection) authSection.style.display = 'none';
+        // HIDE login/reg buttons and SHOW ID
+        if(authSection) {
+            authSection.innerHTML = `<span style="color:#fbbf24; font-weight:bold; font-size:14px;">ID: ${activeUser.id || 'N/A'}</span>`;
+        }
         if(balanceArea) balanceArea.style.display = 'flex';
         if(menuBtn) menuBtn.style.display = 'block';
         if(menuName) menuName.innerText = activeUser.name;
         if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-        
-        // Update game page balance if on a game page
-        const gameBal = document.getElementById('gameBalance') || document.getElementById('gameBal');
-        if(gameBal) gameBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-    } else {
-        // User is logged out: Show login buttons, hide balance
-        if(authSection) authSection.style.display = 'flex';
-        if(balanceArea) balanceArea.style.display = 'none';
-        if(menuBtn) menuBtn.style.display = 'none';
+        if(footerID) footerID.innerText = activeUser.id;
     }
 }
 
-// --- 3. NOTIFICATIONS & WATCHER ---
+// --- 3. BOT NOTIFICATIONS (For Deposit/Withdrawal) ---
 function notifyAdmin(message, type, amount, phone) {
+    // This format must match your Google Script: confirm_type_amount_phone
+    const callbackData = `confirm_${type}_${amount}_${phone}`;
+    
     const inlineKeyboard = {
         inline_keyboard: [[
-            { text: "✅ APPROVE", callback_data: `confirm_${type}_${amount}_${phone}` },
+            { text: "✅ APPROVE", callback_data: callbackData },
             { text: "❌ REJECT", callback_data: `reject_${type}_${amount}_${phone}` }
         ]]
     };
@@ -90,14 +84,14 @@ function notifyAdmin(message, type, amount, phone) {
             parse_mode: 'HTML',
             reply_markup: inlineKeyboard
         })
-    }).catch(err => console.log("Telegram Error:", err));
+    });
 }
 
+// --- 4. UTILITIES ---
 function startBalanceWatcher() {
     setInterval(() => {
         const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
         if (!activeUser) return;
-
         const globalUser = JSON.parse(localStorage.getItem(`user_${activeUser.phone}`));
         if (globalUser && globalUser.balance !== activeUser.balance) {
             activeUser.balance = globalUser.balance;
@@ -107,7 +101,6 @@ function startBalanceWatcher() {
     }, 3000);
 }
 
-// --- 4. UTILITIES ---
 function showToast(msg) {
     let toast = document.getElementById('toast');
     if (!toast) {
@@ -120,7 +113,6 @@ function showToast(msg) {
     setTimeout(() => { toast.className = "toast-hidden"; }, 3000);
 }
 
-// Initialize
 window.onload = () => {
     updateDisplay();
     startBalanceWatcher();
