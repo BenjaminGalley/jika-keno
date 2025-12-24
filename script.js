@@ -1,18 +1,56 @@
-// SIMBA BET CORE ENGINE
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJR101WlDBmvIyQAhBhAwrnvhDMg-w0BV-dL3wEQqtlnLLqtThJKJJA7YrUd8zMB8y/exec";
+// CONFIGURATION
+const ADMIN_CHAT_ID = "6688537446"; 
 const BOT_TOKEN = "8048151095:AAHHJfE21m9JIcGTNOLDzvG81MfWWM16TJ0Y";
-const ADMIN_CHAT_ID = "6688537446";
 
-// 1. UPDATE DISPLAY & SYNC BALANCE
+// --- 1. USER AUTHENTICATION ---
+function registerUser() {
+    const name = document.getElementById('regName').value;
+    const phone = document.getElementById('regPhone').value;
+    const pass = document.getElementById('regPass').value;
+
+    if(!name || !phone || !pass) return showToast("Please fill all fields");
+    if(localStorage.getItem('user_' + phone)) return showToast("User already exists");
+
+    const user = { name, phone, pass, balance: 0.00 };
+    localStorage.setItem('user_' + phone, JSON.stringify(user));
+    
+    // Log them in immediately
+    localStorage.setItem('simba_active_user', JSON.stringify(user));
+    showToast("Registration Successful!");
+    setTimeout(() => location.href = 'index.html', 1500);
+}
+
+function loginUser() {
+    const phone = document.getElementById('loginPhone').value;
+    const pass = document.getElementById('loginPass').value;
+    const user = JSON.parse(localStorage.getItem('user_' + phone));
+
+    if (!user || user.pass !== pass) return showToast("Invalid Phone or Password");
+
+    localStorage.setItem('simba_active_user', JSON.stringify(user));
+    location.href = 'index.html';
+}
+
+function logout() {
+    localStorage.removeItem('simba_active_user');
+    location.href = 'login.html';
+}
+
+// --- 2. BALANCE SYSTEM & NOTIFICATIONS ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
     const balEl = document.getElementById('balanceAmount') || document.getElementById('gameBalance');
-    if (activeUser && balEl) {
-        balEl.innerText = parseFloat(activeUser.balance).toFixed(2);
+    
+    if (activeUser) {
+        // Sync header name if exists
+        const nameEl = document.getElementById('userName');
+        if(nameEl) nameEl.innerText = activeUser.name;
+        
+        // Update balance text
+        if (balEl) balEl.innerText = parseFloat(activeUser.balance).toFixed(2);
     }
 }
 
-// 2. SEND NOTIFICATION TO ADMIN BOT
 function notifyAdmin(message, type, amount, phone) {
     const inlineKeyboard = {
         inline_keyboard: [[
@@ -30,22 +68,17 @@ function notifyAdmin(message, type, amount, phone) {
             parse_mode: 'HTML',
             reply_markup: inlineKeyboard
         })
-    }).then(res => res.json()).then(data => {
-        console.log("Admin notified:", data);
-    });
+    }).catch(err => console.log("Telegram Error:", err));
 }
 
-// 3. AUTOMATIC BALANCE WATCHER (Checks every 3 seconds)
+// Check for balance updates every 3 seconds
 function startBalanceWatcher() {
     setInterval(() => {
         const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
         if (!activeUser) return;
 
-        // Check the individual user storage for changes made by the system
         const globalUser = JSON.parse(localStorage.getItem(`user_${activeUser.phone}`));
-        
         if (globalUser && globalUser.balance !== activeUser.balance) {
-            console.log("Balance change detected! Syncing...");
             activeUser.balance = globalUser.balance;
             localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
             updateDisplay();
@@ -53,18 +86,20 @@ function startBalanceWatcher() {
     }, 3000);
 }
 
-// 4. TOAST NOTIFICATIONS
+// --- 3. UTILITIES ---
 function showToast(msg) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-        toast.innerText = msg;
-        toast.className = "toast-visible";
-        setTimeout(() => { toast.className = "toast-hidden"; }, 3000);
-    } else {
-        alert(msg);
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        document.body.appendChild(toast);
     }
+    toast.innerText = msg;
+    toast.className = "toast-visible";
+    setTimeout(() => { toast.className = "toast-hidden"; }, 3000);
 }
 
+// Initialize
 window.onload = () => {
     updateDisplay();
     startBalanceWatcher();
