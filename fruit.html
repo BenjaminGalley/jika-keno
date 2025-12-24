@@ -4,105 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fruit Mania | Simba Bet</title>
-    <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #111; color: white; text-align: center; }
-        .slot-machine { background: #222; padding: 20px; border: 2px solid gold; border-radius: 15px; margin: 20px auto; max-width: 400px; }
-        .reels { display: flex; justify-content: space-around; margin: 20px 0; background: black; padding: 10px; border-radius: 10px; }
-        .reel { font-size: 50px; }
-        .spin-btn { background: gold; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer; width: 100%; }
-        .spin-btn:disabled { background: #555; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; }
+        body { 
+            background: var(--bg) url('assets/assets/bg.jpg.jpeg') no-repeat center center fixed; 
+            background-size: cover; color: white; font-family: sans-serif; margin: 0; padding: 10px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        .top-bar { width: 100%; display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); }
+        .balance-box { color: var(--gold); font-weight: bold; border: 1px solid var(--gold); padding: 5px 15px; border-radius: 5px; }
+
+        /* MAIN GAME AREA */
+        .game-grid { 
+            display: flex; gap: 15px; margin-top: 20px; padding: 20px;
+            background: rgba(0,0,0,0.85) url('assets/assets/grid_3x3.jpg') no-repeat center;
+            background-size: contain; border: 3px solid var(--gold); border-radius: 15px;
+        }
+
+        /* SIDE MULTIPLIER IMAGE */
+        .side-multiplier { width: 100px; border-radius: 8px; border: 1px solid #444; }
+
+        /* THE REELS */
+        .reels-container { display: flex; gap: 10px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; }
+        .symbol-box { 
+            width: 80px; height: 80px; background: white; border-radius: 8px; 
+            overflow: hidden; border: 2px solid var(--gold);
+        }
+        .symbol-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.1s; }
+
+        /* CONTROLS */
+        .controls { margin-top: 20px; text-align: center; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 15px; width: 90%; max-width: 400px; }
+        .spin-btn { 
+            background: linear-gradient(180deg, #fbbf24, #d97706); border: none; 
+            padding: 15px 60px; font-size: 24px; font-weight: bold; border-radius: 50px; 
+            cursor: pointer; box-shadow: 0 4px 0 #92400e; width: 100%;
+        }
+        .spin-btn:active { transform: translateY(4px); box-shadow: none; }
+        .spin-btn:disabled { background: #444; color: #888; box-shadow: none; }
+
+        #status { height: 30px; margin: 10px 0; color: #2ecc71; font-weight: bold; font-size: 20px; }
+        .blur { filter: blur(4px); transform: scale(0.9); }
     </style>
 </head>
 <body>
-    <div style="padding: 10px; display:flex; justify-content:space-between; align-items:center;">
-        <button onclick="location.href='index.html'" style="background:none; border:none; color:gold; font-size:24px;">←</button>
-        <div style="color:gold; font-weight:bold;">BAL: <span id="gameBalance">0.00</span> ETB</div>
+
+    <div class="top-bar">
+        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 15px; font-weight:bold; border-radius:5px; cursor:pointer;">LOBBY</button>
+        <div class="balance-box">BAL: <span id="gameBal">0.00</span> ETB</div>
     </div>
 
-    <div class="slot-machine">
-        <h2 style="color:gold; margin:0;">FRUIT MANIA</h2>
-        <div class="reels">
-            <div class="reel" id="r1">🍒</div>
-            <div class="reel" id="r2">🍒</div>
-            <div class="reel" id="r3">🍒</div>
-        </div>
-        
-        <div style="margin: 15px 0;">
-            <label>BET:</label>
-            <select id="betAmount" style="padding: 5px; background: #333; color: white; border: 1px solid gold;">
-                <option value="10">10 ETB</option>
-                <option value="20">20 ETB</option>
-                <option value="50">50 ETB</option>
-            </select>
-        </div>
+    <div class="game-grid">
+        <img src="assets/assets/multiplier.jpg" class="side-multiplier" alt="Payouts">
 
-        <div id="status" style="height:25px; color:#2ecc71; font-weight:bold;"></div>
+        <div class="reels-container">
+            <div class="symbol-box"><img id="r1" src="assets/assets/gold_7.jpg"></div>
+            <div class="symbol-box"><img id="r2" src="assets/assets/gold_7.jpg"></div>
+            <div class="symbol-box"><img id="r3" src="assets/assets/gold_7.jpg"></div>
+        </div>
+    </div>
+
+    <div id="status"></div>
+
+    <div class="controls">
+        <select id="betAmount" style="padding:10px; width:100%; margin-bottom:15px; background:#111; color:var(--gold); border:1px solid var(--gold); border-radius:5px;">
+            <option value="10">BET: 10 ETB</option>
+            <option value="50">BET: 50 ETB</option>
+            <option value="100">BET: 100 ETB</option>
+        </select>
         <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
 
     <script>
-        const symbols = ['🍒', '🍋', '🍉', '⭐', '💎', '7️⃣'];
-        
+        // MATCHING GITHUB ASSET NAMES
+        const symbols = [
+            { id: 'gold_7', img: 'assets/assets/gold_7.jpg', mult: 50 },
+            { id: 'diamond', img: 'assets/assets/diamond.jpg', mult: 20 },
+            { id: 'grapes', img: 'assets/assets/grapes.jpg', mult: 10 },
+            { id: 'lemon', img: 'assets/assets/lemon.jpg', mult: 5 },
+            { id: 'melon', img: 'assets/assets/melon.jpg', mult: 5 },
+            { id: 'orange', img: 'assets/assets/orange.jpg', mult: 2 },
+            { id: 'cherry', img: 'assets/assets/cherry.jpg', mult: 2 }
+        ];
+
+        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+
         function updateUI() {
-            const user = JSON.parse(localStorage.getItem('simba_active_user'));
-            if(user) document.getElementById('gameBalance').innerText = parseFloat(user.balance).toFixed(2);
-            else location.href = 'index.html';
+            activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+            if(activeUser) document.getElementById('gameBal').innerText = parseFloat(activeUser.balance).toFixed(2);
         }
 
         function spin() {
-            let user = JSON.parse(localStorage.getItem('simba_active_user'));
             const bet = parseInt(document.getElementById('betAmount').value);
-            
-            if(user.balance < bet) return alert("Insufficient Balance");
-            
-            // 1. Deduct Money
-            user.balance -= bet;
-            saveUser(user);
+            if(!activeUser || activeUser.balance < bet) return alert("Insufficient Balance!");
+
+            // Deduct Balance
+            activeUser.balance -= bet;
+            saveState();
             updateUI();
 
-            // 2. Animate
             const btn = document.getElementById('spinBtn');
+            const reels = [document.getElementById('r1'), document.getElementById('r2'), document.getElementById('r3')];
             btn.disabled = true;
             document.getElementById('status').innerText = "";
-            
-            let spins = 0;
-            const interval = setInterval(() => {
-                document.getElementById('r1').innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                document.getElementById('r2').innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                document.getElementById('r3').innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                spins++;
-                if(spins > 10) {
-                    clearInterval(interval);
-                    checkWin(user, bet);
+
+            let count = 0;
+            const timer = setInterval(() => {
+                reels.forEach(r => {
+                    r.classList.add('blur');
+                    r.src = symbols[Math.floor(Math.random() * symbols.length)].img;
+                });
+                count++;
+
+                if(count > 12) {
+                    clearInterval(timer);
+                    reels.forEach(r => r.classList.remove('blur'));
+                    calculateWin(bet);
                     btn.disabled = false;
                 }
             }, 100);
         }
 
-        function checkWin(user, bet) {
-            const r1 = document.getElementById('r1').innerText;
-            const r2 = document.getElementById('r2').innerText;
-            const r3 = document.getElementById('r3').innerText;
+        function calculateWin(bet) {
+            // Randomly pick final icons
+            const res = [
+                symbols[Math.floor(Math.random() * symbols.length)],
+                symbols[Math.floor(Math.random() * symbols.length)],
+                symbols[Math.floor(Math.random() * symbols.length)]
+            ];
 
-            if(r1 === r2 && r2 === r3) {
-                const win = bet * 10;
-                user.balance += win;
-                saveUser(user);
+            // Set final images
+            document.getElementById('r1').src = res[0].img;
+            document.getElementById('r2').src = res[1].img;
+            document.getElementById('r3').src = res[2].img;
+
+            // Check for 3 matching
+            if(res[0].id === res[1].id && res[1].id === res[2].id) {
+                const win = bet * res[0].mult;
+                activeUser.balance += win;
+                saveState();
                 updateUI();
-                document.getElementById('status').innerText = `WIN! +${win} ETB`;
-            } else if(r1 === r2 || r2 === r3 || r1 === r3) {
-                 const win = bet * 2;
-                 user.balance += win;
-                 saveUser(user);
-                 updateUI();
-                 document.getElementById('status').innerText = `SMALL WIN! +${win} ETB`;
+                document.getElementById('status').innerText = "JACKPOT! +" + win + " ETB";
+            } 
+            // Check for 2 matching
+            else if(res[0].id === res[1].id || res[1].id === res[2].id || res[0].id === res[2].id) {
+                const win = bet * 2;
+                activeUser.balance += win;
+                saveState();
+                updateUI();
+                document.getElementById('status').innerText = "WIN! +" + win + " ETB";
             }
         }
 
-        function saveUser(user) {
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
-            localStorage.setItem('user_' + user.phone, JSON.stringify(user));
+        function saveState() {
+            localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+            localStorage.setItem(`user_${activeUser.phone}`, JSON.stringify(activeUser));
         }
 
         window.onload = updateUI;
