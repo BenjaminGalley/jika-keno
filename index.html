@@ -2,73 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Multi Hot 5 - Ethiopia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Bet</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="main-nav">
-        <div id="menu-open">☰</div>
-        <div class="logo">SLOT-ET</div>
-        <div class="auth-section">
-            <button class="join-btn" onclick="openModal('reg')">JOIN</button>
-            <button class="dep-btn" onclick="openModal('dep')">DEPOSIT</button>
+    <header class="top-nav">
+        <div class="logo-area">
+            <span class="x-logo">X</span> SIMBA BET
+        </div>
+        <div class="nav-buttons">
+            <button class="btn-join">JOIN</button>
+            <button class="btn-deposit">DEPOSIT</button>
         </div>
     </header>
 
-    <div id="side-menu" class="side-menu">
-        <div class="side-header">MENU <span id="menu-close">×</span></div>
-        <nav>
-            <a href="#" onclick="alert('Profile coming soon')">My Profile</a>
-            <a href="#" onclick="openModal('withdraw')">Withdraw (Telebirr)</a>
-            <a href="#" onclick="alert('Mini Games coming soon')">Mini Games</a>
-            <a href="#">Transaction History</a>
-        </nav>
-    </div>
-
-    <div id="entry-screen">
-        <div class="entry-card">
-            <h1 class="game-title">MULTI<br>HOT 5</h1>
-            <button id="start-btn">CONTINUE</button>
-            <div class="balance-status">BALANCE: 10049.01 ETB</div>
+    <main class="lobby-container">
+        <div class="hero-section">
+            <img src="assets/simba_bg.jpg" alt="Simba" class="hero-lion">
+            <h2 class="section-title">Games</h2>
         </div>
-    </div>
 
-    <div id="modal-overlay" class="modal-overlay">
-        <div id="reg-modal" class="modal-box">
-            <h3>Create Account</h3>
-            <input type="text" placeholder="Phone Number (09...)">
-            <input type="password" placeholder="Password">
-            <button class="action-btn">Register</button>
-            <button class="close-btn" onclick="closeModal()">Back</button>
-        </div>
-        <div id="dep-modal" class="modal-box">
-            <h3>Deposit ETB</h3>
-            <input type="number" placeholder="Amount">
-            <button class="action-btn">Pay with Telebirr</button>
-            <button class="close-btn" onclick="closeModal()">Back</button>
-        </div>
-    </div>
-
-    <div class="game-viewport">
-        <div class="game-container">
-            <div class="multiplier-window">
-                <div id="multiplier-reel" class="reel-strip"></div>
+        <div class="games-grid">
+            <div class="game-box" onclick="location.href='keno.html'">
+                <div class="game-img"><img src="assets/keno_icon.jpg" alt="Keno"></div>
+                <p>Keno</p>
             </div>
-            <div class="grid-area">
-                <div class="reel" id="reel1"></div>
-                <div class="reel" id="reel2"></div>
-                <div class="reel" id="reel3"></div>
+            <div class="game-box" onclick="location.href='sba.html'">
+                <div class="game-img"><img src="assets/sba_icon.jpg" alt="SBA"></div>
+                <p>SBA</p>
             </div>
-            <div class="ui-panel">
-                <div class="stat-tag">BALANCE: <span id="balance">10049.01</span> ETB</div>
-                <button id="spin-button">SPIN</button>
-                <div class="stat-tag">BET: 200.00 ETB</div>
+            <div class="game-box" onclick="location.href='slot.html'">
+                <div class="game-img"><img src="assets/gold_7.jpg" alt="Multi Hot 5"></div>
+                <p>Multi Hot 5</p>
+            </div>
+            <div class="game-box placeholder">
+                <div class="game-img"><span>Coming Soon</span></div>
+            </div>
+            <div class="game-box placeholder">
+                <div class="game-img"><span>Coming Soon</span></div>
+            </div>
+            <div class="game-box placeholder">
+                <div class="game-img"><span>Coming Soon</span></div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div id="win-overlay" class="hidden"></div>
-    <script src="script.js"></script>
+    <footer class="bottom-bar">
+        <div class="stat">BALANCE: 10049.01 ETB</div>
+        <div class="stat">BET: 200.00 ETB</div>
+    </footer>
 </body>
 </html>
