@@ -1,107 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-  <title>Register | Simba Bet</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Simba Bet</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-<body style="background:#0b0d17;color:white;text-align:center;font-family:sans-serif;">
-
-  <div style="margin-top:50px;padding:20px;">
-    <h2 style="color:#fbbf24;">CREATE ACCOUNT</h2>
-
-    <div style="
-      display:flex;
-      flex-direction:column;
-      gap:15px;
-      max-width:300px;
-      margin:auto;
-    ">
-
-      <input
-        type="text"
-        id="regName"
-        placeholder="Full Name"
-        style="padding:12px;border-radius:5px;border:1px solid #fbbf24;background:#1a1d29;color:white;"
-      >
-
-      <input
-        type="number"
-        id="regPhone"
-        placeholder="Phone Number"
-        style="padding:12px;border-radius:5px;border:1px solid #fbbf24;background:#1a1d29;color:white;"
-      >
-
-      <input
-        type="password"
-        id="regPass"
-        placeholder="Create Password"
-        style="padding:12px;border-radius:5px;border:1px solid #fbbf24;background:#1a1d29;color:white;"
-      >
-
-      <button
-        onclick="requestRegister()"
-        style="padding:15px;background:#22c55e;color:white;border:none;border-radius:5px;font-weight:bold;cursor:pointer;"
-      >
-        REQUEST ACCOUNT
-      </button>
-
-      <p>
-        Already have an account?
-        <a href="login.html" style="color:#fbbf24;">Login Here</a>
-      </p>
-
+<body style="background: #0b0d17; color: white; text-align: center; font-family: sans-serif;">
+    <div style="margin-top: 50px; padding: 20px;">
+        <h2 style="color: #fbbf24;">CREATE ACCOUNT</h2>
+        <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: auto;">
+            <input type="text" id="regName" placeholder="Full Name" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
+            <input type="number" id="regPhone" placeholder="Phone Number" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
+            <input type="password" id="regPass" placeholder="Create Password" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
+            <button onclick="registerUser()" style="padding: 15px; background: #22c55e; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">CREATE ACCOUNT</button>
+            <p>Already have an account? <a href="login.html" style="color: #fbbf24;">Login Here</a></p>
+        </div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
-
-  <script>
-    function requestRegister() {
-
-      const name = document.getElementById("regName").value;
-      const phone = document.getElementById("regPhone").value;
-      const pass = document.getElementById("regPass").value;
-
-      if (!name || !phone || !pass) {
-        alert("Please fill all fields");
-        return;
-      }
-
-      // ❗ DO NOT REGISTER YET
-      // ❗ WAIT FOR ADMIN APPROVAL
-
-      const details = "New registration request";
-
-      notifyAdmin(
-        details,
-        "Register",
-        0,
-        phone,
-        name
-      );
-
-      // TEMP save pending data (until approval logic is added later)
-      const pendingUser = {
-        name: name,
-        phone: phone,
-        pass: pass
-      };
-
-      localStorage.setItem(
-        "pending_register_" + phone,
-        JSON.stringify(pendingUser)
-      );
-
-      alert("Registration request sent. Waiting for admin approval.");
-      location.href = "login.html";
-    }
-  </script>
-
+    <script src="script.js"></script>
+    <script>
+        // Check if pending registration has been approved
+        window.onload = () => {
+            const pendingKeys = Object.keys(localStorage).filter(k => k.startsWith('pending_register_'));
+            pendingKeys.forEach(k => {
+                const pendingUser = JSON.parse(localStorage.getItem(k));
+                const userData = JSON.parse(localStorage.getItem('user_' + pendingUser.phone));
+                if (userData) {
+                    // Approved! Move from pending to active
+                    localStorage.setItem('simba_active_user', JSON.stringify(userData));
+                    localStorage.removeItem(k);
+                    alert(`🎉 Registration Approved! Welcome, ${userData.name}`);
+                    location.href = 'index.html';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
