@@ -1,8 +1,21 @@
 // SIMBA BET - MASTER WEBSITE SCRIPT
-// This URL matches the one shown in your Google Script screenshot
 const scriptURL = 'https://script.google.com/macros/s/AKfycbzs7hBnR1cqyIts0jrh_6E863BvYjxeDwwFGTgHajzbK3pP_cB_FOPuLK6MMkuA5OpDgQ/exec';
 
-// --- 1. USER AUTHENTICATION ---
+// --- 1. THE CONNECTION BRIDGE ---
+async function notifyAdmin(message, type, amount, phone) {
+    // Construct the URL with parameters for the Google Script doGet(e) function
+    const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(message)}`;
+    
+    try {
+        // Use 'no-cors' to bypass browser security blocks on mobile devices
+        await fetch(finalURL, { mode: 'no-cors' });
+        console.log("Notification request sent.");
+    } catch (error) {
+        console.error("Error sending notification:", error);
+    }
+}
+
+// --- 2. USER AUTHENTICATION ---
 function registerUser() {
     const name = document.getElementById('regName').value;
     const phone = document.getElementById('regPhone').value.toString();
@@ -14,8 +27,7 @@ function registerUser() {
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    // Notify Admin via Telegram
-    notifyAdmin(`New Registration: ${name}`, 'register', 0, phone);
+    notifyAdmin(`New User Registration: ${name}`, 'register', 0, phone);
     
     alert("Registration Successful!");
     setTimeout(() => location.reload(), 1000);
@@ -33,17 +45,6 @@ function loginUser() {
     setTimeout(() => location.reload(), 1000);
 }
 
-// --- 2. THE CONNECTION BRIDGE ---
-async function notifyAdmin(message, type, amount, phone) {
-    const finalURL = `${scriptURL}?action=${type}&user=${phone}&amt=${amount}&ref=${encodeURIComponent(message)}`;
-    
-    // We use 'no-cors' mode so your phone browser doesn't block the request
-    fetch(finalURL, { mode: 'no-cors' })
-    .then(() => console.log("Data sent to Google Script"))
-    .catch(err => console.error("Connection Error:", err));
-}
-
-// --- 3. UI DISPLAY ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
     const authSection = document.getElementById('auth-section');
