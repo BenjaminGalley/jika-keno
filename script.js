@@ -8,11 +8,8 @@ const scriptURL = 'https://script.google.com/macros/s/AKfycby6hEBXA4DZPU3hoWEWW0
 // --- 2. SEND NOTIFICATIONS TO ADMIN (Deposit / Withdraw / Register) ---
 async function notifyAdmin(details, type, amount, phone, name) {
   const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(details)}&name=${encodeURIComponent(name)}`;
-  
-  // Using Image ping to avoid CORS issues on mobile
   const ping = new Image();
   ping.src = finalURL;
-
   console.log(`${type} Notification Sent to Admin: ${name} - ${phone} - ${amount}`);
 }
 
@@ -23,13 +20,8 @@ function registerUser() {
   const pass = document.getElementById('regPass').value;
 
   if(!name || !phone || !pass) return alert("Please fill all fields");
-  
-  if(localStorage.getItem('user_' + phone)) {
-      alert("Phone already registered");
-      return;
-  }
+  if(localStorage.getItem('user_' + phone)) return alert("Phone already registered");
 
-  // ❗ TEMPORARY: do not create user yet, admin must approve
   const pendingUser = { 
       name: name, 
       phone: phone, 
@@ -37,9 +29,8 @@ function registerUser() {
       balance: 0.00, 
       id: Math.floor(1000 + Math.random() * 9000) 
   };
-  localStorage.setItem('pending_register_' + phone, JSON.stringify(pendingUser));
 
-  // Notify admin
+  localStorage.setItem('pending_register_' + phone, JSON.stringify(pendingUser));
   notifyAdmin(`New registration request`, 'Register', 0, phone, name);
 
   alert("Registration request sent! Waiting for admin approval.");
@@ -51,10 +42,7 @@ function loginUser() {
   const pass = document.getElementById('loginPass').value;
   const user = JSON.parse(localStorage.getItem('user_' + phone));
 
-  if (!user || user.pass !== pass) {
-      alert("Invalid Phone or Password");
-      return;
-  }
+  if (!user || user.pass !== pass) return alert("Invalid Phone or Password");
 
   localStorage.setItem('simba_active_user', JSON.stringify(user));
   alert("Login Successful!");
@@ -92,9 +80,8 @@ function processDeposit() {
   if(amount < 100 || amount > 10000) return alert("Limit: 100 - 10,000 ETB");
 
   const details = `Method: ${method}, Paid from: ${phone}`;
-  
   notifyAdmin(details, 'Deposit', amount, user.phone, user.name);
-  
+
   alert("Request sent to Admin! Your balance will update once approved.");
   window.location.href = 'index.html';
 }
@@ -106,26 +93,28 @@ function processWithdraw() {
   const amount = Number(document.getElementById('wdAmount').value);
   const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
-  if (!user) {
-    alert("Please login first");
-    return;
-  }
-  if (!receivePhone || !amount) {
-    alert("Fill all fields");
-    return;
-  }
-  if (amount < 100) {
-    alert("Minimum withdrawal is 100 ETB");
-    return;
-  }
-  if (amount > user.balance) {
-    alert("Insufficient balance");
-    return;
-  }
+  if (!user) return alert("Please login first");
+  if (!receivePhone || !amount) return alert("Fill all fields");
+  if (amount < 100) return alert("Minimum withdrawal is 100 ETB");
+  if (amount > user.balance) return alert("Insufficient balance");
 
   const details = `Method: ${method}, Send to: ${receivePhone}`;
   notifyAdmin(details, 'Withdraw', amount, user.phone, user.name);
 
   alert("Withdrawal request sent. Waiting for admin approval.");
   window.location.href = 'index.html';
+}
+
+// --- 7. UPDATE LOCAL BALANCE AFTER APPROVAL ---
+function updateLocalBalance(phone, newBalance) {
+  const userKey = 'user_' + phone;
+  let user = JSON.parse(localStorage.getItem(userKey));
+  if(user) {
+      user.balance = newBalance;
+      localStorage.setItem(userKey, JSON.stringify(user));
+      const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+      if(activeUser && activeUser.phone === phone) {
+          localStorage.setItem('simba_active_user', JSON.stringify(user));
+      }
+  }
 }
