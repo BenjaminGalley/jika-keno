@@ -1,18 +1,21 @@
 // SIMBA BET - MASTER WEBSITE SCRIPT
-// Updated with your latest URL: ...l4lYEA/exec
+// URL: ...l4lYEA/exec
 const scriptURL = 'https://script.google.com/macros/s/AKfycbwczhI7YENmFO1KjvHkp_rTe5F1qxrHSkU1JdBzneyad3yFzEtAyjuk69XxeTxxl4lYEA/exec';
 
-// --- 1. THE CONNECTION BRIDGE ---
+// --- 1. THE CONNECTION BRIDGE (Fixed for Deposit) ---
 async function notifyAdmin(message, type, amount, phone) {
+    // Construct the URL exactly as the Google Script expects
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(message)}`;
     
-    // Using Image Ping for the most reliable delivery on mobile browsers
+    // We use the Image object to "ping" the URL. 
+    // This is the fastest way to send data without getting blocked by mobile security.
     const ping = new Image();
     ping.src = finalURL;
-    console.log("Notification sent to Telegram Bot");
+    
+    console.log("Deposit Notification Sent to Bot");
 }
 
-// --- 2. USER AUTHENTICATION (BACK TO INSTANT REGISTRATION) ---
+// --- 2. USER AUTHENTICATION ---
 function registerUser() {
     const name = document.getElementById('regName').value;
     const phone = document.getElementById('regPhone').value.toString();
@@ -20,13 +23,11 @@ function registerUser() {
 
     if(!name || !phone || !pass) return alert("Please fill all fields");
     
-    // Check if user already exists
     if(localStorage.getItem('user_' + phone)) {
-        alert("This phone number is already registered.");
+        alert("Phone already registered");
         return;
     }
 
-    // 1. Create the user object (Like yesterday)
     const user = { 
         name: name, 
         phone: phone, 
@@ -35,14 +36,13 @@ function registerUser() {
         id: Math.floor(1000 + Math.random() * 9000) 
     };
 
-    // 2. Save to local database immediately
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    // 3. Notify the Bot (Registration)
-    notifyAdmin(`New User Joined: ${name} (ID: ${user.id})`, 'Register', 0, phone);
+    // Notify bot of new registration
+    notifyAdmin(`New User: ${name}`, 'Register', 0, phone);
     
-    alert("Registration Successful! Welcome to Simba Bet.");
+    alert("Registration Successful!");
     setTimeout(() => { location.reload(); }, 1000);
 }
 
@@ -51,13 +51,8 @@ function loginUser() {
     const pass = document.getElementById('loginPass').value;
     const user = JSON.parse(localStorage.getItem('user_' + phone));
 
-    if (!user) {
-        alert("Account not found. Please register first.");
-        return;
-    }
-    
-    if (user.pass !== pass) {
-        alert("Invalid Password");
+    if (!user || user.pass !== pass) {
+        alert("Invalid Phone or Password");
         return;
     }
 
