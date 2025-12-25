@@ -1,6 +1,5 @@
 // CONFIGURATION
-const ADMIN_CHAT_ID = "6688537446"; 
-const BOT_TOKEN = "8048151095:AAHHJfE21m9JIcGTNOLDzvG81MfWWM16TJ0Y";
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyCX6a4vLxXWApuA--xNy36blAowdmgJS8KuHkrsUNciQAP1-XKdbfAVLlM-N7JneCl/exec';
 
 // --- 1. USER AUTHENTICATION ---
 function registerUser() {
@@ -14,9 +13,11 @@ function registerUser() {
     const user = { name, phone, pass, balance: 0.00, id: Math.floor(1000 + Math.random() * 9000) };
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     
-    // Log in and Notify Admin
+    // Log in locally
     localStorage.setItem('simba_active_user', JSON.stringify(user));
-    notifyAdmin(`🆕 <b>NEW REGISTRATION</b>\nName: ${name}\nPhone: ${phone}\nID: ${user.id}`, "reg", 0, phone);
+    
+    // SEND TO GOOGLE SCRIPT & BOT
+    sendToGoogle('register', phone, 0, `New User: ${name} (ID: ${user.id})`);
     
     showToast("Registration Successful!");
     setTimeout(() => location.reload(), 1500);
@@ -34,86 +35,43 @@ function loginUser() {
     setTimeout(() => location.reload(), 1000);
 }
 
-function logout() {
-    localStorage.removeItem('simba_active_user');
-    location.reload();
-}
-
-// --- 2. UI & BALANCE SYSTEM ---
-function updateDisplay() {
-    const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-    
-    const authSection = document.getElementById('auth-section');
-    const balanceArea = document.getElementById('topBalanceArea');
-    const headerBal = document.getElementById('headerBalance');
-    const menuName = document.getElementById('menuUserName');
-    const menuBtn = document.getElementById('menuToggleBtn');
-    const footerID = document.getElementById('displayUserID');
-
-    if (activeUser) {
-        // HIDE login/reg buttons and SHOW ID
-        if(authSection) {
-            authSection.innerHTML = `<span style="color:#fbbf24; font-weight:bold; font-size:14px;">ID: ${activeUser.id || 'N/A'}</span>`;
+// --- 2. THE CONNECTION BRIDGE (Google Script) ---
+async function sendToGoogle(action, user, amt, detail) {
+    const url = `${scriptURL}?action=${action}&user=${user}&amt=${amt}&ref=${detail}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.status === 'success') {
+            console.log("Admin notified via Google/Telegram");
         }
-        if(balanceArea) balanceArea.style.display = 'flex';
-        if(menuBtn) menuBtn.style.display = 'block';
-        if(menuName) menuName.innerText = activeUser.name;
-        if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-        if(footerID) footerID.innerText = activeUser.id;
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
 
-// --- 3. BOT NOTIFICATIONS (For Deposit/Withdrawal) ---
-function notifyAdmin(message, type, amount, phone) {
-    // This format must match your Google Script: confirm_type_amount_phone
-    const callbackData = `confirm_${type}_${amount}_${phone}`;
+// Call this function when someone clicks "Deposit"
+function handleDeposit(amount, reference) {
+    const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+    if (!activeUser) return showToast("Please login first");
     
-    const inlineKeyboard = {
-        inline_keyboard: [[
-            { text: "✅ APPROVE", callback_data: callbackData },
-            { text: "❌ REJECT", callback_data: `reject_${type}_${amount}_${phone}` }
-        ]]
-    };
-
-    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            chat_id: ADMIN_CHAT_ID,
-            text: message,
-            parse_mode: 'HTML',
-            reply_markup: inlineKeyboard
-        })
-    });
+    sendToGoogle('deposit', activeUser.phone, amount, reference);
+    showToast("Deposit request sent!");
 }
 
-// --- 4. UTILITIES ---
-function startBalanceWatcher() {
-    setInterval(() => {
-        const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-        if (!activeUser) return;
-        const globalUser = JSON.parse(localStorage.getItem(`user_${activeUser.phone}`));
-        if (globalUser && globalUser.balance !== activeUser.balance) {
-            activeUser.balance = globalUser.balance;
-            localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-            updateDisplay();
-        }
-    }, 3000);
+// --- 3. UI & SYSTEM ---
+function updateDisplay() {
+    const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+    const authSection = document.getElementById('auth-section');
+    const headerBal = document.getElementById('headerBalance');
+
+    if (activeUser) {
+        if(authSection) authSection.innerHTML = `<span>ID: ${activeUser.id}</span>`;
+        if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
+    }
 }
 
 function showToast(msg) {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast';
-        document.body.appendChild(toast);
-    }
-    toast.innerText = msg;
-    toast.className = "toast-visible";
-    setTimeout(() => { toast.className = "toast-hidden"; }, 3000);
+    alert(msg); // Simplified for testing
 }
 
-window.onload = () => {
-    updateDisplay();
-    startBalanceWatcher();
-};
+window.onload = updateDisplay;
