@@ -1,4 +1,4 @@
-// CONFIGURATION
+// SIMBA BET - MASTER WEBSITE SCRIPT
 const scriptURL = 'https://script.google.com/macros/s/AKfycbyCX6a4vLxXWApuA--xNy36blAowdmgJS8KuHkrsUNciQAP1-XKdbfAVLlM-N7JneCl/exec';
 
 // --- 1. USER AUTHENTICATION ---
@@ -12,12 +12,9 @@ function registerUser() {
 
     const user = { name, phone, pass, balance: 0.00, id: Math.floor(1000 + Math.random() * 9000) };
     localStorage.setItem('user_' + phone, JSON.stringify(user));
-    
-    // Log in locally
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    // SEND TO GOOGLE SCRIPT & BOT
-    sendToGoogle('register', phone, 0, `New User: ${name} (ID: ${user.id})`);
+    notifyAdmin(`New User: ${name} (ID: ${user.id})`, 'register', 0, phone);
     
     showToast("Registration Successful!");
     setTimeout(() => location.reload(), 1500);
@@ -35,9 +32,25 @@ function loginUser() {
     setTimeout(() => location.reload(), 1000);
 }
 
-// --- 2. THE CONNECTION BRIDGE (Google Script) ---
-async function sendToGoogle(action, user, amt, detail) {
-    const url = `${scriptURL}?action=${action}&user=${user}&amt=${amt}&ref=${detail}`;
+// --- 2. WITHDRAWAL HANDLER ---
+function handleWithdraw() {
+    const amount = document.getElementById('withdrawAmount')?.value;
+    const method = document.getElementById('withdrawMethod')?.value;
+    const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+
+    if (!activeUser) return showToast("Please login first");
+    if (!amount || amount < 100) return showToast("Minimum withdrawal is 100 ETB");
+
+    const msg = `<b>💸 WITHDRAWAL REQUEST</b>\n<b>User:</b> ${activeUser.name}\n<b>Phone:</b> ${activeUser.phone}\n<b>Amount:</b> ${amount} ETB\n<b>Method:</b> ${method}`;
+    
+    // Sends to Google Sheet and Telegram
+    notifyAdmin(msg, 'withdraw', amount, activeUser.phone);
+    showToast("Withdrawal request sent to Admin!");
+}
+
+// --- 3. THE CONNECTION BRIDGE ---
+async function notifyAdmin(message, type, amount, phone) {
+    const url = `${scriptURL}?action=${type}&user=${phone}&amt=${amount}&ref=${encodeURIComponent(message)}`;
     try {
         const response = await fetch(url);
         const data = await response.json();
@@ -49,29 +62,20 @@ async function sendToGoogle(action, user, amt, detail) {
     }
 }
 
-// Call this function when someone clicks "Deposit"
-function handleDeposit(amount, reference) {
-    const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-    if (!activeUser) return showToast("Please login first");
-    
-    sendToGoogle('deposit', activeUser.phone, amount, reference);
-    showToast("Deposit request sent!");
-}
-
-// --- 3. UI & SYSTEM ---
+// --- 4. UI & SYSTEM ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
     const authSection = document.getElementById('auth-section');
     const headerBal = document.getElementById('headerBalance');
 
     if (activeUser) {
-        if(authSection) authSection.innerHTML = `<span>ID: ${activeUser.id}</span>`;
+        if(authSection) authSection.innerHTML = `<span style="color:#fbbf24; font-weight:bold;">ID: ${activeUser.id}</span>`;
         if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
     }
 }
 
 function showToast(msg) {
-    alert(msg); // Simplified for testing
+    alert(msg); 
 }
 
 window.onload = updateDisplay;
