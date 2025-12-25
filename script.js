@@ -1,5 +1,5 @@
 // SIMBA BET - MASTER WEBSITE SCRIPT
-// Updated with URL from your screenshot
+// This URL matches the one shown in your Google Script screenshot
 const scriptURL = 'https://script.google.com/macros/s/AKfycbzs7hBnR1cqyIts0jrh_6E863BvYjxeDwwFGTgHajzbK3pP_cB_FOPuLK6MMkuA5OpDgQ/exec';
 
 // --- 1. USER AUTHENTICATION ---
@@ -14,6 +14,7 @@ function registerUser() {
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
+    // Notify Admin via Telegram
     notifyAdmin(`New Registration: ${name}`, 'register', 0, phone);
     
     alert("Registration Successful!");
@@ -36,10 +37,10 @@ function loginUser() {
 async function notifyAdmin(message, type, amount, phone) {
     const finalURL = `${scriptURL}?action=${type}&user=${phone}&amt=${amount}&ref=${encodeURIComponent(message)}`;
     
-    // 'no-cors' mode is used to bypass browser security blocks for Google Scripts
+    // We use 'no-cors' mode so your phone browser doesn't block the request
     fetch(finalURL, { mode: 'no-cors' })
-    .then(() => console.log("Notification sent to Admin"))
-    .catch(err => console.error("Error:", err));
+    .then(() => console.log("Data sent to Google Script"))
+    .catch(err => console.error("Connection Error:", err));
 }
 
 // --- 3. UI DISPLAY ---
