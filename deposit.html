@@ -1,47 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deposit | Simba Bet</title>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+  <title>Deposit | Simba Bet</title>
 </head>
-<body style="padding: 10px; background: #000; color: white; font-family: sans-serif;">
-    <div style="border: 1px solid gold; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto;">
-        <h3 style="color: gold; text-align: center;">💰 DEPOSIT</h3>
-        
-        <label>Method:</label>
-        <select id="depMethod" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white;">
-            <option value="Telebirr">Telebirr</option>
-            <option value="CBE Birr">CBE Birr</option>
-        </select>
 
-        <input type="text" id="depPhone" placeholder="Your Phone Number" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444;">
-        <input type="number" id="depAmount" placeholder="Amount (100 - 10,000)" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444;">
+<body style="padding:10px;background:#000;color:#fff;font-family:sans-serif;">
 
-        <button onclick="processDeposit()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer;">SEND TO ADMIN</button>
-        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:10px;">Cancel</button>
-    </div>
+  <div style="
+    border:1px solid gold;
+    padding:20px;
+    border-radius:10px;
+    max-width:400px;
+    margin:auto;
+  ">
 
-    <script src="script.js"></script>
-    <script>
-        function processDeposit() {
-            const method = document.getElementById('depMethod').value;
-            const phone = document.getElementById('depPhone').value;
-            const amount = document.getElementById('depAmount').value;
-            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+    <h3 style="color:gold;text-align:center;">💰 DEPOSIT</h3>
 
-            if(!user) return alert("Please Login First");
-            if(!phone || !amount) return alert("Fill all fields");
-            if(amount < 100 || amount > 10000) return alert("Limit: 100 - 10,000 ETB");
-
-            const details = `Method: ${method}, Paid from: ${phone}`;
-            
-            // CALLS THE BOT
-            notifyAdmin(details, 'Deposit', amount, user.phone);
-            
-            alert("Request sent to Admin! Your balance will update once approved.");
-            window.location.href = 'index.html';
-        }
-    </script>
-</body>
-</html>
+    <label>Payment Method</label>
+    <select
+      id="depMethod"
+      style="width:100%;padding:10px;margin:10px 0;background:#222;color:white;"
+    >
+      <option value
