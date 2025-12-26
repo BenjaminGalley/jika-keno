@@ -13,28 +13,14 @@
             <input type="text" id="regName" placeholder="Full Name" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
             <input type="number" id="regPhone" placeholder="Phone Number" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
             <input type="password" id="regPass" placeholder="Create Password" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
+            
             <button onclick="registerUser()" style="padding: 15px; background: #22c55e; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">CREATE ACCOUNT</button>
-            <p>Already have an account? <a href="login.html" style="color: #fbbf24;">Login Here</a></p>
+            
+            <p>Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none;">Login Here</a></p>
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer;">Back to Lobby</button>
         </div>
     </div>
 
     <script src="script.js"></script>
-    <script>
-        // Check if pending registration has been approved
-        window.onload = () => {
-            const pendingKeys = Object.keys(localStorage).filter(k => k.startsWith('pending_register_'));
-            pendingKeys.forEach(k => {
-                const pendingUser = JSON.parse(localStorage.getItem(k));
-                const userData = JSON.parse(localStorage.getItem('user_' + pendingUser.phone));
-                if (userData) {
-                    // Approved! Move from pending to active
-                    localStorage.setItem('simba_active_user', JSON.stringify(userData));
-                    localStorage.removeItem(k);
-                    alert(`🎉 Registration Approved! Welcome, ${userData.name}`);
-                    location.href = 'index.html';
-                }
-            });
-        }
-    </script>
 </body>
 </html>
