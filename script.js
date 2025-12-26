@@ -2,22 +2,22 @@
 // SIMBA BET - FINAL MASTER WEBSITE SCRIPT
 // ==========================================
 
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwz5nmG9NQH0qHt9HNLOdb_VPa4LpGf6GtXli0ROg4b2x1NIfLowoFDUaTEnEhrMIvrsg/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbxjuzNMN8z2ZhVVnD9--TpPriewytR3W8bEjJPA-gGf2p6nFhXmm0CD8uEDlD_6WoTw/exec'; 
 
-// --- Improved Notify Admin (Using Fetch for better reliability) ---
+// --- Notify Admin (Bridge to Telegram) ---
 async function notifyAdmin(details, type, amount, phone, name) {
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(details)}&name=${encodeURIComponent(name)}`;
     
     try {
-        // 'no-cors' mode allows the request to be sent even if Google doesn't send a response back
+        // We use fetch with no-cors to ensure the request is sent to your Google Script
         await fetch(finalURL, { 
-            method: 'GET',
+            method: 'GET', 
             mode: 'no-cors',
             cache: 'no-cache'
         });
-        console.log("Notification sent successfully to Google Script");
-    } catch (error) {
-        console.error("Critical Error: Could not reach Google Script", error);
+        console.log("Notification signal sent to Admin.");
+    } catch (e) {
+        console.error("Connection error while notifying admin", e);
     }
 }
 
@@ -37,11 +37,11 @@ function registerUser() {
         id: Math.floor(1000 + Math.random() * 9000) 
     };
 
-    // Save locally so they can stay logged in
+    // Save user locally
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    // Alert the Admin Bot immediately
+    // Notify Telegram Bot
     notifyAdmin(`New registration request from ${name}`, 'Register', 0, phone, name);
     
     alert("Registration Successful!");
@@ -79,7 +79,7 @@ function processDeposit() {
     if(!user || !phone || !amount) return alert("Please fill all fields correctly");
     if(amount < 100) return alert("Minimum deposit is 100 ETB");
     
-    // This sends the data to your Telegram Bot via Google Script
+    // Sends the data to your Telegram Bot via Google Script
     notifyAdmin(`Method: ${method}, Sending Phone: ${phone}`, 'Deposit', amount, user.phone, user.name);
     
     alert("Deposit request sent to Admin! Please wait for approval.");
@@ -113,9 +113,9 @@ function updateDisplay() {
         if(displayID) displayID.innerText = activeUser.id;
         if(menuName) menuName.innerText = activeUser.name;
         
-        // Hide Login/Register buttons and show ID when logged in
+        // Show ID in header when logged in
         if(authSection) {
-            authSection.innerHTML = `<span style="color:gold; font-weight:bold; font-size:14px;">ID: ${activeUser.id}</span>`;
+            authSection.innerHTML = `<span style="color:#fbbf24; font-weight:bold; font-size:14px;">ID: ${activeUser.id}</span>`;
         }
     }
 }
