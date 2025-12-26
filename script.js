@@ -2,14 +2,15 @@
 // SIMBA BET - FINAL MASTER WEBSITE SCRIPT
 // ==========================================
 
-const scriptURL = 'https://script.google.com/macros/s/AKfycbxjuzNMN8z2ZhVVnD9--TpPriewytR3W8bEjJPA-gGf2p6nFhXmm0CD8uEDlD_6WoTw/exec'; 
+// Your NEW Google Script URL
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwTnP1GfQFraQE4y3SAkYHLwXaBp3iVVY0xKL34ZCjTA4yuGrgLIcr4CJ6lIOcZuIyv/exec'; 
 
 // --- Notify Admin (Bridge to Telegram) ---
 async function notifyAdmin(details, type, amount, phone, name) {
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(details)}&name=${encodeURIComponent(name)}`;
     
     try {
-        // We use fetch with no-cors to ensure the request is sent to your Google Script
+        // We use fetch with no-cors to bypass security blocks
         await fetch(finalURL, { 
             method: 'GET', 
             mode: 'no-cors',
@@ -37,11 +38,9 @@ function registerUser() {
         id: Math.floor(1000 + Math.random() * 9000) 
     };
 
-    // Save user locally
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    // Notify Telegram Bot
     notifyAdmin(`New registration request from ${name}`, 'Register', 0, phone, name);
     
     alert("Registration Successful!");
@@ -79,7 +78,6 @@ function processDeposit() {
     if(!user || !phone || !amount) return alert("Please fill all fields correctly");
     if(amount < 100) return alert("Minimum deposit is 100 ETB");
     
-    // Sends the data to your Telegram Bot via Google Script
     notifyAdmin(`Method: ${method}, Sending Phone: ${phone}`, 'Deposit', amount, user.phone, user.name);
     
     alert("Deposit request sent to Admin! Please wait for approval.");
@@ -113,12 +111,10 @@ function updateDisplay() {
         if(displayID) displayID.innerText = activeUser.id;
         if(menuName) menuName.innerText = activeUser.name;
         
-        // Show ID in header when logged in
         if(authSection) {
             authSection.innerHTML = `<span style="color:#fbbf24; font-weight:bold; font-size:14px;">ID: ${activeUser.id}</span>`;
         }
     }
 }
 
-// Run update UI whenever any page finishes loading
 window.addEventListener('load', updateDisplay);
