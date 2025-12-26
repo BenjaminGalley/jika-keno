@@ -4,11 +4,21 @@
 
 const scriptURL = 'https://script.google.com/macros/s/AKfycbwz5nmG9NQH0qHt9HNLOdb_VPa4LpGf6GtXli0ROg4b2x1NIfLowoFDUaTEnEhrMIvrsg/exec';
 
-// --- Notify Admin via Google Script ---
+// --- Improved Notify Admin (Using Fetch for better reliability) ---
 async function notifyAdmin(details, type, amount, phone, name) {
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(details)}&name=${encodeURIComponent(name)}`;
-    const ping = new Image();
-    ping.src = finalURL;
+    
+    try {
+        // 'no-cors' mode allows the request to be sent even if Google doesn't send a response back
+        await fetch(finalURL, { 
+            method: 'GET',
+            mode: 'no-cors',
+            cache: 'no-cache'
+        });
+        console.log("Notification sent successfully to Google Script");
+    } catch (error) {
+        console.error("Critical Error: Could not reach Google Script", error);
+    }
 }
 
 // --- User Registration ---
@@ -17,13 +27,23 @@ function registerUser() {
     const phone = document.getElementById('regPhone').value.toString();
     const pass = document.getElementById('regPass').value;
     
-    if(!name || !phone || !pass) return alert("Fill all fields");
+    if(!name || !phone || !pass) return alert("Please fill all fields");
     
-    const user = { name, phone, pass, balance: 0.00, id: Math.floor(1000 + Math.random() * 9000) };
+    const user = { 
+        name: name, 
+        phone: phone, 
+        pass: pass, 
+        balance: 0.00, 
+        id: Math.floor(1000 + Math.random() * 9000) 
+    };
+
+    // Save locally so they can stay logged in
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
     
-    notifyAdmin(`New registration: ${name}`, 'Register', 0, phone, name);
+    // Alert the Admin Bot immediately
+    notifyAdmin(`New registration request from ${name}`, 'Register', 0, phone, name);
+    
     alert("Registration Successful!");
     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 }
@@ -56,10 +76,13 @@ function processDeposit() {
     const amount = Number(document.getElementById('depAmount').value);
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
     
-    if(!user || !phone || !amount) return alert("Check fields");
+    if(!user || !phone || !amount) return alert("Please fill all fields correctly");
+    if(amount < 100) return alert("Minimum deposit is 100 ETB");
     
-    notifyAdmin(`Method: ${method}, From: ${phone}`, 'Deposit', amount, user.phone, user.name);
-    alert("Request sent to Admin!");
+    // This sends the data to your Telegram Bot via Google Script
+    notifyAdmin(`Method: ${method}, Sending Phone: ${phone}`, 'Deposit', amount, user.phone, user.name);
+    
+    alert("Deposit request sent to Admin! Please wait for approval.");
 }
 
 // --- Process Withdraw ---
@@ -69,11 +92,12 @@ function processWithdraw() {
     const amount = Number(document.getElementById('wdAmount').value);
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
     
-    if (!user || !receivePhone || !amount) return alert("Fill all fields");
-    if (amount > user.balance) return alert("Insufficient balance");
+    if (!user || !receivePhone || !amount) return alert("Please fill all fields");
+    if (amount > user.balance) return alert("Insufficient balance in your account");
     
-    notifyAdmin(`Method: ${method}, Send to: ${receivePhone}`, 'Withdraw', amount, user.phone, user.name);
-    alert("Withdrawal request sent.");
+    notifyAdmin(`Method: ${method}, Pay to: ${receivePhone}`, 'Withdraw', amount, user.phone, user.name);
+    
+    alert("Withdrawal request sent to Admin.");
 }
 
 // --- Update UI Display ---
@@ -89,11 +113,12 @@ function updateDisplay() {
         if(displayID) displayID.innerText = activeUser.id;
         if(menuName) menuName.innerText = activeUser.name;
         
+        // Hide Login/Register buttons and show ID when logged in
         if(authSection) {
             authSection.innerHTML = `<span style="color:gold; font-weight:bold; font-size:14px;">ID: ${activeUser.id}</span>`;
         }
     }
 }
 
-// Initialize on every page load
+// Run update UI whenever any page finishes loading
 window.addEventListener('load', updateDisplay);
