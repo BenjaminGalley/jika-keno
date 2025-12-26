@@ -2,8 +2,8 @@
 // SIMBA BET - FINAL MASTER WEBSITE SCRIPT
 // ==========================================
 
-// Your NEW Google Script URL
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwTnP1GfQFraQE4y3SAkYHLwXaBp3iVVY0xKL34ZCjTA4yuGrgLIcr4CJ6lIOcZuIyv/exec'; 
+// UPDATED URL: Matches your latest Google Script deployment
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyeQbGm0Jk-UrpUyiWs6Pix1urL1CdflFuQ2ptJyIJUXnv2lQZQ4GOjJcXmgJvhTuFa/exec'; 
 
 // --- Notify Admin (Bridge to Telegram) ---
 async function notifyAdmin(details, type, amount, phone, name) {
