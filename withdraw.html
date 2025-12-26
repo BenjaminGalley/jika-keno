@@ -6,43 +6,32 @@
     <title>Withdraw | Simba Bet</title>
 </head>
 <body style="padding: 10px; background: #000; color: white; font-family: sans-serif;">
-    <div style="border: 1px solid gold; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto;">
+    <div style="border: 1px solid gold; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; margin-top: 50px;">
         <h3 style="color: gold; text-align: center;">💸 WITHDRAW</h3>
         
         <label>Method:</label>
-        <select id="wdMethod" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white;">
+        <select id="wdMethod" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border-radius:5px;">
             <option value="Telebirr">Telebirr</option>
             <option value="CBE Birr">CBE Birr</option>
         </select>
 
-        <input type="text" id="wdPhone" placeholder="Receive Phone Number" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444;">
-        <input type="number" id="wdAmount" placeholder="Amount" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444;">
+        <input type="text" id="wdPhone" placeholder="Receive Phone Number" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
+        <input type="number" id="wdAmount" placeholder="Amount" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
 
-        <button onclick="processWithdraw()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer;">SEND TO ADMIN</button>
-        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:10px;">Cancel</button>
+        <button onclick="processWithdraw()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px;">SEND REQUEST</button>
+        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:15px; cursor:pointer;">Cancel / Back</button>
     </div>
 
     <script src="script.js"></script>
     <script>
-        const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-
-        if (!activeUser) {
-            alert("Please login first");
-            location.href = 'login.html';
-        }
-
-        // Check for approved withdrawals and update balance dynamically
-        window.onload = () => {
-            if (!activeUser) return;
-
-            const userKey = 'user_' + activeUser.phone;
-            const updatedUser = JSON.parse(localStorage.getItem(userKey));
-            if (updatedUser && updatedUser.balance !== activeUser.balance) {
-                localStorage.setItem('simba_active_user', JSON.stringify(updatedUser));
-                alert(`✅ Your balance has been updated! New balance: ${updatedUser.balance.toFixed(2)} ETB`);
-                location.reload();
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+            if (!activeUser) {
+                alert("Please login first");
+                location.href = 'login.html';
             }
-        }
+        });
     </script>
 </body>
 </html>
