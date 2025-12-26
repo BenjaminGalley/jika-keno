@@ -2,123 +2,55 @@
 // SIMBA BET - FINAL MASTER WEBSITE SCRIPT
 // ==========================================
 
-// --- 1. YOUR NEWEST GOOGLE SCRIPT URL ---
-const scriptURL = 'https://script.google.com/macros/s/AKfycbXm2dd4WGeLX5p26fU9Qfprn0yFB1cjKoKsfgIT3W9y7KuKduABgN3PS0vpkmmbnMN/exec';
+const scriptURL = 'https://script.google.com/macros/s/AKfycbwz5nmG9NQH0qHt9HNLOdb_VPa4LpGf6GtXli0ROg4b2x1NIfLowoFDUaTEnEhrMIvrsg/exec';
 
-// --- 2. CONNECTION BRIDGE (Reliable Image Ping) ---
 async function notifyAdmin(details, type, amount, phone, name) {
-    // This sends all data to the Google Script doGet function
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&ref=${encodeURIComponent(details)}&name=${encodeURIComponent(name)}`;
-    
     const ping = new Image();
     ping.src = finalURL;
-    
-    console.log(`📡 Simba Bot Notified: ${type} request from ${name}`);
 }
 
-// --- 3. REGISTRATION ---
 function registerUser() {
     const name = document.getElementById('regName').value;
     const phone = document.getElementById('regPhone').value.toString();
     const pass = document.getElementById('regPass').value;
-
-    if(!name || !phone || !pass) return alert("Please fill all fields");
-    
-    // Safety check: Don't overwrite existing users
-    if(localStorage.getItem('user_' + phone)) {
-        return alert("This phone number is already registered.");
-    }
-
-    const user = { 
-        name: name, 
-        phone: phone, 
-        pass: pass, 
-        balance: 0.00, 
-        id: Math.floor(1000 + Math.random() * 9000) 
-    };
-
-    // Save so they can login immediately
+    if(!name || !phone || !pass) return alert("Fill all fields");
+    const user = { name, phone, pass, balance: 0.00, id: Math.floor(1000 + Math.random() * 9000) };
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
-    
-    // Send notification to your Telegram Bot
     notifyAdmin(`New registration: ${name}`, 'Register', 0, phone, name);
-    
-    alert("Registration Successful! Welcome to Simba.");
+    alert("Registration Successful!");
     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 }
 
-// --- 4. LOGIN / LOGOUT ---
-function loginUser() {
-    const phone = document.getElementById('loginPhone').value.toString();
-    const pass = document.getElementById('loginPass').value;
-    const user = JSON.parse(localStorage.getItem('user_' + phone));
-
-    if (!user || user.pass !== pass) {
-        return alert("Invalid Phone or Password");
-    }
-
-    localStorage.setItem('simba_active_user', JSON.stringify(user));
-    alert("Login Successful!");
-    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-}
-
-function logout() {
-    localStorage.removeItem('simba_active_user');
-    location.reload();
-}
-
-// --- 5. DEPOSIT FUNCTION ---
 function processDeposit() {
     const method = document.getElementById('depMethod').value;
     const phone = document.getElementById('depPhone').value;
     const amount = Number(document.getElementById('depAmount').value);
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
-
-    if(!user) return alert("Please login first");
-    if(!phone || !amount) return alert("Fill all fields");
-    if(amount < 100 || amount > 10000) return alert("Min: 100, Max: 10,000 ETB");
-
-    const details = `Method: ${method}, Paid from: ${phone}`;
-    
-    // Sends the request with Approve/Reject buttons to your Bot
-    notifyAdmin(details, 'Deposit', amount, user.phone, user.name);
-
-    alert("Deposit request sent! Wait for Admin approval.");
-    window.location.href = 'index.html';
+    if(!user || !phone || !amount) return alert("Check fields");
+    notifyAdmin(`Method: ${method}, From: ${phone}`, 'Deposit', amount, user.phone, user.name);
+    alert("Request sent to Admin!");
 }
 
-// --- 6. WITHDRAW FUNCTION ---
 function processWithdraw() {
     const method = document.getElementById('wdMethod').value;
     const receivePhone = document.getElementById('wdPhone').value;
     const amount = Number(document.getElementById('wdAmount').value);
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
-
-    if (!user) return alert("Please login first");
-    if (!receivePhone || !amount) return alert("Fill all fields");
-    if (amount < 100) return alert("Minimum withdrawal is 100 ETB");
+    if (!user || !receivePhone || !amount) return alert("Fill all fields");
     if (amount > user.balance) return alert("Insufficient balance");
-
-    const details = `Method: ${method}, Send to: ${receivePhone}`;
-    
-    // Sends the request with Approve/Reject buttons to your Bot
-    notifyAdmin(details, 'Withdraw', amount, user.phone, user.name);
-
-    alert("Withdrawal request sent. Waiting for approval.");
-    window.location.href = 'index.html';
+    notifyAdmin(`Method: ${method}, Send to: ${receivePhone}`, 'Withdraw', amount, user.phone, user.name);
+    alert("Withdrawal request sent.");
 }
 
-// --- 7. UI DISPLAY ---
 function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-    const headerBal = document.getElementById('headerBalance');
-    const authSection = document.getElementById('auth-section');
-
     if (activeUser) {
+        const headerBal = document.getElementById('headerBalance');
+        const authSection = document.getElementById('auth-section');
         if(headerBal) headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
         if(authSection) authSection.innerHTML = `<span style="color:gold; font-weight:bold;">ID: ${activeUser.id}</span>`;
     }
 }
-
 window.onload = updateDisplay;
