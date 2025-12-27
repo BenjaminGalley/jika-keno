@@ -18,35 +18,36 @@
         .num.draw-glow { box-shadow: inset 0 0 15px var(--win), 0 0 10px var(--win); border: 2px solid white; z-index: 5; background: var(--win) !important; color: white !important; }
 
         .ticket-stack { margin: 15px auto; max-width: 400px; display: flex; flex-direction: column-reverse; gap: 6px; }
-        .ticket { background: var(--card); border: 1px solid #334155; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 12px; }
-        .tix-num { display: inline-block; padding: 2px 4px; margin: 0 2px; border-radius: 3px; }
-        .match { background: var(--win); color: white; font-weight: bold; }
+        .ticket { background: var(--card); border: 1px solid #334155; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .tix-num { display: inline-block; padding: 2px 4px; margin: 0 2px; border-radius: 3px; border: 1px solid #444; }
+        .match { background: var(--win); color: white; font-weight: bold; border-color: white; }
         .miss { background: var(--loss); color: white; opacity: 0.8; }
 
         .timer-bar { font-size: 24px; font-weight: bold; color: var(--gold); margin-bottom: 10px; }
         .locked { opacity: 0.4; pointer-events: none; }
         .bet-btn { background: var(--win); color: white; border: none; width: 95%; padding: 20px; border-radius: 15px; font-size: 24px; font-weight: bold; cursor: pointer; }
 
-        /* FIXED TOP POP UP STYLING */
+        /* ADJUSTED POP UP - SMALLER SIZE */
         #drawOverlay { 
             display: none; position: fixed; top: 0; left: 0; width: 100%; 
-            height: 120px; /* Reduced height */
-            background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.8)); 
-            border-bottom: 3px solid var(--gold);
+            height: 90px; /* Reduced from 120px to show grid better */
+            background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.85)); 
+            border-bottom: 2px solid var(--gold);
             z-index: 200; flex-direction: column; 
             justify-content: center; align-items: center; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
         #bigNum { 
-            font-size: 60px; font-weight: 900; color: var(--gold); 
-            text-shadow: 0 0 15px var(--gold); margin-top: -5px;
+            font-size: 45px; font-weight: 900; color: var(--gold); 
+            text-shadow: 0 0 10px var(--gold); margin-top: -2px;
         }
-        .draw-status { font-size: 14px; color: white; font-weight: bold; letter-spacing: 1px; }
+        .draw-status { font-size: 12px; color: white; font-weight: bold; text-transform: uppercase; }
 
-        /* BET CONTROL STYLES */
         .bet-controls { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 10px 0; }
         .ctrl-btn { background: #334155; color: white; border: 2px solid var(--gold); border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; font-weight: bold; }
         .bet-display { font-size: 20px; color: white; font-weight: bold; }
+        
+        .win-text { color: var(--win); font-weight: bold; }
+        .loss-text { color: #888; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -70,9 +71,9 @@
     <div class="selection-strip" id="selStrip">SELECT NUMBERS</div>
 
     <div class="bet-controls">
-        <button class="ctrl-btn" onclick="changeBet(-1)">-</button>
+        <button class="ctrl-btn" onclick="changeBet(-2)">-</button>
         <div class="bet-display">Stake: <span id="currentBet">2</span> ETB</div>
-        <button class="ctrl-btn" onclick="changeBet(1)">+</button>
+        <button class="ctrl-btn" onclick="changeBet(2)">+</button>
     </div>
 
     <div style="margin:10px 0; font-size:16px; color:var(--gold)">Potential Win: <span id="potential">0.00</span> ETB</div>
@@ -87,13 +88,12 @@
     let activeUserData = JSON.parse(localStorage.getItem('simba_active_user'));
     let balance = activeUserData ? parseFloat(activeUserData.balance) : 0.00;
     
-    let bet = 2; // NEW MINIMUM 2
+    let bet = 2; 
     let selectedNums = [];
     let placedTickets = [];
     let timeLeft = 50; 
     let isLocked = false;
 
-    // Grid Init
     const grid = document.getElementById('kenoGrid');
     for(let i=1; i<=80; i++){
         let d = document.createElement('div');
@@ -112,7 +112,6 @@
         grid.appendChild(d);
     }
 
-    // NEW: Bet Change Logic
     function changeBet(val) {
         if(isLocked) return;
         if(val > 0) bet += 2;
@@ -146,7 +145,7 @@
         stack.innerHTML = placedTickets.map((t, idx) => `
             <div class="ticket" id="tix${idx}">
                 <div>TKT #${idx+1} (${t.bet} ETB): ${t.nums.map(n => `<span class="tix-num" id="t${idx}n${n}">${n}</span>`).join('')}</div>
-                <div><b>${t.win > 0 ? 'WIN: '+t.win : 'PENDING'}</b></div>
+                <div id="res${idx}"><b>PENDING</b></div>
             </div>
         `).join('');
     }
@@ -178,14 +177,12 @@
         const bigNum = document.getElementById('bigNum');
         const counter = document.getElementById('drawCounter');
         
-        overlay.style.display = 'flex'; // Popup appears at TOP
+        overlay.style.display = 'flex';
 
         let drawCount = 1;
         for(let n of draw) {
             counter.innerText = `NUMBER ${drawCount}/20`;
             bigNum.innerText = n;
-            
-            // Mark on board (Board is visible below the top pop-up)
             document.getElementById('n'+n).classList.add('draw-glow');
             
             placedTickets.forEach((t, tidx) => {
@@ -195,32 +192,52 @@
                     if(hitEl) hitEl.classList.add('match');
                 }
             });
-            
             await new Promise(r => setTimeout(r, 800));
             drawCount++;
         }
 
-        overlay.style.display = 'none';
-
+        // --- CALCULATION PHASE ---
+        let sessionTotalWin = 0;
         placedTickets.forEach((t, idx) => {
             const winMults = [0, 0, 2, 5, 15, 40, 100, 300, 1000];
             t.win = t.bet * winMults[t.hits.length];
+            sessionTotalWin += t.win;
             balance += t.win;
             
+            // Mark losses on ticket
             t.nums.forEach(num => {
                 if(!t.hits.includes(num)) {
                     let missEl = document.getElementById(`t${idx}n${num}`);
                     if(missEl) missEl.classList.add('miss');
                 }
             });
+
+            // UPDATE INDIVIDUAL TICKET TEXT
+            const resEl = document.getElementById(`res${idx}`);
+            if(t.win > 0) {
+                resEl.innerHTML = `<b class="win-text">WIN: ${t.win.toFixed(2)}</b>`;
+            } else {
+                resEl.innerHTML = `<b class="loss-text">WIN: 0.00</b>`;
+            }
         });
+
+        // FINAL ANNOUNCEMENT IN HEADER
+        if(sessionTotalWin > 0) {
+            counter.innerText = "CONGRATULATIONS!";
+            bigNum.innerText = "WIN: " + sessionTotalWin.toFixed(2);
+        } else {
+            counter.innerText = "GAME OVER";
+            bigNum.innerText = "TRY AGAIN";
+        }
 
         const hist = document.getElementById('histContent');
         hist.innerHTML = `<div style="font-size:11px; margin-bottom:5px; border-bottom:1px solid #333">${new Date().toLocaleTimeString()}<br>${draw.slice(0,10).join(', ')}...</div>` + hist.innerHTML;
 
         updateUI();
 
+        // Hold result on screen for 10 seconds before resetting
         setTimeout(() => {
+            overlay.style.display = 'none';
             placedTickets = [];
             document.getElementById('ticketStack').innerHTML = "";
             document.querySelectorAll('.num').forEach(n => n.classList.remove('draw-glow'));
