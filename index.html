@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simba Bet | Official</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ensuring hidden elements don't disrupt layout */
+        #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
+        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
+    </style>
 </head>
 <body>
     <div id="sideMenu" class="side-menu">
@@ -81,22 +86,59 @@
     </div></div>
 
     <footer class="footer-stats">
-        <div class="stat-item">ID: <span id="displayUserID">0000</span></div>
-        <div class="stat-item">MIN BET: 10.00 ETB</div>
+        <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:var(--gold)">0000</span></div>
+        <div class="stat-item">MIN BET: 2.00 ETB</div>
     </footer>
 
     <script src="script.js"></script>
     <script>
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
-            if (menu.style.left === '0px') {
-                menu.style.left = '-260px';
+            menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
+        }
+
+        function checkAuthStatus() {
+            const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+            const authSection = document.getElementById('auth-section');
+            const balanceArea = document.getElementById('topBalanceArea');
+            const menuBtn = document.getElementById('menuToggleBtn');
+            const userIDDisplay = document.getElementById('displayUserID');
+            const menuName = document.getElementById('menuUserName');
+            const headerBal = document.getElementById('headerBalance');
+
+            if (activeUser) {
+                // User is Logged In
+                authSection.style.display = 'none';
+                balanceArea.style.display = 'flex';
+                menuBtn.style.display = 'block';
+                
+                // Show Name and Balance
+                menuName.innerText = activeUser.name;
+                headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
+
+                // Set Unique ID (SB + last 4 digits of phone)
+                const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
+                userIDDisplay.innerText = uid;
             } else {
-                menu.style.left = '0px';
+                // User is Logged Out
+                authSection.style.display = 'flex';
+                balanceArea.style.display = 'none';
+                menuBtn.style.display = 'none';
+                userIDDisplay.innerText = "0000";
+                menuName.innerText = "Guest Player";
             }
         }
+
+        function logout() {
+            localStorage.removeItem('simba_active_user');
+            location.reload();
+        }
+
+        // Initialize UI on load
+        window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
 </html>
