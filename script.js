@@ -4,16 +4,14 @@
 
 const scriptURL = 'https://script.google.com/macros/s/AKfycbw_f5jOBsyRmlYYqtty_SA7ypZ3Vcv94KHeJV6whxAEuyUQlm-JsNSImEJlb6XofbGs/exec'; 
 
-// THIS FUNCTION FETCHES THE APPROVED BALANCE FROM GOOGLE
+// FETCHES THE APPROVED BALANCE FROM GOOGLE
 async function updateDisplay() {
     const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
     if (activeUser) {
         try {
-            // It asks your Google Script: "What is the real balance for this phone?"
             const response = await fetch(`${scriptURL}?action=getBalance&user=${activeUser.phone}`);
             const realBalance = await response.text();
             
-            // It updates the screen with the number you "Accepted" in Telegram
             if (!isNaN(realBalance)) {
                 activeUser.balance = realBalance;
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
@@ -22,25 +20,38 @@ async function updateDisplay() {
             console.error("Balance update failed"); 
         }
 
-        // Update the numbers visible on the screen
         if(document.getElementById('headerBalance')) document.getElementById('headerBalance').innerText = activeUser.balance;
         if(document.getElementById('displayUserID')) document.getElementById('displayUserID').innerText = activeUser.id;
     }
 }
 
 async function notifyAdmin(details, type, amount, phone, name) {
-    const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&name=${encodeURIComponent(name)}`;
-    // Sends the request to your Bot
+    const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&name=${encodeURIComponent(name)}&ref=${encodeURIComponent(details)}`;
     await fetch(finalURL, { method: 'GET', mode: 'no-cors' });
 }
 
+// THE DEPOSIT FUNCTION - ADJUSTED MESSAGE ONLY
 function processDeposit() {
+    const method = document.getElementById('depMethod').value; 
     const amount = document.getElementById('depAmount').value;
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
-    if(!amount || amount < 1) return alert("Enter valid amount");
     
-    notifyAdmin('Deposit Request', 'deposit', amount, user.phone, user.name);
-    alert("Request sent! Once you press 'Accept' in Telegram, refresh this page to see your money.");
+    if(!amount || amount < 1) return alert("Please enter a valid amount");
+
+    // Logic for the message instructions
+    let paymentInfo = "";
+    if (method.toLowerCase().includes("telebirr")) {
+        paymentInfo = "Telebirr 0943595090";
+    } else if (method.toLowerCase().includes("cbe")) {
+        paymentInfo = "CBE 0911045825";
+    } else {
+        paymentInfo = "the selected method";
+    }
+
+    notifyAdmin(`Deposit Method: ${method}`, 'deposit', amount, user.phone, user.name);
+    
+    // CUSTOM MESSAGE AS REQUESTED
+    alert(`Please deposit ${paymentInfo} and refresh.`);
 }
 
 function registerUser() {
@@ -66,5 +77,4 @@ function loginUser() {
     window.location.href = 'index.html';
 }
 
-// Automatically check for balance updates when the page opens
 window.addEventListener('load', updateDisplay);
