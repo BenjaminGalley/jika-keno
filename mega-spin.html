@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba's Gold | Mega Spin</title>
+    <style>
+        :root { --gold: #fcc201; --dark: #050505; --glow: rgba(252, 194, 1, 0.5); }
+        body { background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; margin: 0; }
+        
+        .game-container { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+        }
+
+        /* High Standard Slot Machine Frame */
+        .slot-machine {
+            background: linear-gradient(180deg, #444, #111);
+            border: 6px solid #222; border-radius: 20px; padding: 20px;
+            box-shadow: 0 0 50px #000, inset 0 0 20px #000;
+            position: relative; border-image: linear-gradient(to bottom, #fcc201, #92400e) 1;
+        }
+
+        .reels-container {
+            display: flex; gap: 10px; background: #000; padding: 10px;
+            border-radius: 10px; overflow: hidden; height: 300px;
+            border: 2px solid #333;
+        }
+
+        .reel {
+            width: 100px; height: 100%; position: relative;
+            display: flex; flex-direction: column; transition: transform 0.1s;
+        }
+
+        .symbol {
+            height: 100px; width: 100px; display: flex; align-items: center;
+            justify-content: center; font-size: 60px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+        }
+
+        /* Spinning Animation - Blur makes it look professional */
+        .spinning { filter: blur(4px); transition: 0.1s linear; }
+
+        .controls { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        
+        .spin-btn {
+            background: linear-gradient(180deg, #fcc201, #d97706);
+            border: none; padding: 15px 60px; font-size: 24px; font-weight: bold;
+            border-radius: 50px; cursor: pointer; color: black;
+            box-shadow: 0 0 20px var(--glow); transition: 0.2s;
+        }
+        .spin-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
+        .spin-btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
+
+        .win-announcement {
+            position: absolute; top: 40%; font-size: 50px; font-weight: bold;
+            color: var(--gold); text-shadow: 0 0 20px #000; display: none;
+            z-index: 10; pointer-events: none; animation: pop 0.5s ease-out;
+        }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1.2); } }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="winMsg" class="win-announcement">MEGA WIN!</div>
+        
+        <div class="slot-machine">
+            <div class="reels-container">
+                <div class="reel" id="reel1"></div>
+                <div class="reel" id="reel2"></div>
+                <div class="reel" id="reel3"></div>
+                <div class="reel" id="reel4"></div>
+                <div class="reel" id="reel5"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div id="balanceDisplay" style="font-size: 20px; color: var(--gold);">BALANCE: 0.00 ETB</div>
+            <button class="spin-btn" id="spinBtn" onclick="startSpin()">SPIN</button>
+        </div>
+    </div>
+
+    <script>
+        const symbols = ['🦁', '💎', '🔔', '🍋', '🍒', '7️⃣', '🍀'];
+        const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = activeUser ? parseFloat(activeUser.balance) : 0;
+        let isSpinning = false;
+
+        // Initialize Reels
+        function createReel(id) {
+            const reel = document.getElementById(id);
+            for(let i=0; i<20; i++) {
+                const div = document.createElement('div');
+                div.className = 'symbol';
+                div.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                reel.appendChild(div);
+            }
+        }
+
+        ['reel1','reel2','reel3','reel4','reel5'].forEach(createReel);
+
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = `BALANCE: ${balance.toFixed(2)} ETB`;
+            if(activeUser) {
+                activeUser.balance = balance.toFixed(2);
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+            }
+        }
+
+        async function startSpin() {
+            if (isSpinning || balance < 10) return;
+            
+            isSpinning = true;
+            balance -= 10; // High stakes 10 ETB
+            updateUI();
+            
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('winMsg').style.display = 'none';
+
+            const reels = document.querySelectorAll('.reel');
+            const results = [];
+
+            reels.forEach((reel, i) => {
+                reel.classList.add('spinning');
+                
+                // Professional staggered stop
+                setTimeout(() => {
+                    reel.classList.remove('spinning');
+                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    results.push(finalSymbol);
+                    
+                    // Set final symbols
+                    reel.innerHTML = '';
+                    for(let j=0; j<3; j++) {
+                        const div = document.createElement('div');
+                        div.className = 'symbol';
+                        div.innerText = j === 1 ? finalSymbol : symbols[Math.floor(Math.random() * symbols.length)];
+                        reel.appendChild(div);
+                    }
+
+                    if (i === 4) checkMegaWin(results);
+                }, 1000 + (i * 300));
+            });
+        }
+
+        function checkMegaWin(res) {
+            // High Standard Logic: Match 3 or more symbols in a row
+            let counts = {};
+            res.forEach(s => counts[s] = (counts[s] || 0) + 1);
+            
+            let maxMatch = Math.max(...Object.values(counts));
+            if(maxMatch >= 3) {
+                let win = maxMatch * 20; 
+                balance += win;
+                document.getElementById('winMsg').innerText = `WIN: ${win} ETB!`;
+                document.getElementById('winMsg').style.display = 'block';
+            }
+
+            isSpinning = false;
+            document.getElementById('spinBtn').disabled = false;
+            updateUI();
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
