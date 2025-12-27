@@ -6,21 +6,80 @@
     <title>Register | Simba Bet</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background: #0b0d17; color: white; text-align: center; font-family: sans-serif;">
-    <div style="margin-top: 50px; padding: 20px;">
-        <h2 style="color: #fbbf24;">CREATE ACCOUNT</h2>
-        <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: auto;">
-            <input type="text" id="regName" placeholder="Full Name" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
-            <input type="number" id="regPhone" placeholder="Phone Number" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
-            <input type="password" id="regPass" placeholder="Create Password" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
+<body style="background: #0b0d17; color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
+    
+    <div id="regBox" style="padding: 30px; background: #1a1d29; border: 2px solid #fbbf24; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+        <h2 style="color: #fbbf24; margin-bottom: 25px;">CREATE ACCOUNT</h2>
+        
+        <div id="formFields" style="display: flex; flex-direction: column; gap: 15px;">
+            <input type="text" id="regName" placeholder="Full Name (የሙሉ ስም)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             
-            <button onclick="registerUser()" style="padding: 15px; background: #22c55e; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">CREATE ACCOUNT</button>
+            <input type="number" id="regPhone" placeholder="Phone Number (ስልክ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             
-            <p>Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none;">Login Here</a></p>
-            <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer;">Back to Lobby</button>
+            <input type="password" id="regPass" placeholder="Password (ቢያንስ 6 ሆሄ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
+            
+            <input type="password" id="regConfirm" placeholder="Confirm Password" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
+            
+            <div id="errorMsg" style="color: #ef4444; font-size: 13px; display: none; text-align: left;"></div>
+            
+            <button onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
+            
+            <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none; font-weight: bold;">Login Here</a></p>
+            
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer; font-size: 13px;">← Back to Lobby</button>
+        </div>
+
+        <div id="waitingState" style="display: none; padding: 20px;">
+            <div style="font-size: 50px; margin-bottom: 15px;">⏳</div>
+            <h3 style="color: #fbbf24;">ጥያቄዎ ተልኳል!</h3>
+            <p style="line-height: 1.6;">Your registration request has been sent to the admin. Please wait for approval to log in.</p>
+            <button onclick="location.href='index.html'" style="padding: 12px 25px; background: #fbbf24; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">OK</button>
         </div>
     </div>
 
     <script src="script.js"></script>
+    <script>
+        function handleRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value;
+            const confirm = document.getElementById('regConfirm').value;
+            const errorDiv = document.getElementById('errorMsg');
+
+            // 1. Validation Logic
+            if (!name || !phone || !pass) {
+                showError("እባክዎ ሁሉንም መረጃ ይሙሉ (Fill all fields)");
+                return;
+            }
+            if (name.split(' ').length < 2) {
+                showError("Please enter your Full Name (First & Last).");
+                return;
+            }
+            if (pass.length < 6) {
+                showError("Password must be at least 6 characters.");
+                return;
+            }
+            if (pass !== confirm) {
+                showError("Passwords do not match!");
+                return;
+            }
+
+            // 2. Clear errors and send request
+            errorDiv.style.display = 'none';
+
+            // Log the request (This would connect to your Bot/Google Script Action)
+            console.log("Registration Request Sent for:", { name, phone, pass });
+
+            // 3. Switch to Waiting State
+            document.getElementById('formFields').style.display = 'none';
+            document.getElementById('waitingState').style.display = 'block';
+        }
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.innerText = msg;
+            errorDiv.style.display = 'block';
+        }
+    </script>
 </body>
 </html>
