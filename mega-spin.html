@@ -2,166 +2,239 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simba's Gold | Mega Spin</title>
     <style>
-        :root { --gold: #fcc201; --dark: #050505; --glow: rgba(252, 194, 1, 0.5); }
-        body { background: #000; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; margin: 0; }
+        :root { 
+            --gold: #ffd700; 
+            --gold-dim: #c5a000;
+            --purple-dark: #1a0b2e;
+            --purple-light: #2d1b4e;
+            --glow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+        body { 
+            background: radial-gradient(circle at center, var(--purple-light), #000); 
+            color: white; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        }
+
+        /* --- HEADER --- */
+        .game-header {
+            margin-top: 15px;
+            background: linear-gradient(90deg, #000, var(--purple-dark), #000);
+            border: 2px solid var(--gold);
+            border-radius: 50px;
+            padding: 10px 40px;
+            box-shadow: var(--glow);
+            text-align: center;
+            z-index: 10;
+        }
+        .game-title {
+            color: var(--gold); font-size: 22px; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #000;
+            display: flex; align-items: center; gap: 10px; justify-content: center;
+        }
+
+        /* --- SLOT MACHINE GRID --- */
+        .slot-frame {
+            position: relative;
+            background: #000;
+            border: 4px solid var(--gold);
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px #000;
+            width: 90%; max-width: 400px;
+            margin-bottom: 20px;
+        }
         
-        .game-container { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            height: 100vh; background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
-        }
-
-        /* High Standard Slot Machine Frame */
-        .slot-machine {
-            background: linear-gradient(180deg, #444, #111);
-            border: 6px solid #222; border-radius: 20px; padding: 20px;
-            box-shadow: 0 0 50px #000, inset 0 0 20px #000;
-            position: relative; border-image: linear-gradient(to bottom, #fcc201, #92400e) 1;
-        }
-
         .reels-container {
-            display: flex; gap: 10px; background: #000; padding: 10px;
-            border-radius: 10px; overflow: hidden; height: 300px;
-            border: 2px solid #333;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 Columns */
+            gap: 5px;
+            background: #111;
+            overflow: hidden;
+            height: 240px; 
+            border-radius: 10px;
+            border: 1px solid #333;
         }
 
         .reel {
-            width: 100px; height: 100%; position: relative;
-            display: flex; flex-direction: column; transition: transform 0.1s;
+            display: flex; flex-direction: column;
+            width: 100%;
         }
 
+        /* The Symbol Box */
         .symbol {
-            height: 100px; width: 100px; display: flex; align-items: center;
-            justify-content: center; font-size: 60px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+            height: 80px; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px;
+            border: 1px solid #222;
+            background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+            box-shadow: inset 0 0 10px #000;
+            position: relative;
         }
-
-        /* Spinning Animation - Blur makes it look professional */
-        .spinning { filter: blur(4px); transition: 0.1s linear; }
-
-        .controls { margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         
-        .spin-btn {
-            background: linear-gradient(180deg, #fcc201, #d97706);
-            border: none; padding: 15px 60px; font-size: 24px; font-weight: bold;
-            border-radius: 50px; cursor: pointer; color: black;
-            box-shadow: 0 0 20px var(--glow); transition: 0.2s;
+        /* Winning Line Highlight */
+        .win-highlight {
+            background: rgba(255, 215, 0, 0.4) !important;
+            border: 2px solid var(--gold) !important;
+            box-shadow: inset 0 0 20px var(--gold) !important;
+            z-index: 5;
+            animation: pulse 1s infinite;
         }
-        .spin-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--gold); }
-        .spin-btn:disabled { background: #444; box-shadow: none; cursor: not-allowed; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        .win-announcement {
-            position: absolute; top: 40%; font-size: 50px; font-weight: bold;
-            color: var(--gold); text-shadow: 0 0 20px #000; display: none;
-            z-index: 10; pointer-events: none; animation: pop 0.5s ease-out;
+        /* Spin Animation (Blurry Vertical Move) */
+        .spinning .symbol {
+            filter: blur(5px);
+            animation: scroll 0.2s linear infinite;
         }
-        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1.2); } }
+        @keyframes scroll {
+            0% { transform: translateY(-40px); opacity: 0.5; }
+            100% { transform: translateY(40px); opacity: 0.5; } 
+        }
+
+        /* --- CONTROLS FOOTER --- */
+        .controls-area {
+            width: 100%;
+            background: linear-gradient(180deg, #111, #000);
+            border-top: 2px solid var(--gold);
+            padding: 20px 0;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative;
+            z-index: 20;
+        }
+
+        /* Bet Adjuster */
+        .bet-controls {
+            display: flex; align-items: center; gap: 15px;
+            margin-bottom: 15px;
+        }
+        .circle-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: transparent; border: 2px solid var(--gold);
+            color: var(--gold); font-size: 24px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .circle-btn:active { background: var(--gold); color: black; transform: scale(0.9); }
+        
+        .bet-display {
+            background: #222; border: 1px solid #444; color: var(--gold);
+            padding: 8px 30px; border-radius: 20px; font-family: monospace; font-size: 16px;
+            min-width: 120px; text-align: center;
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        /* Spin Button */
+        .spin-btn {
+            background: linear-gradient(180deg, #ffda44, #b8860b);
+            width: 80%; max-width: 300px;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            color: #422006;
+            font-size: 22px; font-weight: 900; letter-spacing: 1px;
+            box-shadow: 0 5px 0 #734a02, 0 0 20px rgba(255,215,0,0.4);
+            cursor: pointer; transition: transform 0.1s;
+        }
+        .spin-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #734a02; }
+        .spin-btn:disabled { filter: grayscale(100%); cursor: not-allowed; }
+
+        /* --- OVERLAYS --- */
+        .win-popup {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.9); border: 4px solid var(--gold);
+            padding: 20px 40px; border-radius: 20px; text-align: center;
+            z-index: 100; transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            pointer-events: none;
+        }
+        .win-popup.show { transform: translate(-50%, -50%) scale(1); }
+        .win-text { color: var(--gold); font-size: 30px; font-weight: bold; margin: 0; text-shadow: 0 0 10px orange; }
+        .win-amount { color: white; font-size: 40px; font-weight: 900; margin: 5px 0; }
+
+        /* Confetti Canvas */
+        #confetti-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+
+        .back-btn { 
+            position: absolute; top: 20px; left: 20px; 
+            color: #777; text-decoration: none; font-size: 24px; 
+            background: rgba(0,0,0,0.5); width: 40px; height: 40px; 
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="game-container">
-        <div id="winMsg" class="win-announcement">MEGA WIN!</div>
-        
-        <div class="slot-machine">
-            <div class="reels-container">
-                <div class="reel" id="reel1"></div>
-                <div class="reel" id="reel2"></div>
-                <div class="reel" id="reel3"></div>
-                <div class="reel" id="reel4"></div>
-                <div class="reel" id="reel5"></div>
-            </div>
-        </div>
+    <a href="index.html" class="back-btn">⬅</a>
+    <canvas id="confetti-canvas"></canvas>
 
-        <div class="controls">
-            <div id="balanceDisplay" style="font-size: 20px; color: var(--gold);">BALANCE: 0.00 ETB</div>
-            <button class="spin-btn" id="spinBtn" onclick="startSpin()">SPIN</button>
+    <div class="game-header">
+        <div class="game-title">🦁 SIMBA'S GOLD</div>
+        <div style="font-size: 11px; color: #ccc; letter-spacing: 1px;">MEGA SPIN EDITION</div>
+    </div>
+
+    <div class="slot-frame">
+        <div class="reels-container" id="reelsArea">
+            <div class="reel" id="reel0"></div>
+            <div class="reel" id="reel1"></div>
+            <div class="reel" id="reel2"></div>
+            <div class="reel" id="reel3"></div>
         </div>
     </div>
 
+    <div id="winPopup" class="win-popup">
+        <div class="win-text">BIG WIN!</div>
+        <div class="win-amount" id="winAmountDisplay">0.00</div>
+    </div>
+
+    <div class="controls-area">
+        <div class="bet-controls">
+            <div style="color:white; font-size:12px; font-weight:bold; position:absolute; top:-25px; left:50%; transform:translateX(-50%); width: 100%; text-align: center;">
+                BALANCE: <span id="balanceDisplay" style="color:var(--gold);">0.00</span> ETB
+            </div>
+            
+            <button class="circle-btn" onclick="adjustBet(-2)">➖</button>
+            <div class="bet-display">BET: <span id="betValue">2.00</span></div>
+            <button class="circle-btn" onclick="adjustBet(2)">➕</button>
+        </div>
+
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
+    </div>
+
     <script>
+        // --- GAME CONFIGURATION ---
+        // Using emoji symbols for now. You can replace with <img src="..."> later.
         const symbols = ['🦁', '💎', '🔔', '🍋', '🍒', '7️⃣', '🍀'];
         const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = activeUser ? parseFloat(activeUser.balance) : 0;
+        
+        let balance = activeUser ? parseFloat(activeUser.balance) : 1000.00;
+        let currentBet = 2.00;
         let isSpinning = false;
+        const rows = 3;
+        const cols = 4; // 4 Columns like your picture
 
-        // Initialize Reels
-        function createReel(id) {
-            const reel = document.getElementById(id);
-            for(let i=0; i<20; i++) {
-                const div = document.createElement('div');
-                div.className = 'symbol';
-                div.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-                reel.appendChild(div);
+        // Initialize display
+        document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
+        
+        // --- INIT REELS ---
+        const reelsData = [[], [], [], []]; 
+        
+        function initGrid() {
+            for(let c=0; c<cols; c++) {
+                const reelEl = document.getElementById(`reel${c}`);
+                reelEl.innerHTML = '';
+                for(let r=0; r<rows; r++) {
+                    const sym = getRandomSymbol();
+                    reelsData[c][r] = sym;
+                    addSymbolBox(reelEl, sym);
+                }
             }
         }
 
-        ['reel1','reel2','reel3','reel4','reel5'].forEach(createReel);
-
-        function updateUI() {
-            document.getElementById('balanceDisplay').innerText = `BALANCE: ${balance.toFixed(2)} ETB`;
-            if(activeUser) {
-                activeUser.balance = balance.toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-            }
-        }
-
-        async function startSpin() {
-            if (isSpinning || balance < 10) return;
-            
-            isSpinning = true;
-            balance -= 10; // High stakes 10 ETB
-            updateUI();
-            
-            document.getElementById('spinBtn').disabled = true;
-            document.getElementById('winMsg').style.display = 'none';
-
-            const reels = document.querySelectorAll('.reel');
-            const results = [];
-
-            reels.forEach((reel, i) => {
-                reel.classList.add('spinning');
-                
-                // Professional staggered stop
-                setTimeout(() => {
-                    reel.classList.remove('spinning');
-                    const finalSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-                    results.push(finalSymbol);
-                    
-                    // Set final symbols
-                    reel.innerHTML = '';
-                    for(let j=0; j<3; j++) {
-                        const div = document.createElement('div');
-                        div.className = 'symbol';
-                        div.innerText = j === 1 ? finalSymbol : symbols[Math.floor(Math.random() * symbols.length)];
-                        reel.appendChild(div);
-                    }
-
-                    if (i === 4) checkMegaWin(results);
-                }, 1000 + (i * 300));
-            });
-        }
-
-        function checkMegaWin(res) {
-            // High Standard Logic: Match 3 or more symbols in a row
-            let counts = {};
-            res.forEach(s => counts[s] = (counts[s] || 0) + 1);
-            
-            let maxMatch = Math.max(...Object.values(counts));
-            if(maxMatch >= 3) {
-                let win = maxMatch * 20; 
-                balance += win;
-                document.getElementById('winMsg').innerText = `WIN: ${win} ETB!`;
-                document.getElementById('winMsg').style.display = 'block';
-            }
-
-            isSpinning = false;
-            document.getElementById('spinBtn').disabled = false;
-            updateUI();
-        }
-
-        updateUI();
-    </script>
-</body>
-</html>
+        function addSymbolBox(container, char) {
+            const div = document.createElement('div');
+            div.className = 'symbol';
+            div.innerHTML
