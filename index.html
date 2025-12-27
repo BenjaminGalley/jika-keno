@@ -9,6 +9,12 @@
         /* Ensuring hidden elements don't disrupt layout */
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
         .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
+        
+        .mega-spin-box {
+            background: linear-gradient(45deg, #fcc201, #92400e) !important;
+            display: flex; align-items: center; justify-content: center;
+            height: 55px; border-radius: 5px; font-size: 24px;
+        }
     </style>
 </head>
 <body>
@@ -38,8 +44,8 @@
         </div>
 
         <div class="auth-btns" id="auth-section">
-            <button class="login-btn" onclick="openModal('loginModal')">LOGIN</button>
-            <button class="register-btn" onclick="openModal('registerModal')">REGISTER</button>
+            <button class="login-btn" onclick="location.href='login.html'">LOGIN</button>
+            <button class="register-btn" onclick="location.href='register.html'">REGISTER</button>
         </div>
     </header>
 
@@ -62,28 +68,15 @@
             <div class="img-wrap keno-box" style="display:flex; align-items:center; justify-content:center; background:#004488; height:55px; border-radius:5px; font-weight:bold;">K6</div>
             <p>Keno</p>
         </div>
+        <div class="game-card" onclick="location.href='mega-spin.html'">
+            <div class="img-wrap mega-spin-box">🎰</div>
+            <p>Simba's Gold</p>
+        </div>
         <div class="game-card" onclick="location.href='game.html'">
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg"></div>
             <p>Simba Shuffle</p>
         </div>
     </div>
-
-    <div id="registerModal" class="modal"><div class="modal-content">
-        <h3>Register</h3>
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="number" id="regPhone" placeholder="Phone Number">
-        <input type="password" id="regPass" placeholder="Password">
-        <button class="submit-btn" onclick="registerUser()">Create Account</button>
-        <button class="back-btn" onclick="closeModal('registerModal')">Cancel</button>
-    </div></div>
-
-    <div id="loginModal" class="modal"><div class="modal-content">
-        <h3>Login</h3>
-        <input type="number" id="loginPhone" placeholder="Phone Number">
-        <input type="password" id="loginPass" placeholder="Password">
-        <button class="submit-btn" onclick="loginUser()">Login</button>
-        <button class="back-btn" onclick="closeModal('loginModal')">Cancel</button>
-    </div></div>
 
     <footer class="footer-stats">
         <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:var(--gold)">0000</span></div>
@@ -92,9 +85,6 @@
 
     <script src="script.js"></script>
     <script>
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
@@ -110,20 +100,14 @@
             const headerBal = document.getElementById('headerBalance');
 
             if (activeUser) {
-                // User is Logged In
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
-                
-                // Show Name and Balance
                 menuName.innerText = activeUser.name;
                 headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-
-                // Set Unique ID (SB + last 4 digits of phone)
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
             } else {
-                // User is Logged Out
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
                 menuBtn.style.display = 'none';
@@ -137,7 +121,6 @@
             location.reload();
         }
 
-        // Initialize UI on load
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
