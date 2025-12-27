@@ -16,37 +16,40 @@
         }
         h2 { color: var(--gold); text-align: center; margin-top: 0; }
         
-        label { display: block; margin: 15px 0 5px; font-weight: bold; font-size: 14px; }
+        label { display: block; margin: 15px 0 5px; font-weight: bold; font-size: 14px; color: #ccc; }
         
         select, input {
             width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
             background: #0b0d17; color: white; font-size: 16px; box-sizing: border-box;
+            outline: none;
         }
+        select:focus, input:focus { border-color: var(--gold); }
 
         .instruction-box {
             background: rgba(251, 191, 36, 0.1); border-left: 4px solid var(--gold);
-            padding: 15px; margin: 20px 0; display: none; /* Hidden until method selected */
-            font-size: 15px; line-height: 1.5;
+            padding: 15px; margin: 20px 0; display: none; 
+            font-size: 15px; line-height: 1.5; color: #fff;
         }
 
         .submit-btn {
             background: linear-gradient(180deg, #fbbf24, #d97706); border: none;
             color: black; width: 100%; padding: 15px; font-size: 18px; font-weight: bold;
-            border-radius: 8px; cursor: pointer; margin-top: 10px;
+            border-radius: 8px; cursor: pointer; margin-top: 20px;
+            box-shadow: 0 4px 0 #92400e;
         }
-        .submit-btn:active { transform: translateY(2px); }
+        .submit-btn:active { transform: translateY(2px); box-shadow: none; }
 
-        .back-link { margin-top: 20px; color: var(--gold); text-decoration: none; font-size: 14px; }
+        .back-link { margin-top: 25px; color: var(--gold); text-decoration: none; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="deposit-card">
-        <h2>DEPOSIT FUNDS</h2>
+        <h2>DEPOSIT / ማስገቢያ</h2>
         
-        <label for="method">Select Payment Method</label>
+        <label for="method">የክፍያ ዘዴ ይምረጡ (Select Method)</label>
         <select id="method" onchange="updateInstructions()">
-            <option value="">-- Choose Method --</option>
+            <option value="">-- ይምረጡ --</option>
             <option value="telebirr">Telebirr</option>
             <option value="cbe">CBE (Commercial Bank)</option>
         </select>
@@ -55,16 +58,19 @@
             <span id="instructionText"></span>
         </div>
 
-        <label for="amount">Amount to Deposit (ETB)</label>
-        <input type="number" id="amount" placeholder="Minimum 10 ETB" min="10">
+        <label for="senderName">የላኪው ሙሉ ስም (Sender Name)</label>
+        <input type="text" id="senderName" placeholder="ስምዎን እዚህ ያስገቡ">
 
-        <label for="transactionId">Transaction ID / Screenshot Ref</label>
-        <input type="text" id="transactionId" placeholder="Enter Reference Number">
+        <label for="senderPhone">የላኪው ስልክ ቁጥር (Sender Phone)</label>
+        <input type="number" id="senderPhone" placeholder="የላኩበትን ስልክ ያስገቡ">
 
-        <button class="submit-btn" onclick="submitDeposit()">ልኬያለሁ (Submit Deposit)</button>
+        <label for="amount">የገንዘቡ መጠን (Amount ETB)</label>
+        <input type="number" id="amount" placeholder="ቢያንስ 10 ብር" min="10">
+
+        <button class="submit-btn" onclick="submitDeposit()">ልኬያለሁ (Submit)</button>
     </div>
 
-    <a href="index.html" class="back-link">← Back to Lobby</a>
+    <a href="index.html" class="back-link">← ወደ ዋናው ገጽ ተመለስ (Back)</a>
 
     <script>
         const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
@@ -87,28 +93,27 @@
 
         function submitDeposit() {
             const method = document.getElementById('method').value;
+            const sName = document.getElementById('senderName').value;
+            const sPhone = document.getElementById('senderPhone').value;
             const amt = document.getElementById('amount').value;
-            const txId = document.getElementById('transactionId').value;
 
-            if (!activeUser) return alert("Please login first!");
-            if (!method || !amt || !txId) return alert("እባክዎ ሁሉንም መረጃ ይሙሉ (Please fill all fields)");
-            if (amt < 10) return alert("Minimum deposit is 10 ETB");
+            if (!activeUser) return alert("እባክዎ መጀመሪያ ይግቡ (Please login first)");
+            if (!method || !sName || !sPhone || !amt) {
+                return alert("እባክዎ ሁሉንም መረጃዎች በትክክል ይሙሉ");
+            }
 
-            // Create deposit request object
+            // Data to be processed
             const depositRequest = {
-                user: activeUser.phone,
-                name: activeUser.name,
+                accountPhone: activeUser.phone,
+                senderName: sName,
+                senderPhone: sPhone,
                 amount: amt,
                 method: method,
-                txId: txId,
-                status: 'pending',
-                date: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString()
             };
 
-            // Log to console for your tracking (In production, this goes to your Google Sheet)
-            console.log("Deposit Request Sent:", depositRequest);
-
-            alert("ጥያቄዎ ደርሶናል! በቅርቡ እናረጋግጣለን። (Request received! We will verify shortly.)");
+            console.log("Deposit Saved:", depositRequest);
+            alert("ጥያቄዎ ደርሶናል! በቅርቡ እናረጋግጣለን።");
             location.href = 'index.html';
         }
     </script>
