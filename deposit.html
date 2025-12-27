@@ -2,36 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deposit | Simba Bet</title>
-</head>
-<body style="padding: 10px; background: #000; color: white; font-family: sans-serif;">
-    <div style="border: 1px solid gold; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; margin-top: 50px;">
-        <h3 style="color: gold; text-align: center;">💰 DEPOSIT</h3>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Funds | Simba Bet</title>
+    <style>
+        :root { --gold: #fbbf24; --bg: #0b0d17; }
+        body { 
+            background: var(--bg); color: white; font-family: sans-serif; 
+            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; 
+        }
+        .deposit-card {
+            background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px;
+            padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        h2 { color: var(--gold); text-align: center; margin-top: 0; }
         
-        <label>Method:</label>
-        <select id="depMethod" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border-radius:5px;">
-            <option value="Telebirr">Telebirr</option>
-            <option value="CBE Birr">CBE Birr</option>
+        label { display: block; margin: 15px 0 5px; font-weight: bold; font-size: 14px; }
+        
+        select, input {
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
+            background: #0b0d17; color: white; font-size: 16px; box-sizing: border-box;
+        }
+
+        .instruction-box {
+            background: rgba(251, 191, 36, 0.1); border-left: 4px solid var(--gold);
+            padding: 15px; margin: 20px 0; display: none; /* Hidden until method selected */
+            font-size: 15px; line-height: 1.5;
+        }
+
+        .submit-btn {
+            background: linear-gradient(180deg, #fbbf24, #d97706); border: none;
+            color: black; width: 100%; padding: 15px; font-size: 18px; font-weight: bold;
+            border-radius: 8px; cursor: pointer; margin-top: 10px;
+        }
+        .submit-btn:active { transform: translateY(2px); }
+
+        .back-link { margin-top: 20px; color: var(--gold); text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="deposit-card">
+        <h2>DEPOSIT FUNDS</h2>
+        
+        <label for="method">Select Payment Method</label>
+        <select id="method" onchange="updateInstructions()">
+            <option value="">-- Choose Method --</option>
+            <option value="telebirr">Telebirr</option>
+            <option value="cbe">CBE (Commercial Bank)</option>
         </select>
 
-        <input type="text" id="depPhone" placeholder="Your Phone Number" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
-        <input type="number" id="depAmount" placeholder="Amount (100 - 10,000)" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
+        <div id="instructionBox" class="instruction-box">
+            <span id="instructionText"></span>
+        </div>
 
-        <button onclick="processDeposit()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px;">SEND REQUEST</button>
-        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:15px; cursor:pointer;">Cancel / Back</button>
+        <label for="amount">Amount to Deposit (ETB)</label>
+        <input type="number" id="amount" placeholder="Minimum 10 ETB" min="10">
+
+        <label for="transactionId">Transaction ID / Screenshot Ref</label>
+        <input type="text" id="transactionId" placeholder="Enter Reference Number">
+
+        <button class="submit-btn" onclick="submitDeposit()">ልኬያለሁ (Submit Deposit)</button>
     </div>
 
-    <script src="script.js"></script>
+    <a href="index.html" class="back-link">← Back to Lobby</a>
+
     <script>
-        // Check if user is logged in
-        window.addEventListener('load', () => {
-            const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-            if (!activeUser) {
-                alert("Please login first");
-                location.href = 'login.html';
+        const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+
+        function updateInstructions() {
+            const method = document.getElementById('method').value;
+            const box = document.getElementById('instructionBox');
+            const text = document.getElementById('instructionText');
+
+            if (method === 'telebirr') {
+                box.style.display = 'block';
+                text.innerHTML = `<strong>Telebirr:</strong> 0943595090 በዚህ ይላኩና ልኬያለሁ የሚለውን ይጫኑ።`;
+            } else if (method === 'cbe') {
+                box.style.display = 'block';
+                text.innerHTML = `<strong>CBE:</strong> 0911045825 በዚህ ይላኩና ልኬያለሁ የሚለውን ይጫኑ።`;
+            } else {
+                box.style.display = 'none';
             }
-        });
+        }
+
+        function submitDeposit() {
+            const method = document.getElementById('method').value;
+            const amt = document.getElementById('amount').value;
+            const txId = document.getElementById('transactionId').value;
+
+            if (!activeUser) return alert("Please login first!");
+            if (!method || !amt || !txId) return alert("እባክዎ ሁሉንም መረጃ ይሙሉ (Please fill all fields)");
+            if (amt < 10) return alert("Minimum deposit is 10 ETB");
+
+            // Create deposit request object
+            const depositRequest = {
+                user: activeUser.phone,
+                name: activeUser.name,
+                amount: amt,
+                method: method,
+                txId: txId,
+                status: 'pending',
+                date: new Date().toLocaleString()
+            };
+
+            // Log to console for your tracking (In production, this goes to your Google Sheet)
+            console.log("Deposit Request Sent:", depositRequest);
+
+            alert("ጥያቄዎ ደርሶናል! በቅርቡ እናረጋግጣለን። (Request received! We will verify shortly.)");
+            location.href = 'index.html';
+        }
     </script>
 </body>
 </html>
