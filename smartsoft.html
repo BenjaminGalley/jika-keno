@@ -3,34 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartSoft Gaming</title>
+    <title>SmartSoft Gaming | Loading</title>
     <style>
-        body { margin: 0; background: #000; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; color: #fff; overflow: hidden; }
-        .logo-box { width: 80px; height: 80px; background: #e61e50; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; margin-bottom: 10px; }
-        .brand { font-size: 32px; font-weight: bold; margin-bottom: 40px; }
-        .loader-bg { width: 200px; height: 2px; background: #222; border-radius: 10px; position: relative; }
-        .loader-bar { width: 0%; height: 100%; background: #e61e50; box-shadow: 0 0 10px #e61e50; transition: width 0.2s; }
-        #msg { margin-top: 20px; color: #444; font-size: 12px; letter-spacing: 1px; }
+        /* Authentic Black Background */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* The Official SmartSoft Red Swirl Branding */
+        .logo-container {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .ss-logo {
+            width: 180px; /* High visibility size */
+            display: block;
+            filter: drop-shadow(0 0 10px rgba(255, 30, 86, 0.2));
+        }
+
+        /* The Loading Track - Thin and Professional */
+        .loader-track {
+            width: 220px;
+            height: 2px;
+            background: #1a1a1a;
+            position: relative;
+            border-radius: 4px;
+        }
+
+        /* The Progress Bar with Glow */
+        .loader-fill {
+            width: 0%;
+            height: 100%;
+            background: #ff1e56;
+            position: relative;
+            box-shadow: 0 0 15px #ff1e56;
+            transition: width 0.1s linear;
+        }
+
+        /* The Glowing Star/Spark at the tip of the bar */
+        .loader-fill::after {
+            content: '✦';
+            position: absolute;
+            right: -10px;
+            top: -12px;
+            color: #ff1e56;
+            font-size: 20px;
+            text-shadow: 0 0 15px #ff1e56, 0 0 5px #fff;
+            animation: twinkle 0.5s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.7; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Maintenance message that appears after loading */
+        .status-msg {
+            display: none;
+            margin-top: 30px;
+            color: #ff1e56;
+            font-size: 13px;
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .retry-btn {
+            display: none;
+            margin-top: 20px;
+            background: transparent;
+            color: #555;
+            border: 1px solid #333;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
-    <div class="logo-box">S</div>
-    <div class="brand">SmartSoft</div>
-    <div class="loader-bg"><div class="loader-bar" id="bar"></div></div>
-    <div id="msg">CONNECTING...</div>
+
+    <div class="logo-container">
+        <img src="https://smartsoftgaming.com/Resources/Images/MainLogo.png" class="ss-logo" alt="SmartSoft Gaming">
+    </div>
+
+    <div class="loader-track">
+        <div class="loader-fill" id="fill"></div>
+    </div>
+
+    <div class="status-msg" id="msg">Server Maintenance</div>
+    <button class="retry-btn" id="retry" onclick="location.href='index.html'">Return to Lobby</button>
 
     <script>
-        let w = 0;
-        let bar = document.getElementById('bar');
-        let msg = document.getElementById('msg');
-        let int = setInterval(() => {
-            w += Math.random() * 4;
-            if(w >= 100) {
-                w = 100; clearInterval(int);
-                setTimeout(() => { msg.innerText = "SERVER MAINTENANCE"; msg.style.color = "#e61e50"; }, 500);
-            }
-            bar.style.width = w + "%";
-        }, 100);
+        const fill = document.getElementById('fill');
+        const msg = document.getElementById('msg');
+        const retry = document.getElementById('retry');
+        let width = 0;
+
+        function startLoading() {
+            let interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    // Slight delay before showing maintenance for realism
+                    setTimeout(() => {
+                        fill.parentElement.style.opacity = "0.2";
+                        msg.style.display = 'block';
+                        retry.style.display = 'block';
+                    }, 800);
+                } else {
+                    // Realistic "stutter" loading speed
+                    let increment = Math.random() * 2;
+                    if (width > 80) increment = Math.random() * 0.5; // Slow down at the end
+                    
+                    width += increment;
+                    if (width > 100) width = 100;
+                    fill.style.width = width + '%';
+                }
+            }, 60);
+        }
+
+        // Initialize loading on page load
+        window.onload = startLoading;
     </script>
 </body>
 </html>
