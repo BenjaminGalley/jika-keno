@@ -16,6 +16,15 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
+        /* Styling the Multi Hot 5 image to be clean and fit the box */
+        .smartsoft-tile {
+            width: 100%;
+            height: 55px;
+            object-fit: cover; /* This 'cuts' the image to fit perfectly */
+            object-position: center; 
+            border-radius: 5px;
+        }
+
         /* Added a small pulse to show when syncing */
         .syncing { opacity: 0.5; }
     </style>
@@ -59,6 +68,13 @@
     <div class="section-label">GAMES</div>
 
     <div class="games-container">
+        <div class="game-card" onclick="location.href='smartsoft.html'">
+            <div class="img-wrap">
+                <img src="https://smartsoftgaming.com/Resources/Images/Games/MultiHot5.png" class="smartsoft-tile" alt="Multi Hot 5">
+            </div>
+            <p>Multi Hot 5</p>
+        </div>
+
         <div class="game-card" onclick="location.href='hot-fruit.html'">
             <div class="img-wrap"><img src="assets/assets/melon.jpg"></div>
             <p>Hot Fruit</p>
@@ -92,7 +108,6 @@
 
     <script src="script.js"></script>
     <script>
-        // 1. ADD YOUR URL HERE
         const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
 
         function toggleMenu() { 
@@ -100,7 +115,6 @@
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
         }
 
-        // 2. THE NEW SYNC FUNCTION
         async function checkAuthStatus() {
             let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             const authSection = document.getElementById('auth-section');
@@ -112,7 +126,6 @@
             const syncStatus = document.getElementById('syncStatus');
 
             if (activeUser) {
-                // Initial show from local storage so it looks fast
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
@@ -121,30 +134,24 @@
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
 
-                // NOW: Ask the Google Sheet for the REAL balance
                 headerBal.classList.add('syncing');
                 syncStatus.innerText = "Syncing...";
 
                 try {
                     const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
                     const data = await response.json();
-
                     if (data && data.balance !== undefined) {
                         const realBal = parseFloat(data.balance).toFixed(2);
                         headerBal.innerText = realBal;
                         syncStatus.innerText = "Synced";
-                        
-                        // Update local storage so games have the correct start amount
                         activeUser.balance = realBal;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     }
                 } catch (e) {
                     syncStatus.innerText = "Offline";
-                    console.log("Remote sync failed.");
                 } finally {
                     headerBal.classList.remove('syncing');
                 }
-
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
@@ -158,7 +165,6 @@
             localStorage.removeItem('simba_active_user');
             location.reload();
         }
-
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
