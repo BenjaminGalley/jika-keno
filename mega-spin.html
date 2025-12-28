@@ -3,334 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba's Gold | Mega Spin</title>
+    <title>Simba's Gold</title>
     <style>
-        :root { 
-            --gold: #ffd700; 
-            --gold-dim: #c5a000;
-            --purple-dark: #1a0b2e;
-            --purple-light: #2d1b4e;
-            --glow: 0 0 15px rgba(255, 215, 0, 0.6);
-        }
-        body { 
-            background: radial-gradient(circle at center, var(--purple-light), #000); 
-            color: white; font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 0; overflow: hidden; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-        }
-
-        .game-header {
-            margin-top: 15px;
-            background: linear-gradient(90deg, #000, var(--purple-dark), #000);
-            border: 2px solid var(--gold);
-            border-radius: 50px;
-            padding: 10px 40px;
-            box-shadow: var(--glow);
-            text-align: center;
-            z-index: 10;
-        }
-        .game-title {
-            color: var(--gold); font-size: 22px; font-weight: 900; 
-            text-transform: uppercase; letter-spacing: 2px;
-            text-shadow: 2px 2px 0 #000;
-            display: flex; align-items: center; gap: 10px; justify-content: center;
-        }
-
-        .slot-frame {
-            position: relative;
-            background: #000;
-            border: 4px solid var(--gold);
-            border-radius: 15px;
-            padding: 10px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8), inset 0 0 30px #000;
-            width: 90%; max-width: 400px;
-            margin-bottom: 20px;
-        }
-        
-        .reels-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            background: #111;
-            overflow: hidden;
-            height: 240px; 
-            border-radius: 10px;
-            border: 1px solid #333;
-        }
-
-        .reel { display: flex; flex-direction: column; width: 100%; }
-
-        .symbol {
-            height: 80px; 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px;
-            border: 1px solid #222;
-            background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
-            box-shadow: inset 0 0 10px #000;
-            position: relative;
-        }
-        
-        .win-highlight {
-            background: rgba(255, 215, 0, 0.4) !important;
-            border: 2px solid var(--gold) !important;
-            box-shadow: inset 0 0 20px var(--gold) !important;
-            z-index: 5;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-
-        .spinning .symbol {
-            filter: blur(5px);
-            animation: scroll 0.2s linear infinite;
-        }
-        @keyframes scroll {
-            0% { transform: translateY(-40px); opacity: 0.5; }
-            100% { transform: translateY(40px); opacity: 0.5; } 
-        }
-
-        .controls-area {
-            width: 100%;
-            background: linear-gradient(180deg, #111, #000);
-            border-top: 2px solid var(--gold);
-            padding: 20px 0;
-            display: flex; flex-direction: column; align-items: center;
-            position: relative;
-            z-index: 20;
-        }
-
-        .bet-controls {
-            display: flex; align-items: center; gap: 15px;
-            margin-bottom: 15px;
-        }
-        .circle-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: transparent; border: 2px solid var(--gold);
-            color: var(--gold); font-size: 24px; font-weight: bold;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
-        .circle-btn:active { background: var(--gold); color: black; transform: scale(0.9); }
-        
-        .bet-display {
-            background: #222; border: 1px solid #444; color: var(--gold);
-            padding: 8px 30px; border-radius: 20px; font-family: monospace; font-size: 16px;
-            min-width: 120px; text-align: center;
-            box-shadow: inset 0 0 10px #000;
-        }
-
-        .spin-btn {
-            background: linear-gradient(180deg, #ffda44, #b8860b);
-            width: 80%; max-width: 300px;
-            padding: 15px;
-            border-radius: 50px;
-            border: none;
-            color: #422006;
-            font-size: 22px; font-weight: 900; letter-spacing: 1px;
-            box-shadow: 0 5px 0 #734a02, 0 0 20px rgba(255,215,0,0.4);
-            cursor: pointer; transition: transform 0.1s;
-        }
-        .spin-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #734a02; }
-        .spin-btn:disabled { filter: grayscale(100%); cursor: not-allowed; }
-
-        .win-popup {
-            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
-            background: rgba(0,0,0,0.9); border: 4px solid var(--gold);
-            padding: 20px 40px; border-radius: 20px; text-align: center;
-            z-index: 100; transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-            pointer-events: none;
-        }
-        .win-popup.show { transform: translate(-50%, -50%) scale(1); }
-        .win-text { color: var(--gold); font-size: 30px; font-weight: bold; margin: 0; text-shadow: 0 0 10px orange; }
-        .win-amount { color: white; font-size: 40px; font-weight: 900; margin: 5px 0; }
-
-        .back-btn { 
-            position: absolute; top: 20px; left: 20px; 
-            color: #777; text-decoration: none; font-size: 24px; 
-            background: rgba(0,0,0,0.5); width: 40px; height: 40px; 
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        }
+        body { background: #111; color: #fff; font-family: sans-serif; text-align: center; margin: 0; }
+        .top-bar { padding: 15px; background: #000; border-bottom: 1px solid #FFD700; display:flex; justify-content:space-between; }
+        .slot-machine { background: #222; border: 5px solid #FFD700; border-radius: 10px; margin: 30px auto; width: 280px; height: 120px; display: flex; align-items: center; justify-content: space-around; }
+        .reel { font-size: 50px; background: #fff; color: #000; width: 70px; height: 90px; display: flex; align-items: center; justify-content: center; border-radius: 5px; }
+        .spin-btn { background: #FFD700; color: #000; font-size: 24px; font-weight: bold; padding: 15px 50px; border: none; border-radius: 50px; cursor: pointer; width: 80%; }
     </style>
 </head>
 <body>
-
-    <a href="index.html" class="back-btn">⬅</a>
-
-    <div class="game-header">
-        <div class="game-title">🦁 SIMBA'S GOLD</div>
-        <div style="font-size: 11px; color: #ccc; letter-spacing: 1px;">MEGA SPIN EDITION</div>
+    <div class="top-bar">
+        <button onclick="location.href='index.html'">LOBBY</button>
+        <span id="balDisplay" style="color:#FFD700; font-weight:bold;">0.00 ETB</span>
     </div>
-
-    <div class="slot-frame">
-        <div class="reels-container" id="reelsArea">
-            <div class="reel" id="reel0"></div>
-            <div class="reel" id="reel1"></div>
-            <div class="reel" id="reel2"></div>
-            <div class="reel" id="reel3"></div>
-        </div>
+    <div class="slot-machine">
+        <div class="reel" id="r1">🦁</div>
+        <div class="reel" id="r2">🦁</div>
+        <div class="reel" id="r3">🦁</div>
     </div>
-
-    <div id="winPopup" class="win-popup">
-        <div class="win-text">BIG WIN!</div>
-        <div class="win-amount" id="winAmountDisplay">0.00</div>
-    </div>
-
-    <div class="controls-area">
-        <div class="bet-controls">
-            <div style="color:white; font-size:12px; font-weight:bold; position:absolute; top:-25px; left:50%; transform:translateX(-50%); width: 100%; text-align: center;">
-                BALANCE: <span id="balanceDisplay" style="color:var(--gold);">0.00</span> ETB
-            </div>
-            
-            <button class="circle-btn" onclick="adjustBet(-2)">➖</button>
-            <div class="bet-display">BET: <span id="betValue">2.00</span></div>
-            <button class="circle-btn" onclick="adjustBet(2)">➕</button>
-        </div>
-
-        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
-    </div>
+    <div id="msg" style="margin: 20px; color:#FFD700; font-weight:bold;">SPIN THE GOLD</div>
+    <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
 
     <script>
-        // --- 1. CONFIGURATION ---
-        // PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
-        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
+        let bet = 10;
+        const symbols = ['🦁', '💎', '7️⃣', '🍒', '🔔'];
 
-        const symbols = ['🦁', '💎', '🔔', '🍋', '🍒', '7️⃣', '🍀']; 
-        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = activeUser ? parseFloat(activeUser.balance) : 0.00;
-        let currentBet = 2.00;
-        let isSpinning = false;
-        const rows = 3;
-        const cols = 4;
-        const reelsData = [[], [], [], []]; 
-
-        // --- 2. THE BRAIN: SYNC FUNCTION ---
-        async function syncBalance() {
-            if(!activeUser) return;
-            
-            const formatted = balance.toFixed(2);
-            document.getElementById('balanceDisplay').innerText = formatted;
-            
-            // Local Save
-            activeUser.balance = formatted;
-            localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-
-            // Remote Save (Google Sheet)
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'updateBalance',
-                        phone: activeUser.phone,
-                        newBalance: formatted
-                    })
-                });
-            } catch (e) { console.error("Network sync failed"); }
+        function saveBalance() {
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
 
-        function getRandomSymbol() {
-            return Math.random() < 0.10 ? '🦁' : symbols[Math.floor(Math.random() * symbols.length)];
+        function init() {
+            if(!user) location.href='index.html';
+            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
         }
 
-        function initGrid() {
-            for(let c=0; c<cols; c++) {
-                const reelEl = document.getElementById(`reel${c}`);
-                reelEl.innerHTML = '';
-                reelsData[c] = [];
-                for(let r=0; r<rows; r++) {
-                    const sym = getRandomSymbol();
-                    reelsData[c][r] = sym;
-                    const div = document.createElement('div');
-                    div.className = 'symbol';
-                    div.innerText = sym;
-                    reelEl.appendChild(div);
-                }
-            }
-        }
-
-        function adjustBet(val) {
-            if (isSpinning) return;
-            currentBet = Math.max(2, currentBet + val);
-            document.getElementById('betValue').innerText = currentBet.toFixed(2);
-        }
-
-        async function spin() {
-            if (isSpinning) return;
-            
-            // Re-fetch active user to ensure latest data
-            activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-            balance = activeUser ? parseFloat(activeUser.balance) : 0;
-
-            if (balance < currentBet) return alert("Insufficient Balance!");
-
-            isSpinning = true;
-            balance -= currentBet;
-            
-            // IMMEDIATELY sync deduction to Google Sheet
-            await syncBalance(); 
-
-            document.getElementById('reelsArea').classList.add('spinning');
+        function spin() {
+            if(balance < bet) return;
+            balance -= bet;
+            saveBalance();
+            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
             document.getElementById('spinBtn').disabled = true;
 
-            setTimeout(async () => {
-                document.getElementById('reelsArea').classList.remove('spinning');
-                generateResult();
-                await checkWin();
-                isSpinning = false;
-                document.getElementById('spinBtn').disabled = false;
-            }, 1200);
-        }
-
-        function generateResult() {
-            for(let c=0; c<cols; c++) {
-                const reelEl = document.getElementById(`reel${c}`);
-                reelEl.innerHTML = '';
-                for(let r=0; r<rows; r++) {
-                    const sym = getRandomSymbol();
-                    reelsData[c][r] = sym;
-                    const div = document.createElement('div');
-                    div.className = 'symbol';
-                    div.innerText = sym;
-                    reelEl.appendChild(div);
+            let count = 0;
+            let timer = setInterval(() => {
+                document.getElementById('r1').innerText = symbols[Math.floor(Math.random()*symbols.length)];
+                document.getElementById('r2').innerText = symbols[Math.floor(Math.random()*symbols.length)];
+                document.getElementById('r3').innerText = symbols[Math.floor(Math.random()*symbols.length)];
+                count++;
+                if(count > 15) {
+                    clearInterval(timer);
+                    checkWin();
                 }
-            }
+            }, 100);
         }
 
-        async function checkWin() {
-            let totalWin = 0;
-            for (let r = 0; r < rows; r++) {
-                if (reelsData[0][r] === reelsData[1][r] && reelsData[1][r] === reelsData[2][r]) {
-                    let winMult = (reelsData[2][r] === reelsData[3][r]) ? 15 : 5;
-                    totalWin += currentBet * winMult;
-                    highlightWin(r);
-                }
+        function checkWin() {
+            let s1 = document.getElementById('r1').innerText;
+            let s2 = document.getElementById('r2').innerText;
+            let s3 = document.getElementById('r3').innerText;
+
+            if(s1 === s2 && s2 === s3) {
+                let win = bet * 10;
+                balance += win;
+                saveBalance();
+                document.getElementById('msg').innerText = "JACKPOT! +" + win;
+            } else {
+                document.getElementById('msg').innerText = "TRY AGAIN";
             }
-
-            if (totalWin > 0) {
-                balance += totalWin;
-                showWinPopup(totalWin);
-                // Sync the WINNINGS to Google Sheet
-                await syncBalance();
-            }
+            document.getElementById('balDisplay').innerText = balance.toFixed(2) + " ETB";
+            document.getElementById('spinBtn').disabled = false;
         }
-
-        function highlightWin(rowIdx) {
-            for(let c=0; c<cols; c++) {
-                document.getElementById(`reel${c}`).children[rowIdx].classList.add('win-highlight');
-            }
-        }
-
-        function showWinPopup(amt) {
-            const popup = document.getElementById('winPopup');
-            document.getElementById('winAmountDisplay').innerText = amt.toFixed(2) + " ETB";
-            popup.classList.add('show');
-            setTimeout(() => popup.classList.remove('show'), 2500);
-        }
-
-        window.onload = () => {
-            if(!activeUser) location.href = 'index.html';
-            initGrid();
-            document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
-        };
+        window.onload = init;
     </script>
 </body>
 </html>
