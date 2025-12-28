@@ -8,10 +8,10 @@
         :root {
             --gold: #FFD700;
             --win-green: #00FF41;
-            /* Precise sizing to fit the grid.jpg slots */
-            --reel-w: 64px; 
-            --reel-h: 216px;
-            --sym-h: 72px;
+            /* Optimized for the grid.jpg slots */
+            --reel-w: 52px; 
+            --reel-h: 180px;
+            --sym-h: 60px;
         }
 
         body {
@@ -35,23 +35,20 @@
             justify-content: space-between;
             align-items: center;
             box-sizing: border-box;
-            z-index: 10;
         }
 
         .balance-txt { color: var(--gold); font-size: 20px; font-weight: bold; }
 
-        /* THE HD GRID VIEWPORT */
         .game-viewport {
             position: relative;
-            margin-top: 30px;
-            width: 360px;
+            margin-top: 20px;
+            width: 340px;
             height: 300px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Your grid.jpg sits perfectly behind the reels */
         .grid-bg {
             position: absolute;
             top: 0;
@@ -66,7 +63,7 @@
             position: absolute;
             z-index: 2;
             display: flex;
-            gap: 3px; 
+            gap: 8px; /* Perfectly aligns with your grid slots */
             margin-top: 5px;
         }
 
@@ -75,6 +72,7 @@
             height: var(--reel-h);
             overflow: hidden;
             position: relative;
+            background: rgba(0,0,0,0.2);
         }
 
         .strip {
@@ -95,32 +93,29 @@
         }
 
         .symbol img {
-            width: 85%;
-            height: 85%;
+            width: 90%;
+            height: 90%;
             object-fit: contain;
         }
 
-        /* Straight Win Line through the middle */
         .payline {
             position: absolute;
             top: 50%;
             left: 0;
             width: 100%;
-            height: 5px;
+            height: 4px;
             background: var(--win-green);
-            box-shadow: 0 0 15px var(--win-green), 0 0 5px #fff;
+            box-shadow: 0 0 15px var(--win-green);
             z-index: 5;
             display: none;
             transform: translateY(-50%);
-            border-radius: 10px;
         }
 
-        /* Controls Panel */
         .controls {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: linear-gradient(0deg, #000 0%, #1a1a1a 100%);
+            background: #111;
             padding: 20px;
             border-top: 3px solid var(--gold);
             display: flex;
@@ -129,46 +124,38 @@
             gap: 15px;
         }
 
-        .bet-display { font-size: 22px; color: var(--gold); font-weight: bold; }
-        
+        .bet-selector { display: flex; align-items: center; gap: 15px; }
+        .bet-btn { 
+            background: none; border: 2px solid var(--gold); color: var(--gold); 
+            width: 40px; height: 40px; border-radius: 50%; font-size: 20px; font-weight: bold;
+        }
+
         .spin-btn {
             background: linear-gradient(to bottom, #FFD700, #ff8c00);
             border: none;
-            width: 85%;
+            width: 80%;
             padding: 15px;
             font-size: 24px;
             font-weight: 900;
             border-radius: 40px;
             color: #000;
-            box-shadow: 0 5px 0 #8b6b00;
-            cursor: pointer;
         }
 
-        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #8b6b00; }
-        .spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
-
-        #status { margin: 10px; font-size: 22px; color: var(--gold); height: 25px; font-weight: bold; }
-
-        /* High-Definition Win Pulse */
-        .win-glow { animation: pulse 0.5s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .spin-btn:disabled { opacity: 0.5; }
+        #status { color: var(--gold); font-weight: bold; height: 25px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:#333; color:white; border:1px solid #555; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
+        <button onclick="location.href='index.html'" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:5px;">LOBBY</button>
         <div class="balance-txt"><span id="balance">0.00</span> ETB</div>
     </div>
 
-    <div id="status">MULTI HOT 5</div>
-
     <div class="game-viewport">
         <img src="assets/assets/grid.jpg" class="grid-bg">
-        
         <div class="reels-container">
             <div class="payline" id="line"></div>
-            
             <div class="reel"><div class="strip" id="r0"></div></div>
             <div class="reel"><div class="strip" id="r1"></div></div>
             <div class="reel"><div class="strip" id="r2"></div></div>
@@ -178,16 +165,16 @@
     </div>
 
     <div class="controls">
-        <div class="bet-display">
-            <button onclick="adjBet(-10)" style="background:#333;color:white;border:1px solid var(--gold);width:35px;height:35px;border-radius:50%;margin-right:10px;">-</button>
-            BET: <span id="betAmt">20</span>
-            <button onclick="adjBet(10)" style="background:#333;color:white;border:1px solid var(--gold);width:35px;height:35px;border-radius:50%;margin-left:10px;">+</button>
+        <div id="status">MULTI HOT 5</div>
+        <div class="bet-selector">
+            <button class="bet-btn" onclick="changeBet(-2)">-</button>
+            <div style="font-size: 22px; color: var(--gold);">BET: <span id="betAmt">2</span></div>
+            <button class="bet-btn" onclick="changeBet(2)">+</button>
         </div>
         <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
 
     <script>
-        // The 9 files identified from your assets/assets/ folder
         const assets = [
             'star.png', 'red.gift.png', 'collector.png', 
             'purple.gift.png', 'bell.png', 'double.star.png', 
@@ -197,20 +184,18 @@
 
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let balance = user ? parseFloat(user.balance) : 0;
-        let bet = 20;
+        let bet = 2; 
         let spinning = false;
 
-        function saveBalance() {
+        function save() {
             user.balance = balance.toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
 
         function init() {
-            if(!user) location.href = 'index.html';
             document.getElementById('balance').innerText = balance.toFixed(2);
             for(let i=0; i<5; i++) {
                 const reel = document.getElementById('r'+i);
-                // Pre-fill with random symbols from your assets
                 for(let j=0; j<20; j++) reel.appendChild(createSym());
             }
         }
@@ -219,17 +204,17 @@
             const div = document.createElement('div');
             div.className = 'symbol';
             const img = document.createElement('img');
-            const name = assets[Math.floor(Math.random() * assets.length)];
+            const name = assets[Math.floor(Math.random()*assets.length)];
             img.src = path + name;
             div.dataset.name = name;
             div.appendChild(img);
             return div;
         }
 
-        function adjBet(v) {
+        function changeBet(val) {
             if(spinning) return;
-            if(bet + v >= 10 && bet + v <= 2000) {
-                bet += v;
+            if(bet + val >= 2 && bet + val <= 500) {
+                bet += val;
                 document.getElementById('betAmt').innerText = bet;
             }
         }
@@ -237,9 +222,66 @@
         async function spin() {
             if(balance < bet || spinning) return;
             
-            // Deduct immediately and Save
             balance -= bet;
-            saveBalance();
+            save();
             document.getElementById('balance').innerText = balance.toFixed(2);
+            document.getElementById('line').style.display = 'none';
             
-            //
+            spinning = true;
+            document.getElementById('spinBtn').disabled = true;
+
+            const results = [];
+            for(let i=0; i<5; i++) {
+                results.push(runReel(i, i * 100)); 
+            }
+
+            const grid = await Promise.all(results);
+            checkWin(grid);
+        }
+
+        function runReel(id, delay) {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const reel = document.getElementById('r'+id);
+                    let ticks = 0;
+                    const maxTicks = 15 + (id * 5);
+
+                    const timer = setInterval(() => {
+                        reel.removeChild(reel.firstElementChild);
+                        reel.appendChild(createSym());
+                        ticks++;
+                        if(ticks >= maxTicks) {
+                            clearInterval(timer);
+                            resolve(Array.from(reel.children).slice(-3));
+                        }
+                    }, 50);
+                }, delay);
+            });
+        }
+
+        function checkWin(grid) {
+            const mid = grid.map(col => col[1].dataset.name);
+            let matches = 1;
+            for(let i=1; i<5; i++) {
+                if(mid[i] === mid[0]) matches++;
+                else break;
+            }
+
+            if(matches >= 3) {
+                const win = bet * (matches === 5 ? 50 : matches === 4 ? 10 : 3);
+                balance += win;
+                save();
+                document.getElementById('status').innerText = "WIN: " + win + " ETB!";
+                document.getElementById('line').style.display = 'block';
+            } else {
+                document.getElementById('status').innerText = "TRY AGAIN";
+            }
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            spinning = false;
+            document.getElementById('spinBtn').disabled = false;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
