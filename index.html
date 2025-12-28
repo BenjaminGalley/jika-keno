@@ -6,7 +6,6 @@
     <title>Simba Bet | Official</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Ensuring hidden elements don't disrupt layout */
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
         .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
         
@@ -16,7 +15,6 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
-        /* NEW: Style for the Multi Hot 5 Image to match Keno/Fruit size */
         .game-tile-img {
             width: 100%;
             height: 55px;
@@ -25,8 +23,7 @@
             display: block;
         }
 
-        /* Added a small pulse to show when syncing */
-        .syncing { opacity: 0.5; }
+        .syncing { opacity: 0.7; font-style: italic; }
     </style>
 </head>
 <body>
@@ -108,7 +105,7 @@
 
     <script src="script.js"></script>
     <script>
-        // REPLACE WITH YOUR ACTUAL URL
+        // Update this with your actual Apps Script URL
         const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
 
         function toggleMenu() { 
@@ -127,42 +124,44 @@
             const syncStatus = document.getElementById('syncStatus');
 
             if (activeUser) {
+                // 1. IMMEDIATELY SHOW LOCAL BALANCE (Fixes the rollback)
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
+                
+                // Show the balance exactly as it was when the user left the game
                 headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
+                
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
 
-                headerBal.classList.add('syncing');
-                syncStatus.innerText = "Syncing...";
-
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
-                    const data = await response.json();
-
-                    if (data && data.balance !== undefined) {
-                        const realBal = parseFloat(data.balance).toFixed(2);
-                        headerBal.innerText = realBal;
-                        syncStatus.innerText = "Synced";
-                        
-                        activeUser.balance = realBal;
-                        localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                // 2. BACKGROUND SYNC (Optional: only if you want to pull cloud data)
+                if(SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                    syncStatus.innerText = "Syncing...";
+                    try {
+                        const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
+                        const data = await response.json();
+                        if (data && data.balance !== undefined) {
+                            // Only update if the local balance hasn't changed since we started the fetch
+                            const latestLocal = JSON.parse(localStorage.getItem('simba_active_user'));
+                            if (latestLocal.balance == activeUser.balance) {
+                                const cloudBal = parseFloat(data.balance).toFixed(2);
+                                headerBal.innerText = cloudBal;
+                                activeUser.balance = cloudBal;
+                                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                                syncStatus.innerText = "Synced";
+                            }
+                        }
+                    } catch (e) {
+                        syncStatus.innerText = "Offline";
                     }
-                } catch (e) {
-                    syncStatus.innerText = "Offline";
-                    console.log("Remote sync failed.");
-                } finally {
-                    headerBal.classList.remove('syncing');
                 }
-
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
                 menuBtn.style.display = 'none';
                 userIDDisplay.innerText = "0000";
-                menuName.innerText = "Guest Player";
             }
         }
 
@@ -174,4 +173,4 @@
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
-</html>
+    </html>
