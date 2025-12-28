@@ -19,7 +19,6 @@
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
         }
 
-        /* --- HEADER --- */
         .game-header {
             margin-top: 15px;
             background: linear-gradient(90deg, #000, var(--purple-dark), #000);
@@ -37,7 +36,6 @@
             display: flex; align-items: center; gap: 10px; justify-content: center;
         }
 
-        /* --- SLOT MACHINE GRID --- */
         .slot-frame {
             position: relative;
             background: #000;
@@ -60,10 +58,7 @@
             border: 1px solid #333;
         }
 
-        .reel {
-            display: flex; flex-direction: column;
-            width: 100%;
-        }
+        .reel { display: flex; flex-direction: column; width: 100%; }
 
         .symbol {
             height: 80px; 
@@ -93,7 +88,6 @@
             100% { transform: translateY(40px); opacity: 0.5; } 
         }
 
-        /* --- CONTROLS FOOTER --- */
         .controls-area {
             width: 100%;
             background: linear-gradient(180deg, #111, #000);
@@ -195,31 +189,46 @@
     </div>
 
     <script>
-        // --- 10% CHANCE CONFIGURATION ---
+        // --- 1. CONFIGURATION ---
+        // PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
+        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
         const symbols = ['🦁', '💎', '🔔', '🍋', '🍒', '7️⃣', '🍀']; 
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-        
         let balance = activeUser ? parseFloat(activeUser.balance) : 0.00;
         let currentBet = 2.00;
         let isSpinning = false;
         const rows = 3;
         const cols = 4;
-
-        document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
         const reelsData = [[], [], [], []]; 
-        
-        // Simba (🦁) now has a strict 10% chance to appear.
-        function getRandomSymbol() {
-            const r = Math.random();
-            if (r < 0.10) return '🦁'; 
-            return symbols[Math.floor(Math.random() * symbols.length)];
+
+        // --- 2. THE BRAIN: SYNC FUNCTION ---
+        async function syncBalance() {
+            if(!activeUser) return;
+            
+            const formatted = balance.toFixed(2);
+            document.getElementById('balanceDisplay').innerText = formatted;
+            
+            // Local Save
+            activeUser.balance = formatted;
+            localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+
+            // Remote Save (Google Sheet)
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        action: 'updateBalance',
+                        phone: activeUser.phone,
+                        newBalance: formatted
+                    })
+                });
+            } catch (e) { console.error("Network sync failed"); }
         }
 
-        function addSymbolBox(container, char) {
-            const div = document.createElement('div');
-            div.className = 'symbol';
-            div.innerText = char;
-            container.appendChild(div);
+        function getRandomSymbol() {
+            return Math.random() < 0.10 ? '🦁' : symbols[Math.floor(Math.random() * symbols.length)];
         }
 
         function initGrid() {
@@ -230,7 +239,10 @@
                 for(let r=0; r<rows; r++) {
                     const sym = getRandomSymbol();
                     reelsData[c][r] = sym;
-                    addSymbolBox(reelEl, sym);
+                    const div = document.createElement('div');
+                    div.className = 'symbol';
+                    div.innerText = sym;
+                    reelEl.appendChild(div);
                 }
             }
         }
@@ -241,8 +253,10 @@
             document.getElementById('betValue').innerText = currentBet.toFixed(2);
         }
 
-        function spin() {
+        async function spin() {
             if (isSpinning) return;
+            
+            // Re-fetch active user to ensure latest data
             activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             balance = activeUser ? parseFloat(activeUser.balance) : 0;
 
@@ -250,18 +264,17 @@
 
             isSpinning = true;
             balance -= currentBet;
-            updateBalanceUI();
+            
+            // IMMEDIATELY sync deduction to Google Sheet
+            await syncBalance(); 
 
             document.getElementById('reelsArea').classList.add('spinning');
             document.getElementById('spinBtn').disabled = true;
 
-            const allSymbols = document.querySelectorAll('.symbol');
-            allSymbols.forEach(s => s.classList.remove('win-highlight'));
-
-            setTimeout(() => {
+            setTimeout(async () => {
                 document.getElementById('reelsArea').classList.remove('spinning');
                 generateResult();
-                checkWin();
+                await checkWin();
                 isSpinning = false;
                 document.getElementById('spinBtn').disabled = false;
             }, 1200);
@@ -274,19 +287,19 @@
                 for(let r=0; r<rows; r++) {
                     const sym = getRandomSymbol();
                     reelsData[c][r] = sym;
-                    addSymbolBox(reelEl, sym);
+                    const div = document.createElement('div');
+                    div.className = 'symbol';
+                    div.innerText = sym;
+                    reelEl.appendChild(div);
                 }
             }
         }
 
-        function checkWin() {
+        async function checkWin() {
             let totalWin = 0;
             for (let r = 0; r < rows; r++) {
-                // Check for matches
                 if (reelsData[0][r] === reelsData[1][r] && reelsData[1][r] === reelsData[2][r]) {
-                    let winMult = 5; 
-                    if (reelsData[2][r] === reelsData[3][r]) winMult = 15; 
-                    
+                    let winMult = (reelsData[2][r] === reelsData[3][r]) ? 15 : 5;
                     totalWin += currentBet * winMult;
                     highlightWin(r);
                 }
@@ -295,14 +308,14 @@
             if (totalWin > 0) {
                 balance += totalWin;
                 showWinPopup(totalWin);
-                updateBalanceUI();
+                // Sync the WINNINGS to Google Sheet
+                await syncBalance();
             }
         }
 
         function highlightWin(rowIdx) {
             for(let c=0; c<cols; c++) {
-                const reel = document.getElementById(`reel${c}`);
-                reel.children[rowIdx].classList.add('win-highlight');
+                document.getElementById(`reel${c}`).children[rowIdx].classList.add('win-highlight');
             }
         }
 
@@ -313,15 +326,11 @@
             setTimeout(() => popup.classList.remove('show'), 2500);
         }
 
-        function updateBalanceUI() {
+        window.onload = () => {
+            if(!activeUser) location.href = 'index.html';
+            initGrid();
             document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
-            if(activeUser) {
-                activeUser.balance = balance.toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-            }
-        }
-
-        initGrid();
+        };
     </script>
 </body>
 </html>
