@@ -195,9 +195,8 @@
     </div>
 
     <script>
-        // --- EASY WIN CONFIGURATION ---
-        // I have simplified the symbol list to make matches much more frequent.
-        const symbols = ['🦁', '🦁', '💎', '🔔', '7️⃣', '🍀']; 
+        // --- 10% CHANCE CONFIGURATION ---
+        const symbols = ['🦁', '💎', '🔔', '🍋', '🍒', '7️⃣', '🍀']; 
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
         
         let balance = activeUser ? parseFloat(activeUser.balance) : 0.00;
@@ -209,11 +208,10 @@
         document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
         const reelsData = [[], [], [], []]; 
         
-        // This is the "Brain" of the RTP. 
-        // Currently weighted to favor the '🦁' (Simba) symbol.
+        // Simba (🦁) now has a strict 10% chance to appear.
         function getRandomSymbol() {
             const r = Math.random();
-            if (r < 0.3) return '🦁'; // 30% chance for Simba
+            if (r < 0.10) return '🦁'; 
             return symbols[Math.floor(Math.random() * symbols.length)];
         }
 
@@ -284,10 +282,10 @@
         function checkWin() {
             let totalWin = 0;
             for (let r = 0; r < rows; r++) {
-                // Match 3 Symbols = Easy Win
+                // Check for matches
                 if (reelsData[0][r] === reelsData[1][r] && reelsData[1][r] === reelsData[2][r]) {
-                    let winMult = 10; // Increased payout
-                    if (reelsData[2][r] === reelsData[3][r]) winMult = 50; // Huge win
+                    let winMult = 5; 
+                    if (reelsData[2][r] === reelsData[3][r]) winMult = 15; 
                     
                     totalWin += currentBet * winMult;
                     highlightWin(r);
