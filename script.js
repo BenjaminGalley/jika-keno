@@ -1,5 +1,5 @@
 // ==========================================
-// SIMBA BET - FINAL MASTER WEBSITE SCRIPT
+// SIMBA BET - MASTER WEBSITE SCRIPT (LOGIC V3)
 // ==========================================
 
 // --- ✅ TELEGRAM CONFIGURATION ---
@@ -52,15 +52,21 @@ async function sendTelegramNotification(message) {
 }
 
 async function notifyAdmin(details, type, amount, phone, name) {
-    // Keep Google Sheets updated
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&name=${encodeURIComponent(name)}&ref=${encodeURIComponent(details)}`;
     fetch(finalURL, { method: 'GET', mode: 'no-cors' });
 
-    // Choose emoji
     let emoji = '🦁';
+    let displayAmount = amount;
+    
     if (type.toLowerCase() === 'deposit') emoji = '💰';
-    if (type.toLowerCase() === 'withdraw') emoji = '💸';
-    if (type.toLowerCase() === 'register') emoji = '👤';
+    if (type.toLowerCase() === 'withdraw') {
+        emoji = '💸';
+        displayAmount = Math.abs(amount);
+    }
+    if (type.toLowerCase() === 'register') {
+        emoji = '👤';
+        displayAmount = "NEW ACCOUNT";
+    }
 
     const telegramMsg = `
 ${emoji} <b>NEW ${type.toUpperCase()} REQUEST</b> ${emoji}
@@ -68,33 +74,38 @@ ${emoji} <b>NEW ${type.toUpperCase()} REQUEST</b> ${emoji}
 👤 <b>Name:</b> ${name}
 📱 <b>Phone:</b> ${phone}
 --------------------------------
-💵 <b>Amount/Action:</b> ${amount} ETB
+💵 <b>Amount:</b> ${displayAmount} ${typeof displayAmount === 'number' ? 'ETB' : ''}
 📝 <b>Details:</b> ${details}
 --------------------------------
-<i>Action Required!</i>
+<i>Verify on Google Sheet to Approve!</i>
     `;
     sendTelegramNotification(telegramMsg);
 }
 
-// THE DEPOSIT FUNCTION
+// THE DEPOSIT FUNCTION (FIXED: NO AUTO-ADD, 100 MIN)
 function submitDepositRequest() {
     const method = document.getElementById('method').value;
     const sName = document.getElementById('senderName').value;
     const sPhone = document.getElementById('senderPhone').value;
-    const amt = document.getElementById('amount').value;
+    const amt = parseFloat(document.getElementById('amount').value);
     const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
     if (!user) return alert("Please login first");
     if (!method || !sName || !sPhone || !amt) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
 
-    const detailString = `Method: ${method.toUpperCase()} | Sender: ${sName} | Sender Phone: ${sPhone}`;
+    if (amt < 100) return alert("ዝቅተኛው ማስገቢያ 100 ብር ነው (Minimum Deposit is 100 ETB)");
+
+    // NOTE: We do NOT update user.balance locally here. 
+    // It only updates when updateDisplay() fetches from Google after you approve.
+
+    const detailString = `Method: ${method.toUpperCase()} | Sender: ${sName} | Phone: ${sPhone}`;
     notifyAdmin(detailString, 'Deposit', amt, user.phone, user.name);
     
-    alert("Request Sent! Your balance will be updated after verification.");
+    alert("ጥያቄዎ ተልኳል! ገንዘቡ ሲረጋገጥ ሂሳብዎ ላይ ይጨመራል። (Request Sent! Balance will update after verification.)");
     window.location.href = 'index.html';
 }
 
-// THE WITHDRAWAL FUNCTION
+// THE WITHDRAWAL FUNCTION (FIXED: AUTO-SUBTRACT, 100 MIN)
 function processWithdraw() {
     const method = document.getElementById('wdMethod').value;
     const receivePhone = document.getElementById('wdPhone').value;
@@ -103,31 +114,30 @@ function processWithdraw() {
 
     if (!user) return alert("Please login first");
     if (!receivePhone || !amount) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
-    if (amount < 100 || amount > 10000) return alert("Min: 100, Max: 10,000");
-    if (amount > parseFloat(user.balance)) return alert("Insufficient Balance");
-
-    const detailString = `Withdrawal to: ${method} | Phone: ${receivePhone}`;
-    notifyAdmin(detailString, 'Withdraw', amount, user.phone, user.name);
     
-    alert("Request Sent!");
+    if (amount < 100) return alert("ዝቅተኛው ወጪ 100 ብር ነው (Minimum withdrawal is 100 ETB)");
+    if (amount > 10000) return alert("ከፍተኛው ወጪ 10,000 ብር ነው");
+    
+    if (amount > parseFloat(user.balance)) return alert("በቂ ሂሳብ የለዎትም (Insufficient Balance)");
+
+    // SUBTRACT IMMEDIATELY (Locks the funds)
+    user.balance = (parseFloat(user.balance) - amount).toFixed(2);
+    localStorage.setItem('simba_active_user', JSON.stringify(user));
+
+    const detailString = `Withdraw to: ${method} | Phone: ${receivePhone}`;
+    const negativeAmount = -Math.abs(amount);
+    
+    notifyAdmin(detailString, 'Withdraw', negativeAmount, user.phone, user.name);
+    
+    alert("የወጪ ጥያቄዎ ተልኳል! (Withdrawal request sent!)");
     window.location.href = 'index.html';
 }
 
-// THE REGISTER FUNCTION
 function processRegistration(name, phone, pass) {
-    const user = { 
-        name, 
-        phone, 
-        pass, 
-        balance: "0.00", 
-        id: "SB-" + Math.floor(1000 + Math.random() * 9000) 
-    };
-
-    // Save locally
+    const generatedID = "SB-" + Math.floor(1000 + Math.random() * 9000);
+    const user = { name, phone, pass, balance: "0.00", id: generatedID };
     localStorage.setItem('user_' + phone, JSON.stringify(user));
-    
-    // Notify Bot
-    notifyAdmin(`New User Registration. Password: ${pass}`, 'Register', 0, phone, name);
+    notifyAdmin(`ID: ${generatedID} | Password: ${pass}`, 'Register', 0, phone, name);
 }
 
 function loginUser() {
