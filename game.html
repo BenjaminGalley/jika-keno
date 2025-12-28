@@ -3,104 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Shuffle | Anti-Rollback</title>
+    <title>Simba Shuffle</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --win: #22c55e; }
-        body { background: radial-gradient(circle, #1a1d29, #000); color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; }
-        .header { background: rgba(0,0,0,0.8); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
-        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 360px; width: 90%; margin: 20px auto; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 15px; border: 2px solid #333; }
-        .cell { aspect-ratio: 1/1; background: #1e293b; border-radius: 8px; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; border: 1px solid #444; }
-        .cover { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f59e0b, #92400e); display: flex; align-items: center; justify-content: center; font-size: 24px; z-index: 2; transition: opacity 0.4s; }
-        .cell.revealed .cover { opacity: 0; visibility: hidden; }
-        .controls { background: rgba(0,0,0,0.8); width: 100%; padding: 20px 0; border-top: 2px solid var(--gold); margin-top: auto; }
-        .btn-main { background: linear-gradient(180deg, #f59e0b, #92400e); color: white; border: none; width: 80%; padding: 15px; border-radius: 50px; font-size: 1.2rem; font-weight: bold; box-shadow: 0 4px 0 #734a02; cursor: pointer; }
-        .btn-main:disabled { background: #444; box-shadow: none; }
-        .win-cell { background: #064e3b !important; border: 2px solid var(--win) !important; }
+        body { background: #1a1a1a; color: white; font-family: sans-serif; text-align: center; margin: 0; }
+        .header { padding: 15px; background: #000; border-bottom: 2px solid #FFD700; display: flex; justify-content: space-between; }
+        .game-area { display: flex; justify-content: center; gap: 15px; margin-top: 50px; }
+        .card { width: 90px; height: 130px; background: #333; border: 2px solid #FFD700; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 40px; cursor: pointer; }
+        .controls { margin-top: 50px; background: #222; padding: 20px; }
+        .play-btn { background: #FFD700; border: none; padding: 15px 40px; font-size: 20px; font-weight: bold; border-radius: 30px; width: 80%; }
     </style>
 </head>
 <body>
-
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:var(--gold); border:none; padding:8px 12px; border-radius:5px; font-weight:bold;">LOBBY</button>
-        <div id="balDisplay" style="color:var(--gold); font-weight:bold;">0.00 ETB</div>
+        <button onclick="location.href='index.html'">EXIT</button>
+        <div style="color:#FFD700; font-weight:bold;"><span id="balance">0.00</span> ETB</div>
     </div>
-
-    <div style="flex:1; overflow-y:auto;">
-        <h2 style="color:var(--gold); margin: 20px 0 5px;">SIMBA SHUFFLE</h2>
-        <div id="status" style="color:var(--gold); font-weight:bold; margin-bottom: 10px;">SCRATCH 4 TO WIN!</div>
-        <div class="grid">
-            <script>
-                for(let i=0; i<16; i++) {
-                    document.write(`<div class="cell" onclick="scratch(${i})" id="gc${i}"><div class="cover">🐾</div><span id="gs${i}">?</span></div>`);
-                }
-            </script>
-        </div>
+    <div id="status" style="margin-top:20px; color:#FFD700;">PICK THE GOLD 7</div>
+    <div class="game-area">
+        <div class="card" onclick="pick(0)" id="c0">🦁</div>
+        <div class="card" onclick="pick(1)" id="c1">🦁</div>
+        <div class="card" onclick="pick(2)" id="c2">🦁</div>
     </div>
-
     <div class="controls">
-        <div style="margin-bottom:15px; font-weight:bold;">
-            BET: <button onclick="adjBet(-2)" style="width:30px;">-</button> 
-            <span id="betDisp" style="color:var(--gold); margin:0 10px;">2</span> 
-            <button onclick="adjBet(2)" style="width:30px;">+</button>
-        </div>
-        <button class="btn-main" id="buyCardBtn" onclick="buyCard()">BUY NEW CARD</button>
+        <div style="margin-bottom:15px;">BET: <span id="betDisplay">10</span></div>
+        <button class="play-btn" id="startBtn" onclick="startShuffle()">SHUFFLE</button>
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
-        const syms = ['🐘', '🦍', '🐆', '🦓', '🦒', '🦏'];
-        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = activeUser ? parseFloat(activeUser.balance) : 0;
-        let bet = 2, gameActive = false, revealed = 0, results = [];
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
+        let bet = 10;
+        let isPlaying = false;
+        let winCard = -1;
 
-        async function sync() {
-            if(!activeUser) return;
-            const f = balance.toFixed(2);
-            document.getElementById('balDisplay').innerText = f + " ETB";
-            activeUser.balance = f;
-            localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-            try { await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:'updateBalance', phone:activeUser.phone, newBalance:f})}); } catch(e){}
+        function saveBalance() {
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
 
-        function adjBet(v) { if(!gameActive) { bet = Math.max(2, bet+v); document.getElementById('betDisp').innerText = bet; } }
+        function init() {
+            if(!user) location.href='index.html';
+            document.getElementById('balance').innerText = balance.toFixed(2);
+        }
 
-        async function buyCard() {
-            if(balance < bet || gameActive) return;
-            balance -= bet; gameActive = true; revealed = 0; results = [];
-            await sync();
-            document.getElementById('buyCardBtn').disabled = true;
-            for(let i=0; i<16; i++){
-                let s = Math.random() < 0.10 ? '🦁' : syms[Math.floor(Math.random()*syms.length)];
-                results.push(s);
-                document.getElementById(`gs${i}`).innerText = s;
-                document.getElementById(`gc${i}`).classList.remove('revealed', 'win-cell');
+        function startShuffle() {
+            if(balance < bet || isPlaying) return;
+            balance -= bet;
+            saveBalance();
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            isPlaying = true;
+            winCard = Math.floor(Math.random() * 3);
+            document.getElementById('status').innerText = "SHUFFLING...";
+            setTimeout(() => { document.getElementById('status').innerText = "CHOOSE A CARD!"; }, 1000);
+        }
+
+        function pick(i) {
+            if(!isPlaying || winCard === -1) return;
+            if(i === winCard) {
+                let win = bet * 2.5;
+                balance += win;
+                saveBalance();
+                document.getElementById('status').innerText = "WINNER! +" + win;
+                document.getElementById('c'+i).innerText = "7️⃣";
+            } else {
+                document.getElementById('status').innerText = "TRY AGAIN";
+                document.getElementById('c'+i).innerText = "❌";
             }
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            isPlaying = false;
+            setTimeout(() => { location.reload(); }, 2000);
         }
-
-        function scratch(i) {
-            if(!gameActive) return;
-            let c = document.getElementById(`gc${i}`);
-            if(!c.classList.contains('revealed')) {
-                c.classList.add('revealed'); revealed++;
-                if(revealed === 16) setTimeout(check, 500);
-            }
-        }
-
-        async function check() {
-            let win = 0;
-            const lines = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
-            lines.forEach(l => {
-                if(results[l[0]]===results[l[1]] && results[l[1]]===results[l[2]] && results[l[2]]===results[l[3]]) {
-                    win += (bet * (results[l[0]] === '🦁' ? 50 : 10));
-                    l.forEach(idx => document.getElementById(`gc${idx}`).classList.add('win-cell'));
-                }
-            });
-            if(win > 0) { balance += win; document.getElementById('status').innerText = "WIN! +" + win; }
-            else { document.getElementById('status').innerText = "TRY AGAIN"; }
-            await sync();
-            gameActive = false; document.getElementById('buyCardBtn').disabled = false;
-        }
-        window.onload = sync;
+        window.onload = init;
     </script>
 </body>
 </html>
