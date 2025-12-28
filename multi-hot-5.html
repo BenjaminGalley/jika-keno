@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Multi Hot 5 | Simba Bet</title>
+    <style>
+        :root {
+            --gold: #FFD700;
+            --win-green: #00FF41;
+            /* Precise sizing to fit the grid.jpg slots */
+            --reel-w: 64px; 
+            --reel-h: 216px;
+            --sym-h: 72px;
+        }
+
+        body {
+            background: #000;
+            color: white;
+            font-family: 'Arial Black', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            width: 100%;
+            padding: 10px 20px;
+            background: #111;
+            border-bottom: 2px solid var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .balance-txt { color: var(--gold); font-size: 20px; font-weight: bold; }
+
+        /* THE HD GRID VIEWPORT */
+        .game-viewport {
+            position: relative;
+            margin-top: 30px;
+            width: 360px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Your grid.jpg sits perfectly behind the reels */
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            object-fit: contain;
+        }
+
+        .reels-container {
+            position: absolute;
+            z-index: 2;
+            display: flex;
+            gap: 3px; 
+            margin-top: 5px;
+        }
+
+        .reel {
+            width: var(--reel-w);
+            height: var(--reel-h);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .strip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .symbol {
+            width: var(--reel-w);
+            height: var(--sym-h);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .symbol img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+        }
+
+        /* Straight Win Line through the middle */
+        .payline {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--win-green);
+            box-shadow: 0 0 15px var(--win-green), 0 0 5px #fff;
+            z-index: 5;
+            display: none;
+            transform: translateY(-50%);
+            border-radius: 10px;
+        }
+
+        /* Controls Panel */
+        .controls {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(0deg, #000 0%, #1a1a1a 100%);
+            padding: 20px;
+            border-top: 3px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bet-display { font-size: 22px; color: var(--gold); font-weight: bold; }
+        
+        .spin-btn {
+            background: linear-gradient(to bottom, #FFD700, #ff8c00);
+            border: none;
+            width: 85%;
+            padding: 15px;
+            font-size: 24px;
+            font-weight: 900;
+            border-radius: 40px;
+            color: #000;
+            box-shadow: 0 5px 0 #8b6b00;
+            cursor: pointer;
+        }
+
+        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #8b6b00; }
+        .spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
+
+        #status { margin: 10px; font-size: 22px; color: var(--gold); height: 25px; font-weight: bold; }
+
+        /* High-Definition Win Pulse */
+        .win-glow { animation: pulse 0.5s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="location.href='index.html'" style="background:#333; color:white; border:1px solid #555; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
+        <div class="balance-txt"><span id="balance">0.00</span> ETB</div>
+    </div>
+
+    <div id="status">MULTI HOT 5</div>
+
+    <div class="game-viewport">
+        <img src="assets/assets/grid.jpg" class="grid-bg">
+        
+        <div class="reels-container">
+            <div class="payline" id="line"></div>
+            
+            <div class="reel"><div class="strip" id="r0"></div></div>
+            <div class="reel"><div class="strip" id="r1"></div></div>
+            <div class="reel"><div class="strip" id="r2"></div></div>
+            <div class="reel"><div class="strip" id="r3"></div></div>
+            <div class="reel"><div class="strip" id="r4"></div></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-display">
+            <button onclick="adjBet(-10)" style="background:#333;color:white;border:1px solid var(--gold);width:35px;height:35px;border-radius:50%;margin-right:10px;">-</button>
+            BET: <span id="betAmt">20</span>
+            <button onclick="adjBet(10)" style="background:#333;color:white;border:1px solid var(--gold);width:35px;height:35px;border-radius:50%;margin-left:10px;">+</button>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
+    </div>
+
+    <script>
+        // The 9 files identified from your assets/assets/ folder
+        const assets = [
+            'star.png', 'red.gift.png', 'collector.png', 
+            'purple.gift.png', 'bell.png', 'double.star.png', 
+            'seven.triple.png', 'crown.png'
+        ];
+        const path = 'assets/assets/';
+
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
+        let bet = 20;
+        let spinning = false;
+
+        function saveBalance() {
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        }
+
+        function init() {
+            if(!user) location.href = 'index.html';
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            for(let i=0; i<5; i++) {
+                const reel = document.getElementById('r'+i);
+                // Pre-fill with random symbols from your assets
+                for(let j=0; j<20; j++) reel.appendChild(createSym());
+            }
+        }
+
+        function createSym() {
+            const div = document.createElement('div');
+            div.className = 'symbol';
+            const img = document.createElement('img');
+            const name = assets[Math.floor(Math.random() * assets.length)];
+            img.src = path + name;
+            div.dataset.name = name;
+            div.appendChild(img);
+            return div;
+        }
+
+        function adjBet(v) {
+            if(spinning) return;
+            if(bet + v >= 10 && bet + v <= 2000) {
+                bet += v;
+                document.getElementById('betAmt').innerText = bet;
+            }
+        }
+
+        async function spin() {
+            if(balance < bet || spinning) return;
+            
+            // Deduct immediately and Save
+            balance -= bet;
+            saveBalance();
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            
+            //
