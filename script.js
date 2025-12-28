@@ -52,12 +52,16 @@ async function sendTelegramNotification(message) {
 }
 
 async function notifyAdmin(details, type, amount, phone, name) {
-    // Keep Google Sheets updated (Optional backup)
+    // Keep Google Sheets updated
     const finalURL = `${scriptURL}?action=${encodeURIComponent(type)}&user=${encodeURIComponent(phone)}&amt=${encodeURIComponent(amount)}&name=${encodeURIComponent(name)}&ref=${encodeURIComponent(details)}`;
     fetch(finalURL, { method: 'GET', mode: 'no-cors' });
 
-    // Send Telegram Alert for immediate approval
-    let emoji = (type.toLowerCase() === 'deposit') ? '💰' : '🦁';
+    // Choose emoji based on request type
+    let emoji = '🦁';
+    if (type.toLowerCase() === 'deposit') emoji = '💰';
+    if (type.toLowerCase() === 'withdraw') emoji = '💸';
+
+    // Send Telegram Alert
     const telegramMsg = `
 ${emoji} <b>NEW ${type.toUpperCase()} REQUEST</b> ${emoji}
 --------------------------------
@@ -67,12 +71,12 @@ ${emoji} <b>NEW ${type.toUpperCase()} REQUEST</b> ${emoji}
 💵 <b>Amount:</b> ${amount} ETB
 📝 <b>Details:</b> ${details}
 --------------------------------
-<i>Verify payment and update Google Sheet!</i>
+<i>Verify and process this request!</i>
     `;
     sendTelegramNotification(telegramMsg);
 }
 
-// THE DEPOSIT FUNCTION (CALLED FROM DEPOSIT.HTML)
+// THE DEPOSIT FUNCTION
 function submitDepositRequest() {
     const method = document.getElementById('method').value;
     const sName = document.getElementById('senderName').value;
@@ -92,16 +96,40 @@ function submitDepositRequest() {
     window.location.href = 'index.html';
 }
 
+// --- ✅ NEW WITHDRAWAL FUNCTION ---
+function processWithdraw() {
+    const method = document.getElementById('wdMethod').value;
+    const receivePhone = document.getElementById('wdPhone').value;
+    const amount = parseFloat(document.getElementById('wdAmount').value);
+    const user = JSON.parse(localStorage.getItem('simba_active_user'));
+
+    if (!user) return alert("Please login first");
+    if (!receivePhone || !amount) {
+        return alert("እባክዎን ሁሉንም መረጃ ይሙሉ (Please fill all fields)");
+    }
+
+    // Constraints: 100 - 10,000
+    if (amount < 100) return alert("ዝቅተኛው ወጪ 100 ብር ነው (Min withdrawal: 100 ETB)");
+    if (amount > 10000) return alert("ከፍተኛው ወጪ 10,000 ብር ነው (Max withdrawal: 10,000 ETB)");
+    
+    // Check balance
+    if (amount > parseFloat(user.balance)) {
+        return alert("በቂ ሂሳብ የለዎትም (Insufficient Balance)");
+    }
+
+    const detailString = `Withdraw to: ${method} | Receive Phone: ${receivePhone}`;
+    notifyAdmin(detailString, 'Withdraw', amount, user.phone, user.name);
+    
+    alert("የወጪ ጥያቄዎ ተልኳል! በቅርቡ እናስተካክላለን። (Request Sent!)");
+    window.location.href = 'index.html';
+}
+
 function registerUser() {
     const name = document.getElementById('regName').value;
     const phone = document.getElementById('regPhone').value.toString();
     const pass = document.getElementById('regPass').value;
-    
     if(!name || !phone || !pass) return alert("Please fill all fields");
-    
-    if (!name.trim().includes(" ")) {
-        return alert("Please enter Full Name (First and Last Name)");
-    }
+    if (!name.trim().includes(" ")) return alert("Please enter Full Name (First and Last Name)");
 
     const user = { 
         name, 
@@ -113,9 +141,7 @@ function registerUser() {
 
     localStorage.setItem('user_' + phone, JSON.stringify(user));
     localStorage.setItem('simba_active_user', JSON.stringify(user));
-    
     notifyAdmin(`Registration Info`, 'Register', 0, phone, name);
-    
     alert("Registration Successful!");
     setTimeout(() => { window.location.href = 'index.html'; }, 1000);
 }
@@ -124,11 +150,7 @@ function loginUser() {
     const phoneInput = document.getElementById('loginPhone').value.toString();
     const passInput = document.getElementById('loginPass').value;
     const storedUser = JSON.parse(localStorage.getItem('user_' + phoneInput));
-    
-    if (!storedUser || storedUser.pass !== passInput) {
-        return alert("Invalid Phone or Password");
-    }
-    
+    if (!storedUser || storedUser.pass !== passInput) return alert("Invalid Phone or Password");
     localStorage.setItem('simba_active_user', JSON.stringify(storedUser));
     alert("Login Successful!");
     window.location.href = 'index.html';
