@@ -15,6 +15,15 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
+        /* HD Multi Hot 5 Tile Style */
+        .multihot-box {
+            background: linear-gradient(135deg, #053305, #000) !important;
+            border: 1px solid #FFD700;
+            display: flex; align-items: center; justify-content: center;
+            height: 55px; border-radius: 5px; font-weight: bold; color: #FFD700;
+            text-shadow: 0 0 5px #ff4500;
+        }
+
         .game-tile-img {
             width: 100%;
             height: 55px;
@@ -62,12 +71,12 @@
         <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-img">
     </div>
 
-    <div class="section-label">GAMES</div>
+    <div class="section-label">PREMIUM GAMES</div>
 
     <div class="games-container">
-        <div class="game-card" onclick="location.href='smartsoft.html'">
-            <div class="img-wrap">
-                <img src="https://smartsoftgaming.com/Resources/Images/Games/MultiHot5.png" class="game-tile-img" alt="Multi Hot 5">
+        <div class="game-card" onclick="location.href='multi-hot-5.html'">
+            <div class="img-wrap multihot-box">
+                HOT 5
             </div>
             <p>Multi Hot 5</p>
         </div>
@@ -105,7 +114,6 @@
 
     <script src="script.js"></script>
     <script>
-        // Update this with your actual Apps Script URL
         const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
 
         function toggleMenu() { 
@@ -124,26 +132,22 @@
             const syncStatus = document.getElementById('syncStatus');
 
             if (activeUser) {
-                // 1. IMMEDIATELY SHOW LOCAL BALANCE (Fixes the rollback)
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
                 
-                // Show the balance exactly as it was when the user left the game
                 headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
                 
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
 
-                // 2. BACKGROUND SYNC (Optional: only if you want to pull cloud data)
                 if(SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_URL_HERE") {
                     syncStatus.innerText = "Syncing...";
                     try {
                         const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
                         const data = await response.json();
                         if (data && data.balance !== undefined) {
-                            // Only update if the local balance hasn't changed since we started the fetch
                             const latestLocal = JSON.parse(localStorage.getItem('simba_active_user'));
                             if (latestLocal.balance == activeUser.balance) {
                                 const cloudBal = parseFloat(data.balance).toFixed(2);
@@ -173,4 +177,4 @@
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
-    </html>
+</html>
