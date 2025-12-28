@@ -4,27 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdraw | Simba Bet</title>
+    <style>
+        :root { --gold: #fbbf24; --bg: #0b0d17; }
+        body { background: #000; color: white; font-family: sans-serif; padding: 10px; }
+        .card { 
+            border: 1px solid var(--gold); padding: 20px; border-radius: 10px; 
+            max-width: 400px; margin: auto; margin-top: 50px; background: #0b0d17; 
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+        }
+        h3 { color: var(--gold); text-align: center; }
+        label { display: block; margin: 15px 0 5px; color: #ccc; font-size: 14px; }
+        select, input {
+            width: 100%; padding: 12px; margin-bottom: 5px; background: #1a1d29; 
+            color: white; border: 1px solid #333; border-radius: 8px; box-sizing: border-box; outline: none;
+        }
+        .btn {
+            background: linear-gradient(180deg, #fbbf24, #d97706); color: black; 
+            width: 100%; padding: 15px; border: none; font-weight: bold; 
+            border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 0 #92400e;
+        }
+        .back-btn {
+            width: 100%; background: transparent; border: none; color: #777; 
+            margin-top: 15px; cursor: pointer; font-weight: bold;
+        }
+    </style>
 </head>
-<body style="padding: 10px; background: #000; color: white; font-family: sans-serif;">
-    <div style="border: 1px solid gold; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; margin-top: 50px;">
-        <h3 style="color: gold; text-align: center;">💸 WITHDRAW</h3>
+<body>
+    <div class="card">
+        <h3>💸 WITHDRAW / ወጪ ማድረግ</h3>
         
-        <label>Method:</label>
-        <select id="wdMethod" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border-radius:5px;">
+        <label>ወደ ምን ይላክልዎት (Method):</label>
+        <select id="wdMethod">
             <option value="Telebirr">Telebirr</option>
             <option value="CBE Birr">CBE Birr</option>
         </select>
 
-        <input type="text" id="wdPhone" placeholder="Receive Phone Number" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
-        <input type="number" id="wdAmount" placeholder="Amount" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white; border:1px solid #444; border-radius:5px;">
+        <label>የሚላክበት ስልክ ቁጥር (Receive Phone Number):</label>
+        <input type="number" id="wdPhone" placeholder="09...">
 
-        <button onclick="processWithdraw()" style="background: gold; color: black; width: 100%; padding: 15px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 10px;">SEND REQUEST</button>
-        <button onclick="location.href='index.html'" style="width:100%; background:transparent; border:none; color:#777; margin-top:15px; cursor:pointer;">Cancel / Back</button>
+        <label>የገንዘብ መጠን (Amount ETB):</label>
+        <input type="number" id="wdAmount" placeholder="100 - 10,000">
+        <p style="font-size: 11px; color: #666; margin: 0;">* ዝቅተኛ 100 ETB | ከፍተኛ 10,000 ETB</p>
+
+        <button class="btn" onclick="processWithdraw()">SEND REQUEST</button>
+        <button class="back-btn" onclick="location.href='index.html'">Cancel / Back</button>
     </div>
 
     <script src="script.js"></script>
     <script>
-        // Check if user is logged in
         window.addEventListener('load', () => {
             const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             if (!activeUser) {
