@@ -16,13 +16,13 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
-        /* Styling the Multi Hot 5 image to be clean and fit the box */
-        .smartsoft-tile {
+        /* NEW: Style for the Multi Hot 5 Image to match Keno/Fruit size */
+        .game-tile-img {
             width: 100%;
             height: 55px;
-            object-fit: cover; /* This 'cuts' the image to fit perfectly */
-            object-position: center; 
+            object-fit: cover;
             border-radius: 5px;
+            display: block;
         }
 
         /* Added a small pulse to show when syncing */
@@ -70,17 +70,17 @@
     <div class="games-container">
         <div class="game-card" onclick="location.href='smartsoft.html'">
             <div class="img-wrap">
-                <img src="https://smartsoftgaming.com/Resources/Images/Games/MultiHot5.png" class="smartsoft-tile" alt="Multi Hot 5">
+                <img src="https://smartsoftgaming.com/Resources/Images/Games/MultiHot5.png" class="game-tile-img" alt="Multi Hot 5">
             </div>
             <p>Multi Hot 5</p>
         </div>
 
         <div class="game-card" onclick="location.href='hot-fruit.html'">
-            <div class="img-wrap"><img src="assets/assets/melon.jpg"></div>
+            <div class="img-wrap"><img src="assets/assets/melon.jpg" class="game-tile-img"></div>
             <p>Hot Fruit</p>
         </div>
         <div class="game-card" onclick="location.href='fruit.html'">
-            <div class="img-wrap"><img src="assets/assets/cherry.jpg"></div>
+            <div class="img-wrap"><img src="assets/assets/cherry.jpg" class="game-tile-img"></div>
             <p>Fruit Mania</p>
         </div>
         <div class="game-card" onclick="location.href='keno.html'">
@@ -92,7 +92,7 @@
             <p>Simba's Gold</p>
         </div>
         <div class="game-card" onclick="location.href='game.html'">
-            <div class="img-wrap"><img src="assets/assets/gold_7.jpg"></div>
+            <div class="img-wrap"><img src="assets/assets/gold_7.jpg" class="game-tile-img"></div>
             <p>Simba Shuffle</p>
         </div>
         <div class="game-card" onclick="location.href='lion.html'">
@@ -108,6 +108,7 @@
 
     <script src="script.js"></script>
     <script>
+        // REPLACE WITH YOUR ACTUAL URL
         const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
 
         function toggleMenu() { 
@@ -140,18 +141,22 @@
                 try {
                     const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
                     const data = await response.json();
+
                     if (data && data.balance !== undefined) {
                         const realBal = parseFloat(data.balance).toFixed(2);
                         headerBal.innerText = realBal;
                         syncStatus.innerText = "Synced";
+                        
                         activeUser.balance = realBal;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     }
                 } catch (e) {
                     syncStatus.innerText = "Offline";
+                    console.log("Remote sync failed.");
                 } finally {
                     headerBal.classList.remove('syncing');
                 }
+
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
@@ -165,6 +170,7 @@
             localStorage.removeItem('simba_active_user');
             location.reload();
         }
+
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
     </script>
 </body>
