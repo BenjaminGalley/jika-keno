@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fruit Mania | Simba Bet</title>
+    <style>
+        body { background: #1a1a1a; color: #fff; font-family: sans-serif; text-align: center; margin: 0; overflow: hidden; }
+        
+        .header {
+            padding: 15px;
+            background: #000;
+            border-bottom: 2px solid #FFD700;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bal-box { color: #FFD700; font-weight: bold; font-size: 18px; }
+
+        .slot-container {
+            margin: 40px auto;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .reel {
+            width: 85px;
+            height: 110px;
+            background: #fff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: #000;
+            border: 3px solid #FFD700;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .controls {
+            background: #222;
+            padding: 20px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid #333;
+        }
+
+        .spin-btn {
+            background: linear-gradient(to bottom, #FFD700, #ff8c00);
+            border: none;
+            padding: 15px 50px;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 30px;
+            width: 85%;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .spin-btn:active { transform: scale(0.98); }
+        .spin-btn:disabled { opacity: 0.5; filter: grayscale(1); }
+
+        .bet-row { margin-bottom: 15px; font-size: 18px; display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .win-display { margin: 20px; font-size: 24px; color: #FFD700; height: 35px; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        
+        .adj-btn { background: #444; color: #fff; border: 1px solid #FFD700; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <button onclick="location.href='index.html'" style="background:#333; color:#fff; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">LOBBY</button>
+        <div class="bal-box"><span id="balance">0.00</span> ETB</div>
+    </div>
+
+    <div class="win-display" id="status">SPIN TO WIN!</div>
+
+    <div class="slot-container">
+        <div class="reel" id="r1">🍎</div>
+        <div class="reel" id="r2">🍒</div>
+        <div class="reel" id="r3">🍋</div>
+    </div>
+
+    <div class="controls">
+        <div class="bet-row">
+            <button class="adj-btn" onclick="changeBet(-5)">-</button>
+            <span style="font-weight:bold;">BET: <span id="bet">10</span></span>
+            <button class="adj-btn" onclick="changeBet(5)">+</button>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
+    </div>
+
+    <script>
+        // --- PERSISTENT BALANCE SYSTEM ---
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
+        let bet = 10;
+        let isSpinning = false;
+        const fruits = ['🍎', '🍒', '🍋', '🍉', '🔔', '💎', '7️⃣'];
+
+        function init() {
+            if(!user) {
+                location.href = 'index.html';
+                return;
+            }
+            document.getElementById('balance').innerText = balance.toFixed(2);
+        }
+
+        function saveBalance() {
+            // This ensures the Lobby sees the updated balance immediately
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        }
+
+        function changeBet(val) {
+            if(isSpinning) return;
+            if(bet + val >= 5 && bet + val <= 1000) {
+                bet += val;
+                document.getElementById('bet').innerText = bet;
+            }
+        }
+
+        function spin() {
+            if(balance < bet) {
+                alert("Insufficient Balance!");
+                return;
+            }
+
+            // DEDUCT & SAVE IMMEDIATELY (Prevents rollback if user exits during spin)
+            balance -= bet;
+            saveBalance();
+            document.getElementById('balance').innerText = balance.toFixed(2);
+
+            isSpinning = true;
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('status').innerText = "SPINNING...";
+
+            let count = 0;
+            let interval = setInterval(() => {
+                document.getElementById('r1').innerText = fruits[Math.floor(Math.random() * fruits.length)];
+                document.getElementById('r2').innerText = fruits[Math.floor(Math.random() * fruits.length)];
+                document.getElementById('r3').innerText = fruits[Math.floor(Math.random() * fruits.length)];
+                count++;
+                
+                if(count > 15) {
+                    clearInterval(interval);
+                    determineResult();
+                }
+            }, 80);
+        }
+
+        function determineResult() {
+            const s1 = fruits[Math.floor(Math.random() * fruits.length)];
+            const s2 = fruits[Math.floor(Math.random() * fruits.length)];
+            const s3 = fruits[Math.floor(Math.random() * fruits.length)];
+
+            document.getElementById('r1').innerText = s1;
+            document.getElementById('r2').innerText = s2;
+            document.getElementById('r3').innerText = s3;
+
+            let win = 0;
+
+            if(s1 === s2 && s2 === s3) {
+                // Triple Match
+                if(s1 === '7️⃣') win = bet * 100;
+                else if(s1 === '💎') win = bet * 50;
+                else if(s1 === '🔔') win = bet * 20;
+                else win = bet * 10;
+            } else if(s1 === s2 || s2 === s3 || s1 === s3) {
+                // Double Match
+                win = bet * 1.5;
+            }
+
+            if(win > 0) {
+                balance += win;
+                saveBalance(); // SAVE WIN IMMEDIATELY
+                document.getElementById('status').innerText = `WIN: +${win.toFixed(2)} ETB!`;
+            } else {
+                document.getElementById('status').innerText = "TRY AGAIN!";
+            }
+
+            document.getElementById('balance').innerText = balance.toFixed(2);
+            isSpinning = false;
+            document.getElementById('spinBtn').disabled = false;
+        }
+
+        window.onload = init;
+    </script>
+</body>
+          </html>
