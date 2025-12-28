@@ -15,6 +15,9 @@
             display: flex; align-items: center; justify-content: center;
             height: 55px; border-radius: 5px; font-size: 24px;
         }
+
+        /* Added a small pulse to show when syncing */
+        .syncing { opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -76,30 +79,40 @@
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg"></div>
             <p>Simba Shuffle</p>
         </div>
+        <div class="game-card" onclick="location.href='lion.html'">
+            <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
+            <p>Lion Scratch</p>
+        </div>
     </div>
 
     <footer class="footer-stats">
         <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:var(--gold)">0000</span></div>
-        <div class="stat-item">MIN BET: 2.00 ETB</div>
+        <div class="stat-item">STATUS: <span id="syncStatus" style="color:var(--gold)">Online</span></div>
     </footer>
 
     <script src="script.js"></script>
     <script>
+        // 1. ADD YOUR URL HERE
+        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
         }
 
-        function checkAuthStatus() {
-            const activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        // 2. THE NEW SYNC FUNCTION
+        async function checkAuthStatus() {
+            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             const authSection = document.getElementById('auth-section');
             const balanceArea = document.getElementById('topBalanceArea');
             const menuBtn = document.getElementById('menuToggleBtn');
             const userIDDisplay = document.getElementById('displayUserID');
             const menuName = document.getElementById('menuUserName');
             const headerBal = document.getElementById('headerBalance');
+            const syncStatus = document.getElementById('syncStatus');
 
             if (activeUser) {
+                // Initial show from local storage so it looks fast
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
@@ -107,6 +120,31 @@
                 headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
+
+                // NOW: Ask the Google Sheet for the REAL balance
+                headerBal.classList.add('syncing');
+                syncStatus.innerText = "Syncing...";
+
+                try {
+                    const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
+                    const data = await response.json();
+
+                    if (data && data.balance !== undefined) {
+                        const realBal = parseFloat(data.balance).toFixed(2);
+                        headerBal.innerText = realBal;
+                        syncStatus.innerText = "Synced";
+                        
+                        // Update local storage so games have the correct start amount
+                        activeUser.balance = realBal;
+                        localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    }
+                } catch (e) {
+                    syncStatus.innerText = "Offline";
+                    console.log("Remote sync failed.");
+                } finally {
+                    headerBal.classList.remove('syncing');
+                }
+
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
