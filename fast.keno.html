@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fast Keno | Simba Bet</title>
+    <style>
+        :root { --gold: #FFD700; --green: #2ecc71; --red: #e74c3c; }
+        body { background: #0b0f19; color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        
+        /* Header */
+        .top-bar { background: #1a1f2e; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
+        .bal-box { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
+
+        /* Timer & Status */
+        .timer-section { text-align: center; padding: 10px; background: #242b3d; margin: 10px; border-radius: 8px; border: 1px solid #3d4455; }
+        #timer { font-size: 24px; color: var(--gold); font-weight: bold; }
+        #status-msg { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #aaa; }
+
+        /* The Grid */
+        .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 10px; max-width: 450px; margin: auto; }
+        .num { background: #2c344a; border: 1px solid #454d66; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 4px; font-weight: bold; cursor: pointer; position: relative; transition: 0.2s; }
+        .num.selected { background: var(--gold); color: black; border-color: white; transform: scale(1.05); }
+        .num.hit::after { content: '✔'; position: absolute; color: var(--green); font-size: 18px; font-weight: 900; text-shadow: 0 0 5px black; }
+        .num.miss::after { content: '✘'; position: absolute; color: var(--red); font-size: 18px; font-weight: 900; text-shadow: 0 0 5px black; }
+        .num.draw-active { border: 2px solid var(--gold); box-shadow: 0 0 10px var(--gold); }
+
+        /* Controls */
+        .controls { position: fixed; bottom: 0; width: 100%; background: #1a1f2e; border-top: 2px solid var(--gold); padding: 10px 0; z-index: 100; }
+        .bet-area { display: flex; justify-content: space-around; align-items: center; margin-bottom: 10px; }
+        .bet-btn { background: #333; color: white; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; }
+        .potential-win { color: var(--green); font-size: 14px; text-align: center; margin-bottom: 5px; font-weight: bold; }
+        .main-btns { display: flex; gap: 10px; padding: 0 15px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-clear { background: #454d66; color: white; }
+        .btn-play { background: linear-gradient(to bottom, #fcc201, #b48a00); color: black; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Pop-up Win */
+        #win-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 2px solid var(--gold); padding: 30px; border-radius: 15px; text-align: center; display: none; z-index: 1000; min-width: 200px; box-shadow: 0 0 30px var(--gold); }
+        .win-amt { font-size: 32px; color: var(--gold); display: block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid #555; color:white; padding:5px 10px; border-radius:4px;">LOBBY</button>
+        <div class="bal-box"><span id="balance">0.00</span> ETB</div>
+    </div>
+
+    <div class="timer-section">
+        <div id="status-msg">NEXT DRAW IN</div>
+        <div id="timer">00:15</div>
+    </div>
+
+    <div class="keno-grid" id="grid"></div>
+
+    <div id="win-overlay">
+        <h2 style="margin:0; color:var(--gold);">BIG WIN!</h2>
+        <span class="win-amt" id="win-display">0.00</span>
+        <button onclick="document.getElementById('win-overlay').style.display='none'" class="btn btn-play" style="width:100%">COLLECT</button>
+    </div>
+
+    <div class="controls">
+        <div class="potential-win">Potential Win: <span id="pot-win">0.00</span> ETB</div>
+        <div class="bet-area">
+            <button class="bet-btn" onclick="changeBet(-5)">-</button>
+            <span style="font-weight:bold">BET: <span id="current-bet">2</span> ETB</span>
+            <button class="bet-btn" onclick="changeBet(5)">+</button>
+        </div>
+        <div class="main-btns">
+            <button class="btn btn-clear" onclick="clearBoard()">CLEAR</button>
+            <button class="btn btn-play" id="play-btn" onclick="startPlay()" disabled>PLAY NOW</button>
+        </div>
+    </div>
+
+    <script>
+        let selected = [];
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
+        let bet = 2; // Original 2 Birr start
+        let isDrawing = false;
+        let timeLeft = 15;
+
+        const grid = document.getElementById('grid');
+        const balanceEl = document.getElementById('balance');
+        const betEl = document.getElementById('current-bet');
+        const potWinEl = document.getElementById('pot-win');
+
+        function init() {
+            balanceEl.innerText = balance.toFixed(2);
+            for(let i=1; i<=80; i++) {
+                let d = document.createElement('div');
+                d.className = 'num';
+                d.innerText = i;
+                d.onclick = () => toggleNum(i, d);
+                grid.appendChild(d);
+            }
+            startTimer();
+        }
+
+        function toggleNum(n, el) {
+            if(isDrawing) return;
+            if(selected.includes(n)) {
+                selected = selected.filter(x => x !== n);
+                el.classList.remove('selected');
+            } else if(selected.length < 10) {
+                selected.push(n);
+                el.classList.add('selected');
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('play-btn').disabled = (selected.length === 0 || isDrawing);
+            // Keno odds calculation (Simple multiplier for Fast Keno)
+            let mult = [0, 2, 5, 15, 50, 150, 300, 600, 1200, 2500, 10000];
+            let pot = bet * (mult[selected.length] || 0);
+            potWinEl.innerText = pot.toFixed(2);
+        }
+
+        function changeBet(val) {
+            if(isDrawing) return;
+            if(bet + val >= 2) {
+                bet += val;
+                betEl.innerText = bet;
+                updateUI();
+            }
+        }
+
+        function clearBoard() {
+            if(isDrawing) return;
+            selected = [];
+            document.querySelectorAll('.num').forEach(n => {
+                n.classList.remove('selected', 'hit', 'miss', 'draw-active');
+            });
+            updateUI();
+        }
+
+        function startTimer() {
+            setInterval(() => {
+                if(!isDrawing) {
+                    timeLeft--;
+                    if(timeLeft <= 0) {
+                        if(selected.length > 0) startPlay();
+                        timeLeft = 15;
+                    }
+                    document.getElementById('timer').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+                }
+            }, 1000);
+        }
+
+        async function startPlay() {
+            if(balance < bet || isDrawing) return;
+            isDrawing = true;
+            balance -= bet;
+            save();
+            
+            document.getElementById('status-msg').innerText = "DRAWING LIVE...";
+            document.getElementById('play-btn').disabled = true;
+
+            let drawn = [];
+            while(drawn.length < 20) {
+                let r = Math.floor(Math.random()*80) + 1;
+                if(!drawn.includes(r)) drawn.push(r);
+            }
+
+            let hits = 0;
+            for(let n of drawn) {
+                await new Promise(r => setTimeout(r, 150));
+                let el = grid.children[n-1];
+                el.classList.add('draw-active');
+                if(selected.includes(n)) {
+                    el.classList.add('hit');
+                    hits++;
+                } else {
+                    el.classList.add('miss');
+                }
+            }
+
+            // Paytable logic
+            let mults = {1:2, 2:5, 3:15, 4:40, 5:100, 6:250, 7:500, 8:1000, 9:5000, 10:10000};
+            let win = hits > 0 ? bet * (mults[hits] || 0) : 0;
+
+            if(win > 0) {
+                balance += win;
+                save();
+                document.getElementById('win-display').innerText = win.toFixed(2);
+                document.getElementById('win-overlay').style.display = 'block';
+            }
+
+            setTimeout(() => {
+                isDrawing = false;
+                timeLeft = 15;
+                document.getElementById('status-msg').innerText = "NEXT DRAW IN";
+                clearBoard();
+            }, 3000);
+        }
+
+        function save() {
+            balanceEl.innerText = balance.toFixed(2);
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        }
+
+        init();
+    </script>
+</body>
+</html>
