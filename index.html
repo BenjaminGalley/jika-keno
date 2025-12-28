@@ -15,6 +15,15 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
+        /* Fast Keno Specific Style */
+        .fast-keno-box {
+            background: linear-gradient(135deg, #004488, #001122) !important;
+            border: 1px solid #00CCFF;
+            display: flex; align-items: center; justify-content: center;
+            height: 55px; border-radius: 5px; font-weight: bold; color: #00CCFF;
+            text-shadow: 0 0 8px #00CCFF;
+        }
+
         /* HD Multi Hot 5 Tile Style */
         .multihot-box {
             background: linear-gradient(135deg, #053305, #000) !important;
@@ -71,9 +80,16 @@
         <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-img">
     </div>
 
-    <div class="section-label">PREMIUM GAMES</div>
+    <div class="section-label">NEW & HOT</div>
 
     <div class="games-container">
+        <div class="game-card" onclick="location.href='fast.keno.html'">
+            <div class="img-wrap fast-keno-box">
+                FAST K6
+            </div>
+            <p>Fast Keno</p>
+        </div>
+
         <div class="game-card" onclick="location.href='multi-hot-5.html'">
             <div class="img-wrap multihot-box">
                 HOT 5
@@ -85,22 +101,22 @@
             <div class="img-wrap"><img src="assets/assets/melon.jpg" class="game-tile-img"></div>
             <p>Hot Fruit</p>
         </div>
+        
         <div class="game-card" onclick="location.href='fruit.html'">
             <div class="img-wrap"><img src="assets/assets/cherry.jpg" class="game-tile-img"></div>
             <p>Fruit Mania</p>
         </div>
-        <div class="game-card" onclick="location.href='keno.html'">
-            <div class="img-wrap keno-box" style="display:flex; align-items:center; justify-content:center; background:#004488; height:55px; border-radius:5px; font-weight:bold;">K6</div>
-            <p>Keno</p>
-        </div>
+
         <div class="game-card" onclick="location.href='mega-spin.html'">
             <div class="img-wrap mega-spin-box">🎰</div>
             <p>Simba's Gold</p>
         </div>
+        
         <div class="game-card" onclick="location.href='game.html'">
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg" class="game-tile-img"></div>
             <p>Simba Shuffle</p>
         </div>
+
         <div class="game-card" onclick="location.href='lion.html'">
             <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
             <p>Lion Scratch</p>
