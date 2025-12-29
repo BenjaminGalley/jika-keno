@@ -5,283 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multi Hot 5 | Simba Bet</title>
     <style>
-        :root {
-            --gold: #FFD700;
-            --win-green: #00FF41;
-            /* Optimized for the grid.jpg slots */
-            --reel-w: 52px; 
-            --reel-h: 180px;
-            --sym-h: 60px;
-        }
-
-        body {
-            background: #000;
-            color: white;
-            font-family: 'Arial Black', sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .header {
-            width: 100%;
-            padding: 10px 20px;
-            background: #111;
-            border-bottom: 2px solid var(--gold);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-        }
-
-        .balance-txt { color: var(--gold); font-size: 20px; font-weight: bold; }
-
-        .game-viewport {
-            position: relative;
-            margin-top: 20px;
-            width: 340px;
-            height: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .grid-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            object-fit: contain;
-        }
-
-        .reels-container {
-            position: absolute;
-            z-index: 2;
-            display: flex;
-            gap: 8px; /* Perfectly aligns with your grid slots */
-            margin-top: 5px;
-        }
-
-        .reel {
-            width: var(--reel-w);
-            height: var(--reel-h);
-            overflow: hidden;
-            position: relative;
-            background: rgba(0,0,0,0.2);
-        }
-
-        .strip {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .symbol {
-            width: var(--reel-w);
-            height: var(--sym-h);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .symbol img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-        }
-
-        .payline {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--win-green);
-            box-shadow: 0 0 15px var(--win-green);
-            z-index: 5;
-            display: none;
-            transform: translateY(-50%);
-        }
-
-        .controls {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #111;
-            padding: 20px;
-            border-top: 3px solid var(--gold);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .bet-selector { display: flex; align-items: center; gap: 15px; }
-        .bet-btn { 
-            background: none; border: 2px solid var(--gold); color: var(--gold); 
-            width: 40px; height: 40px; border-radius: 50%; font-size: 20px; font-weight: bold;
-        }
-
-        .spin-btn {
-            background: linear-gradient(to bottom, #FFD700, #ff8c00);
-            border: none;
-            width: 80%;
-            padding: 15px;
-            font-size: 24px;
-            font-weight: 900;
-            border-radius: 40px;
-            color: #000;
-        }
-
-        .spin-btn:disabled { opacity: 0.5; }
-        #status { color: var(--gold); font-weight: bold; height: 25px; margin-bottom: 5px; }
+        body { background: #000; color: white; font-family: sans-serif; text-align: center; margin: 0; }
+        .header { background: #111; padding: 15px; border-bottom: 2px solid #FFD700; display: flex; justify-content: space-between; }
+        .balance { color: #FFD700; font-weight: bold; }
+        .slot-machine { margin: 20px auto; width: 320px; height: 200px; background: url('assets/assets/grid.jpg'); background-size: cover; position: relative; border: 4px solid #444; }
+        .controls { position: fixed; bottom: 0; width: 100%; background: #111; padding: 20px 0; border-top: 2px solid #FFD700; }
+        .spin-btn { background: #FFD700; border: none; padding: 15px 60px; font-weight: bold; border-radius: 30px; font-size: 20px; }
+        .bet-row { margin-bottom: 10px; font-size: 18px; color: #FFD700; }
     </style>
 </head>
 <body>
-
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:5px;">LOBBY</button>
-        <div class="balance-txt"><span id="balance">0.00</span> ETB</div>
+        <button onclick="location.href='index.html'" style="background:#333; color:white; border:none; padding:5px 10px;">LOBBY</button>
+        <div class="balance"><span id="bal">0.00</span> ETB</div>
     </div>
 
-    <div class="game-viewport">
-        <img src="assets/assets/grid.jpg" class="grid-bg">
-        <div class="reels-container">
-            <div class="payline" id="line"></div>
-            <div class="reel"><div class="strip" id="r0"></div></div>
-            <div class="reel"><div class="strip" id="r1"></div></div>
-            <div class="reel"><div class="strip" id="r2"></div></div>
-            <div class="reel"><div class="strip" id="r3"></div></div>
-            <div class="reel"><div class="strip" id="r4"></div></div>
+    <div class="slot-machine" id="machine">
         </div>
-    </div>
 
     <div class="controls">
-        <div id="status">MULTI HOT 5</div>
-        <div class="bet-selector">
-            <button class="bet-btn" onclick="changeBet(-2)">-</button>
-            <div style="font-size: 22px; color: var(--gold);">BET: <span id="betAmt">2</span></div>
-            <button class="bet-btn" onclick="changeBet(2)">+</button>
-        </div>
-        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
+        <div class="bet-row">BET: <span id="bet">2</span> ETB</div>
+        <button class="spin-btn" id="sBtn" onclick="spin()">SPIN</button>
     </div>
 
     <script>
-        const assets = [
-            'star.png', 'red.gift.png', 'collector.png', 
-            'purple.gift.png', 'bell.png', 'double.star.png', 
-            'seven.triple.png', 'crown.png'
-        ];
-        const path = 'assets/assets/';
-
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let balance = user ? parseFloat(user.balance) : 0;
-        let bet = 2; 
-        let spinning = false;
+        let bet = 2;
 
-        function save() {
+        document.getElementById('bal').innerText = balance.toFixed(2);
+
+        async function sync() {
             user.balance = balance.toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
-        }
-
-        function init() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            for(let i=0; i<5; i++) {
-                const reel = document.getElementById('r'+i);
-                for(let j=0; j<20; j++) reel.appendChild(createSym());
-            }
-        }
-
-        function createSym() {
-            const div = document.createElement('div');
-            div.className = 'symbol';
-            const img = document.createElement('img');
-            const name = assets[Math.floor(Math.random()*assets.length)];
-            img.src = path + name;
-            div.dataset.name = name;
-            div.appendChild(img);
-            return div;
-        }
-
-        function changeBet(val) {
-            if(spinning) return;
-            if(bet + val >= 2 && bet + val <= 500) {
-                bet += val;
-                document.getElementById('betAmt').innerText = bet;
-            }
+            document.getElementById('bal').innerText = balance.toFixed(2);
+            try { await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`); } catch(e){}
         }
 
         async function spin() {
-            if(balance < bet || spinning) return;
-            
+            if(balance < bet) return alert("Low Balance");
             balance -= bet;
-            save();
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            document.getElementById('line').style.display = 'none';
+            await sync();
             
-            spinning = true;
-            document.getElementById('spinBtn').disabled = true;
-
-            const results = [];
-            for(let i=0; i<5; i++) {
-                results.push(runReel(i, i * 100)); 
-            }
-
-            const grid = await Promise.all(results);
-            checkWin(grid);
+            document.getElementById('sBtn').disabled = true;
+            // Simulated spin logic
+            setTimeout(async () => {
+                let win = Math.random() > 0.8 ? bet * 5 : 0;
+                if(win > 0) { balance += win; await sync(); alert("Winner: " + win); }
+                document.getElementById('sBtn').disabled = false;
+            }, 1000);
         }
-
-        function runReel(id, delay) {
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    const reel = document.getElementById('r'+id);
-                    let ticks = 0;
-                    const maxTicks = 15 + (id * 5);
-
-                    const timer = setInterval(() => {
-                        reel.removeChild(reel.firstElementChild);
-                        reel.appendChild(createSym());
-                        ticks++;
-                        if(ticks >= maxTicks) {
-                            clearInterval(timer);
-                            resolve(Array.from(reel.children).slice(-3));
-                        }
-                    }, 50);
-                }, delay);
-            });
-        }
-
-        function checkWin(grid) {
-            const mid = grid.map(col => col[1].dataset.name);
-            let matches = 1;
-            for(let i=1; i<5; i++) {
-                if(mid[i] === mid[0]) matches++;
-                else break;
-            }
-
-            if(matches >= 3) {
-                const win = bet * (matches === 5 ? 50 : matches === 4 ? 10 : 3);
-                balance += win;
-                save();
-                document.getElementById('status').innerText = "WIN: " + win + " ETB!";
-                document.getElementById('line').style.display = 'block';
-            } else {
-                document.getElementById('status').innerText = "TRY AGAIN";
-            }
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            spinning = false;
-            document.getElementById('spinBtn').disabled = false;
-        }
-
-        window.onload = init;
     </script>
 </body>
 </html>
