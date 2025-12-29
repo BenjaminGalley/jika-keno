@@ -1,201 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Bet | Official</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
-        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
-        
-        .mega-spin-box {
-            background: linear-gradient(45deg, #fcc201, #92400e) !important;
-            display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-size: 24px;
-        }
+<script>
+    // FINAL MASTER URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
 
-        /* Fast Keno Specific Style */
-        .fast-keno-box {
-            background: linear-gradient(135deg, #004488, #001122) !important;
-            border: 1px solid #00CCFF;
-            display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-weight: bold; color: #00CCFF;
-            text-shadow: 0 0 8px #00CCFF;
-        }
+    async function checkAuthStatus() {
+        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        const headerBal = document.getElementById('headerBalance');
+        const syncStatus = document.getElementById('syncStatus');
 
-        /* HD Multi Hot 5 Tile Style */
-        .multihot-box {
-            background: linear-gradient(135deg, #053305, #000) !important;
-            border: 1px solid #FFD700;
-            display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-weight: bold; color: #FFD700;
-            text-shadow: 0 0 5px #ff4500;
-        }
-
-        .game-tile-img {
-            width: 100%;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 5px;
-            display: block;
-        }
-
-        .syncing { opacity: 0.7; font-style: italic; }
-    </style>
-</head>
-<body>
-    <div id="sideMenu" class="side-menu">
-        <div class="menu-header">
-            <span id="menuUserName">Guest Player</span>
-            <button class="close-btn" onclick="toggleMenu()">×</button>
-        </div>
-        <nav class="menu-links">
-            <a href="deposit.html">💰 Deposit Funds</a>
-            <a href="withdraw.html">💸 Withdraw Funds</a>
-            <a href="#" onclick="alert('Loading History...'); toggleMenu();">📜 History</a>
-            <hr style="border: 0.5px solid #333; margin: 10px 0;">
-            <a href="#" class="logout-link" onclick="logout()">🚪 Logout</a>
-        </nav>
-    </div>
-
-    <header class="top-nav">
-        <div class="left-section">
-            <button class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()">☰</button>
-            <div class="brand"><span class="x-logo">X</span> SIMBA BET</div>
-        </div>
-        
-        <div class="top-balance-area" id="topBalanceArea">
-            <span class="balance-label">BALANCE</span>
-            <span class="balance-value" id="headerBalance">0.00</span> <small>ETB</small>
-        </div>
-
-        <div class="auth-btns" id="auth-section">
-            <button class="login-btn" onclick="location.href='login.html'">LOGIN</button>
-            <button class="register-btn" onclick="location.href='register.html'">REGISTER</button>
-        </div>
-    </header>
-
-    <div class="hero-container">
-        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-img">
-    </div>
-
-    <div class="section-label">NEW & HOT</div>
-
-    <div class="games-container">
-        <div class="game-card" onclick="location.href='fast.keno.html'">
-            <div class="img-wrap fast-keno-box">
-                FAST K6
-            </div>
-            <p>Fast Keno</p>
-        </div>
-
-        <div class="game-card" onclick="location.href='multi-hot-5.html'">
-            <div class="img-wrap multihot-box">
-                HOT 5
-            </div>
-            <p>Multi Hot 5</p>
-        </div>
-
-        <div class="game-card" onclick="location.href='hot-fruit.html'">
-            <div class="img-wrap"><img src="assets/assets/melon.jpg" class="game-tile-img"></div>
-            <p>Hot Fruit</p>
-        </div>
-        
-        <div class="game-card" onclick="location.href='fruit.html'">
-            <div class="img-wrap"><img src="assets/assets/cherry.jpg" class="game-tile-img"></div>
-            <p>Fruit Mania</p>
-        </div>
-
-        <div class="game-card" onclick="location.href='mega-spin.html'">
-            <div class="img-wrap mega-spin-box">🎰</div>
-            <p>Simba's Gold</p>
-        </div>
-        
-        <div class="game-card" onclick="location.href='game.html'">
-            <div class="img-wrap"><img src="assets/assets/gold_7.jpg" class="game-tile-img"></div>
-            <p>Simba Shuffle</p>
-        </div>
-
-        <div class="game-card" onclick="location.href='lion.html'">
-            <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
-            <p>Lion Scratch</p>
-        </div>
-    </div>
-
-    <footer class="footer-stats">
-        <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:var(--gold)">0000</span></div>
-        <div class="stat-item">STATUS: <span id="syncStatus" style="color:var(--gold)">Online</span></div>
-    </footer>
-
-    <script src="script.js"></script>
-    <script>
-        // UPDATED WITH YOUR SCRIPT URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
-
-        function toggleMenu() { 
-            const menu = document.getElementById('sideMenu');
-            menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
-        }
-
-        async function checkAuthStatus() {
-            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-            const authSection = document.getElementById('auth-section');
-            const balanceArea = document.getElementById('topBalanceArea');
-            const menuBtn = document.getElementById('menuToggleBtn');
-            const userIDDisplay = document.getElementById('displayUserID');
-            const menuName = document.getElementById('menuUserName');
-            const headerBal = document.getElementById('headerBalance');
-            const syncStatus = document.getElementById('syncStatus');
-
-            if (activeUser) {
-                authSection.style.display = 'none';
-                balanceArea.style.display = 'flex';
-                menuBtn.style.display = 'block';
-                menuName.innerText = activeUser.name;
-                
-                // Show local balance immediately
-                headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-                
-                const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
-                userIDDisplay.innerText = uid;
-
-                // Sync with Google Sheets Cloud
-                if(SCRIPT_URL.includes("macros")) {
-                    syncStatus.innerText = "Syncing...";
-                    try {
-                        const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
-                        const data = await response.json();
-                        
-                        if (data && data.balance !== undefined) {
-                            const cloudBal = parseFloat(data.balance).toFixed(2);
-                            
-                            // If cloud balance is different, update local
-                            if (parseFloat(activeUser.balance).toFixed(2) !== cloudBal) {
-                                headerBal.innerText = cloudBal;
-                                activeUser.balance = cloudBal;
-                                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                            }
-                            syncStatus.innerText = "Synced ✅";
-                        }
-                    } catch (e) {
-                        syncStatus.innerText = "Offline ⚠️";
-                    }
+        if (activeUser) {
+            // Show local balance first for speed
+            headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
+                const data = await response.json();
+                if (data && data.balance !== undefined) {
+                    const cloudBal = parseFloat(data.balance).toFixed(2);
+                    headerBal.innerText = cloudBal;
+                    activeUser.balance = cloudBal;
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    syncStatus.innerText = "Synced ✅";
                 }
-            } else {
-                authSection.style.display = 'flex';
-                balanceArea.style.display = 'none';
-                menuBtn.style.display = 'none';
-                userIDDisplay.innerText = "0000";
-            }
+            } catch (e) { syncStatus.innerText = "Offline ⚠️"; }
         }
-
-        function logout() {
-            localStorage.removeItem('simba_active_user');
-            location.reload();
-        }
-
-        window.addEventListener('DOMContentLoaded', checkAuthStatus);
-    </script>
-</body>
-</html>
+    }
+    window.addEventListener('DOMContentLoaded', checkAuthStatus);
+</script>
