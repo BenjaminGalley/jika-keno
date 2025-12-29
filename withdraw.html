@@ -28,14 +28,14 @@
             width: 100%; background: transparent; border: none; color: #777; 
             margin-top: 15px; cursor: pointer; font-weight: bold;
         }
-        .bal-info { text-align: center; color: var(--gold); margin-bottom: 15px; font-weight: bold; }
+        .bal-info { text-align: center; color: var(--gold); margin-bottom: 15px; font-weight: bold; font-size: 18px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h3>💸 WITHDRAW / ወጪ ማድረግ</h3>
         
-        <div class="bal-info">Current Balance: <span id="curBal">0.00</span> ETB</div>
+        <div class="bal-info">Your Balance: <span id="curBal">0.00</span> ETB</div>
 
         <label>ወደ ምን ይላክልዎት (Method):</label>
         <select id="wdMethod">
@@ -55,7 +55,9 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
+        // YOUR FINAL MASTER URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
+        
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         window.addEventListener('load', () => {
@@ -63,9 +65,24 @@
                 alert("Please login first");
                 location.href = 'login.html';
             } else {
-                document.getElementById('curBal').innerText = parseFloat(activeUser.balance).toFixed(2);
+                // Refresh balance from cloud on load to be sure
+                syncBalance();
             }
         });
+
+        async function syncBalance() {
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
+                const data = await res.json();
+                if(data.balance !== undefined) {
+                    activeUser.balance = data.balance;
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    document.getElementById('curBal').innerText = parseFloat(data.balance).toFixed(2);
+                }
+            } catch(e) {
+                document.getElementById('curBal').innerText = parseFloat(activeUser.balance).toFixed(2);
+            }
+        }
 
         async function processWithdraw() {
             const method = document.getElementById('wdMethod').value;
@@ -73,38 +90,25 @@
             const amount = parseFloat(document.getElementById('wdAmount').value);
             const btn = document.getElementById('wdBtn');
 
-            // 1. Validations
+            // Validations
             if (!phone || !amount) return alert("እባክዎ መረጃውን በትክክል ይሙሉ (Fill all fields)");
             if (amount < 100) return alert("ዝቅተኛው ወጪ 100 ብር ነው (Minimum 100 ETB)");
             
-            // 2. Balance Check
+            // Re-check balance against current data
             if (amount > parseFloat(activeUser.balance)) {
                 return alert("በቂ ቀሪ ሂሳብ የሎትም (Insufficient Balance)");
             }
 
+            if (!confirm(`Are you sure you want to withdraw ${amount} ETB to ${phone}?`)) return;
+
             btn.disabled = true;
             btn.innerText = "Processing... (በመላክ ላይ)";
 
-            // 3. Send to Google Script & Bot
-            // We use action=withdraw which you should add to your Apps Script doGet
+            // Action matches the 'withdraw' case in your Master Google Script
             const query = `?action=withdraw&phone=${activeUser.phone}&amount=${amount}&wdPhone=${phone}&method=${method}`;
             
             try {
-                // First, deduct locally for immediate feedback
-                activeUser.balance = (parseFloat(activeUser.balance) - amount).toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-
-                // Send to Cloud
-                await fetch(SCRIPT_URL + query);
+                const response = await fetch(SCRIPT_URL + query);
+                const result = await response.json();
                 
-                alert("የወጪ ጥያቄዎ ተልኳል! Admin በቅርቡ ያረጋግጣል። (Request Sent! Admin will verify soon.)");
-                location.href = 'index.html';
-            } catch (error) {
-                // Fallback success if network blocks JSON response but alert still triggers
-                alert("ጥያቄዎ ተልኳል! (Request Sent!)");
-                location.href = 'index.html';
-            }
-        }
-    </script>
-</body>
-</html>
+                if(
