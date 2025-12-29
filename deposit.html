@@ -64,8 +64,8 @@
     <a href="index.html" class="back-link">← ወደ ዋናው ገጽ ተመለስ (Back)</a>
 
     <script>
-        // Use your verified Script URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
+        // YOUR FINAL RECENT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
 
         function updateInstructions() {
             const method = document.getElementById('method').value;
@@ -84,9 +84,9 @@
         }
 
         async function submitDepositRequest() {
-            const name = document.getElementById('senderName').value;
-            const phone = document.getElementById('senderPhone').value;
-            const amount = document.getElementById('amount').value;
+            const name = document.getElementById('senderName').value.trim();
+            const phone = document.getElementById('senderPhone').value.trim();
+            const amount = document.getElementById('amount').value.trim();
             const method = document.getElementById('method').value;
             const btn = document.getElementById('subBtn');
 
@@ -96,24 +96,19 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "በመላክ ላይ (Sending...)";
+            btn.innerText = "በመላክ ላይ... (Sending...)";
 
-            // Prepare the request URL for your Google Script
+            // action=deposit matches your Master Google Script
             const query = `?action=deposit&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&method=${method}`;
             
             try {
                 const response = await fetch(SCRIPT_URL + query);
                 const result = await response.json();
                 
-                alert("ጥያቄዎ ተልኳል! በቅርቡ እናረጋግጣለን። (Request Sent! We will verify shortly.)");
+                alert("ጥያቄዎ ተልኳል! (Request Sent!) Admin will verify and add your balance soon.");
                 location.href = 'index.html';
             } catch (error) {
-                // Even if fetch has a CORS error, the script usually still runs. 
-                // We show success if the bot receives it.
+                // Fetch often catches CORS errors even if the script hits. 
+                // We show success to the user as the Bot usually receives it anyway.
                 alert("ጥያቄዎ ተልኳል! (Request Sent!)");
-                location.href = 'index.html';
-            }
-        }
-    </script>
-</body>
-</html>
+                location.
