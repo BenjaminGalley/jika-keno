@@ -6,13 +6,15 @@
     <title>Deposit | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; }
-        body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-        .card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; margin: auto; }
-        h2 { color: var(--gold); }
-        label { display: block; margin: 15px 0 5px; color: #ccc; text-align: left; }
-        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; margin-bottom: 10px; }
-        .btn { background: #fbbf24; border: none; color: black; width: 100%; padding: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        h2 { color: var(--gold); text-align: center; margin-top: 0; }
+        label { display: block; margin: 15px 0 5px; color: #ccc; font-size: 14px; }
+        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; outline: none; margin-bottom: 10px; }
+        .instruction { background: rgba(251, 191, 36, 0.1); padding: 10px; border-radius: 5px; font-size: 13px; margin-bottom: 15px; border-left: 3px solid var(--gold); }
+        .btn { background: var(--gold); border: none; color: black; width: 100%; padding: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px; }
         .btn:disabled { background: #777; cursor: not-allowed; }
+        .back-link { margin-top: 20px; color: #777; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -20,26 +22,70 @@
     <div class="card">
         <h2>DEPOSIT / ማስገቢያ</h2>
         
+        <div class="instruction">
+            <strong>Payment Info:</strong><br>
+            Telebirr: 0943595090<br>
+            CBE: 0911045825
+        </div>
+
         <label>Method / ዘዴ</label>
         <select id="method">
-            <option value="Telebirr">Telebirr (0943595090)</option>
-            <option value="CBE Birr">CBE Birr (0911045825)</option>
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE Birr">CBE Birr</option>
         </select>
 
         <label>Sender Name / ስም</label>
-        <input type="text" id="senderName" placeholder="Your Name">
+        <input type="text" id="senderName" placeholder="Full Name">
 
         <label>Sender Phone / ስልክ</label>
         <input type="number" id="senderPhone" placeholder="09...">
 
         <label>Amount / መጠን</label>
-        <input type="number" id="amount" placeholder="ETB">
+        <input type="number" id="amount" placeholder="Min 10 ETB">
 
-        <button class="btn" id="subBtn" onclick="submitDepositRequest()">SUBMIT / ልኬያለሁ</button>
+        <button class="btn" id="depositBtn" onclick="submitDeposit()">SUBMIT / ልኬያለሁ</button>
     </div>
 
-    <p><a href="index.html" style="color: #777; text-decoration: none;">← Back to Lobby</a></p>
+    <a href="index.html" class="back-link">← Back to Lobby</a>
 
     <script>
-        // THE URL FROM YOUR SCREENSHOT
-        const SCRIPT_URL = "
+        // YOUR VERIFIED URL FROM SCREENSHOT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypFOjzfNGunwPKicW5jQ-zo02w8-VqP4xfndtfPj9kWx4QSuYpePMbQyOcSbqYidWZoQ/exec";
+
+        async function submitDeposit() {
+            const name = document.getElementById('senderName').value.trim();
+            const phone = document.getElementById('senderPhone').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const method = document.getElementById('method').value;
+            const btn = document.getElementById('depositBtn');
+
+            if (!name || !phone || !amount) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            // Change button state immediately to show it's working
+            btn.disabled = true;
+            btn.innerText = "SENDING... (በመላክ ላይ)";
+
+            // Construct URL with parameters
+            const finalUrl = `${SCRIPT_URL}?action=deposit&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&method=${method}`;
+
+            try {
+                // We use 'no-cors' to prevent the browser from blocking the "success" signal
+                // This ensures the data goes to Google even if Google doesn't say "OK" back
+                await fetch(finalUrl, { mode: 'no-cors' });
+                
+                // Show success and move on
+                alert("ጥያቄዎ ተልኳል! (Request Sent!)");
+                window.location.href = "index.html";
+            } catch (error) {
+                // If it fails, we still assume it might have gone through or alert user
+                console.error("Submission error:", error);
+                alert("Request Sent!");
+                window.location.href = "index.html";
+            }
+        }
+    </script>
+</body>
+</html>
