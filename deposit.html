@@ -3,112 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deposit Funds | Simba Bet</title>
+    <title>Deposit | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; }
-        body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
-            margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; 
-        }
-        .deposit-card {
-            background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px;
-            padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        h2 { color: var(--gold); text-align: center; margin-top: 0; }
-        label { display: block; margin: 15px 0 5px; font-weight: bold; font-size: 14px; color: #ccc; }
-        select, input {
-            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
-            background: #0b0d17; color: white; font-size: 16px; box-sizing: border-box; outline: none;
-        }
-        .instruction-box {
-            background: rgba(251, 191, 36, 0.1); border-left: 4px solid var(--gold);
-            padding: 15px; margin: 20px 0; display: none; font-size: 15px; color: #fff;
-        }
-        .submit-btn {
-            background: linear-gradient(180deg, #fbbf24, #d97706); border: none;
-            color: black; width: 100%; padding: 15px; font-size: 18px; font-weight: bold;
-            border-radius: 8px; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 0 #92400e;
-        }
-        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .back-link { margin-top: 25px; color: var(--gold); text-decoration: none; font-size: 14px; }
+        body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 20px; width: 100%; max-width: 400px; margin: auto; }
+        h2 { color: var(--gold); }
+        label { display: block; margin: 15px 0 5px; color: #ccc; text-align: left; }
+        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; margin-bottom: 10px; }
+        .btn { background: #fbbf24; border: none; color: black; width: 100%; padding: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; font-size: 16px; }
+        .btn:disabled { background: #777; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-    <div class="deposit-card">
+    <div class="card">
         <h2>DEPOSIT / ማስገቢያ</h2>
         
-        <label for="method">የክፍያ ዘዴ ይምረጡ (Select Method)</label>
-        <select id="method" onchange="updateInstructions()">
-            <option value="">-- ይምረጡ --</option>
-            <option value="telebirr">Telebirr</option>
-            <option value="cbe">CBE (Commercial Bank)</option>
+        <label>Method / ዘዴ</label>
+        <select id="method">
+            <option value="Telebirr">Telebirr (0943595090)</option>
+            <option value="CBE Birr">CBE Birr (0911045825)</option>
         </select>
 
-        <div id="instructionBox" class="instruction-box">
-            <span id="instructionText"></span>
-        </div>
+        <label>Sender Name / ስም</label>
+        <input type="text" id="senderName" placeholder="Your Name">
 
-        <label for="senderName">የላኪው ሙሉ ስም (Sender Name)</label>
-        <input type="text" id="senderName" placeholder="ስምዎን እዚህ ያስገቡ">
+        <label>Sender Phone / ስልክ</label>
+        <input type="number" id="senderPhone" placeholder="09...">
 
-        <label for="senderPhone">የላኪው ስልክ ቁጥር (Sender Phone)</label>
-        <input type="number" id="senderPhone" placeholder="የላኩበትን ስልክ ያስገቡ">
+        <label>Amount / መጠን</label>
+        <input type="number" id="amount" placeholder="ETB">
 
-        <label for="amount">የገንዘቡ መጠን (Amount ETB)</label>
-        <input type="number" id="amount" placeholder="ቢያንስ 10 ብር" min="10">
-
-        <button class="submit-btn" id="subBtn" onclick="submitDepositRequest()">ልኬያለሁ (Submit)</button>
+        <button class="btn" id="subBtn" onclick="submitDepositRequest()">SUBMIT / ልኬያለሁ</button>
     </div>
 
-    <a href="index.html" class="back-link">← ወደ ዋናው ገጽ ተመለስ (Back)</a>
+    <p><a href="index.html" style="color: #777; text-decoration: none;">← Back to Lobby</a></p>
 
     <script>
-        // YOUR FINAL RECENT URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
-
-        function updateInstructions() {
-            const method = document.getElementById('method').value;
-            const box = document.getElementById('instructionBox');
-            const text = document.getElementById('instructionText');
-
-            if (method === 'telebirr') {
-                box.style.display = 'block';
-                text.innerHTML = `<strong>Telebirr:</strong> 0943595090 በዚህ ይላኩና ልኬያለሁ የሚለውን ይጫኑ።`;
-            } else if (method === 'cbe') {
-                box.style.display = 'block';
-                text.innerHTML = `<strong>CBE:</strong> 0911045825 በዚህ ይላኩና ልኬያለሁ የሚለውን ይጫኑ።`;
-            } else {
-                box.style.display = 'none';
-            }
-        }
-
-        async function submitDepositRequest() {
-            const name = document.getElementById('senderName').value.trim();
-            const phone = document.getElementById('senderPhone').value.trim();
-            const amount = document.getElementById('amount').value.trim();
-            const method = document.getElementById('method').value;
-            const btn = document.getElementById('subBtn');
-
-            if (!name || !phone || !amount || !method) {
-                alert("እባክዎ ሁሉንም መረጃዎች በትክክል ይሙሉ (Please fill all fields)");
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerText = "በመላክ ላይ... (Sending...)";
-
-            // action=deposit matches your Master Google Script
-            const query = `?action=deposit&name=${encodeURIComponent(name)}&phone=${phone}&amount=${amount}&method=${method}`;
-            
-            try {
-                const response = await fetch(SCRIPT_URL + query);
-                const result = await response.json();
-                
-                alert("ጥያቄዎ ተልኳል! (Request Sent!) Admin will verify and add your balance soon.");
-                location.href = 'index.html';
-            } catch (error) {
-                // Fetch often catches CORS errors even if the script hits. 
-                // We show success to the user as the Bot usually receives it anyway.
-                alert("ጥያቄዎ ተልኳል! (Request Sent!)");
-                location.
+        // THE URL FROM YOUR SCREENSHOT
+        const SCRIPT_URL = "
