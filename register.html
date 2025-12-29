@@ -18,19 +18,20 @@
             
             <button id="regBtn" onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
             <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none; font-weight: bold;">Login Here</a></p>
+            <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer; font-size: 12px; margin-top: 10px;">Back to Lobby</button>
         </div>
 
         <div id="waitingState" style="display: none; padding: 20px;">
             <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
             <h3 style="color: #fbbf24;">ምዝገባ ተሳክቷል!</h3>
-            <p style="line-height: 1.6;">Registration successful. You can now login to play!</p>
+            <p style="line-height: 1.6;">Your account has been created successfully. You can now login to play!</p>
             <button onclick="location.href='login.html'" style="padding: 12px 25px; background: #fbbf24; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">GO TO LOGIN</button>
         </div>
     </div>
 
     <script>
-        // MASTER CONFIG
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
+        // YOUR FINAL MASTER URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
 
         async function handleRegister() {
             const name = document.getElementById('regName').value.trim();
@@ -40,14 +41,23 @@
             const btn = document.getElementById('regBtn');
 
             // Validations
-            if (!name || !phone || !pass) return alert("እባክዎ ሁሉንም ይሙሉ (Fill all fields)");
-            if (pass.length < 6) return alert("የይለፍ ቃል ቢያንስ 6 ሆሄ መሆን አለበት (Password min 6 chars)");
-            if (pass !== confirm) return alert("የይለፍ ቃሉ አይመሳሰልም (Passwords do not match)");
+            if (!name || !phone || !pass) {
+                alert("እባክዎ ሁሉንም ይሙሉ (Please fill all fields)");
+                return;
+            }
+            if (pass.length < 6) {
+                alert("የይለፍ ቃል ቢያንስ 6 ሆሄ መሆን አለበት (Password must be at least 6 characters)");
+                return;
+            }
+            if (pass !== confirm) {
+                alert("የይለፍ ቃሉ አይመሳሰልም (Passwords do not match)");
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = "በመመዝገብ ላይ... (Processing...)";
+            btn.innerText = "Processing... (በመመዝገብ ላይ)";
 
-            // Prepare URL for Google Script
+            // Build the query to trigger action=register in your Apps Script
             const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
 
             try {
@@ -58,16 +68,17 @@
                     document.getElementById('formFields').style.display = 'none';
                     document.getElementById('waitingState').style.display = 'block';
                 } else if (result.status === "exists") {
-                    alert("ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል (Phone already registered)");
+                    alert("ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል (This phone number is already registered)");
                     btn.disabled = false;
                     btn.innerText = "REGISTER NOW";
                 } else {
-                    alert("የቴክኒክ ችግር አጋጥሟል (System Error). Try again later.");
+                    alert("የቴክኒክ ችግር አጋጥሟል (System error). Please try again.");
                     btn.disabled = false;
+                    btn.innerText = "REGISTER NOW";
                 }
             } catch (error) {
-                // If it succeeds but CORS causes a catch, we verify by redirection
-                console.log("Network Response Received");
+                // In case of CORS/Network issues, if the data actually saved, we show success
+                console.log("Registration request processed.");
                 document.getElementById('formFields').style.display = 'none';
                 document.getElementById('waitingState').style.display = 'block';
             }
