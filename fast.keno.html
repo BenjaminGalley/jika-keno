@@ -5,64 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fast Keno | Simba Bet</title>
     <style>
-        :root { --gold: #FFD700; --green: #2ecc71; --red: #e74c3c; --bg: #0b0f19; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; }
+        :root { 
+            --gold: #FFD700; 
+            --cyan: #00f2ff;
+            --green: #2ecc71; 
+            --red: #e74c3c; 
+            --bg: #05070a; /* Deep black-blue */
+        }
         
-        /* Navbar & Speaker Toggle */
-        .top-nav { width: 100%; background: #1a1f2e; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); box-sizing: border-box; }
-        .bal-display { color: var(--gold); font-weight: 900; font-size: 1.2rem; }
-        .speaker-btn { background: none; border: 1px solid #444; color: white; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; font-size: 18px; }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow: hidden; /* Prevents awkward scrolling */
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh;
+        }
 
-        /* Timer & Title */
-        .timer-container { margin: 10px 0; text-align: center; }
-        #game-title { color: var(--gold); font-weight: bold; font-size: 20px; letter-spacing: 2px; }
-        #timer-box { font-size: 32px; font-weight: bold; color: white; text-shadow: 0 0 10px var(--gold); }
-        .locked { color: var(--red) !important; animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
+        /* Top Nav - Compact */
+        .top-nav { 
+            background: #0a0e17; 
+            padding: 8px 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+        }
+        .bal-display { color: var(--gold); font-weight: 900; font-size: 1.1rem; }
+        .speaker-btn { background: none; border: 1px solid #444; color: white; border-radius: 50%; width: 35px; height: 35px; cursor: pointer; }
 
-        /* Main Game Layout */
-        .main-layout { display: flex; gap: 10px; width: 98%; max-width: 1000px; justify-content: center; }
-        .side-board { width: 60px; background: #1a1f2e; border: 1px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; padding: 5px; height: 420px; overflow: hidden; }
-        .draw-num { width: 35px; height: 35px; background: var(--gold); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin: 2px 0; animation: popIn 0.3s; }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+        /* Timer - Shiny */
+        .timer-container { text-align: center; padding: 5px 0; }
+        #timer-box { 
+            font-size: 28px; 
+            font-weight: bold; 
+            color: var(--cyan); 
+            text-shadow: 0 0 10px var(--cyan); 
+        }
 
-        .keno-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; flex-grow: 1; max-width: 500px; }
-        .cell { background: #2c344a; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 4px; border: 1px solid #454d66; cursor: pointer; }
-        .cell.selected { background: var(--gold); color: black; font-weight: bold; }
-        .cell.hit { background: var(--green) !important; color: white; }
-        .cell.miss { opacity: 0.3; }
+        /* Main Game Area - Fixed Height */
+        .main-layout { 
+            display: flex; 
+            gap: 5px; 
+            padding: 0 10px;
+            justify-content: center; 
+            flex: 1; 
+            overflow: hidden;
+        }
 
-        #number-popup { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 120px; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px black; pointer-events: none; display: none; z-index: 100; }
+        /* Side Board - Static "Paper" Style */
+        .side-board { 
+            width: 50px; 
+            background: #111827; 
+            border: 1px solid #1f2937; 
+            border-radius: 4px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 4px 0;
+        }
+        .draw-num { 
+            width: 32px; 
+            height: 20px; 
+            background: #1e293b; 
+            color: var(--cyan); 
+            border-bottom: 1px solid #334155;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 14px;
+            margin: 1px 0;
+        }
+        .draw-num.active { color: white; background: #0ea5e9; text-shadow: 0 0 5px white; }
 
-        /* Bottom Section */
-        .bottom-section { width: 100%; max-width: 600px; padding: 15px; box-sizing: border-box; }
-        .ticket-area { background: #1e2536; border: 2px dashed #444; border-radius: 10px; padding: 10px; margin-bottom: 15px; min-height: 80px; }
-        .ticket-num { display: inline-block; width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 50%; background: #333; margin: 3px; font-weight: bold; }
+        /* Keno Grid - Full 80 Numbers */
+        .keno-grid { 
+            display: grid; 
+            grid-template-columns: repeat(8, 1fr); /* 8 columns to save vertical space */
+            gap: 3px; 
+            width: 100%;
+            max-width: 400px;
+        }
+        .cell { 
+            background: #1e293b; /* Blue-black light color */
+            aspect-ratio: 1.2; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 13px; 
+            border-radius: 3px; 
+            border: 1px solid #334155; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cell.selected { background: var(--cyan); color: black; font-weight: bold; border-color: white; box-shadow: 0 0 8px var(--cyan); }
+        .cell.hit { background: var(--green) !important; color: white; box-shadow: 0 0 10px var(--green); }
+        .cell.miss { opacity: 0.2; }
+
+        /* Pop-up and Ticket - Compacted */
+        #number-popup { position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; color: white; text-shadow: 0 0 20px var(--cyan); pointer-events: none; display: none; z-index: 100; }
+
+        .bottom-section { 
+            background: #0a0e17; 
+            padding: 10px; 
+            border-top: 1px solid #334155;
+        }
+        .ticket-area { display: flex; flex-wrap: wrap; gap: 4px; min-height: 35px; margin-bottom: 8px; border-bottom: 1px solid #1e293b; }
+        .ticket-num { width: 22px; height: 22px; line-height: 22px; text-align: center; border-radius: 50%; background: #334155; font-size: 11px; }
         .ticket-num.matched { background: var(--green); color: white; }
 
-        .controls { display: flex; justify-content: space-around; align-items: center; background: #1a1f2e; padding: 15px; border-radius: 10px; border: 1px solid var(--gold); }
-        .btn-play { background: linear-gradient(180deg, var(--gold), #DAA520); color: black; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; }
-        .btn-play:disabled { opacity: 0.3; }
+        .controls { display: flex; justify-content: space-between; align-items: center; }
+        .btn-play { 
+            background: linear-gradient(180deg, var(--cyan), #0088cc); 
+            color: white; 
+            border: none; 
+            padding: 10px 40px; 
+            border-radius: 5px; 
+            font-weight: bold; 
+            font-size: 16px; 
+            box-shadow: 0 0 10px var(--cyan);
+        }
+        .btn-play:disabled { opacity: 0.2; box-shadow: none; }
 
-        #win-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
-        .win-banner { font-size: 40px; color: var(--gold); text-align: center; }
+        #win-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
     </style>
 </head>
 <body>
 
-    <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3"></audio>
     <audio id="soundPop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
-    <audio id="soundWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-    <audio id="soundClick" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
 
     <div class="top-nav">
-        <button onclick="location.href='index.html'" style="background:#333; color:white; border:none; padding:8px 15px; border-radius:5px;">LOBBY</button>
-        <button id="muteBtn" class="speaker-btn" onclick="toggleMute()">🔊</button>
+        <button onclick="location.href='index.html'" style="background:#333; color:white; border:none; padding:5px 10px; border-radius:4px;">LOBBY</button>
+        <button id="muteBtn" class="speaker-btn" onclick="toggleMute()">🔇</button>
         <div class="bal-display"><span id="user-bal">0.00</span> ETB</div>
     </div>
 
     <div class="timer-container">
-        <div id="game-title">FAST KENO</div>
         <div id="timer-box">00:60</div>
     </div>
 
@@ -74,71 +158,54 @@
     <div id="number-popup"></div>
 
     <div class="bottom-section">
-        <div class="ticket-area" id="activeTicket">
-            <div id="ticketPrompt" style="color:#666; text-align:center; padding-top:15px;">Select numbers...</div>
-            <div id="ticketNumbers"></div>
-            <div id="potentialWin" style="color:var(--green); font-size:14px; font-weight:bold;"></div>
-        </div>
-
+        <div class="ticket-area" id="ticketNumbers"></div>
         <div class="controls">
-            <div class="bet-selector">
-                <select id="betAmount" onchange="updatePotential()" style="background:#000; color:var(--gold); border:1px solid var(--gold); padding:8px; border-radius:5px;">
-                    <option value="2">2 ETB</option>
-                    <option value="5">5 ETB</option>
-                    <option value="10">10 ETB</option>
-                </select>
-            </div>
-            <button class="btn-play" id="playBtn" onclick="placeBet()" disabled>PLACE BET</button>
+            <select id="betAmount" style="background:#000; color:var(--cyan); border:1px solid var(--cyan); padding:8px; border-radius:5px;">
+                <option value="2">2 ETB</option>
+                <option value="10">10 ETB</option>
+                <option value="50">50 ETB</option>
+            </select>
+            <button class="btn-play" id="playBtn" onclick="placeBet()" disabled>PLAY NOW</button>
         </div>
     </div>
 
     <div id="win-overlay">
-        <div class="win-banner">BIG WIN!!<br><span id="total-win-amount">0</span> ETB</div>
+        <h1 style="color:var(--gold); font-size:40px;">BIG WIN!</h1>
+        <div style="font-size:24px;"><span id="total-win-amount">0</span> ETB</div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypFOjzfNGunwPKicW5jQ-zo02w8-VqP4xfndtfPj9kWx4QSuYpePMbQyOcSbqYidWZoQ/exec";
-        let user = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = user ? parseFloat(user.balance) : 0;
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 0, phone: 'guest' };
+        let balance = parseFloat(user.balance);
         let selectedNumbers = [];
         let isLocked = false;
         let timeLeft = 60;
         let hasActiveBet = false;
-        let isMuted = true; // Browser policy: start muted until interaction
+        let isMuted = true;
 
-        // --- AUDIO CONTROLS ---
-        function toggleMute() {
-            isMuted = !isMuted;
-            const btn = document.getElementById('muteBtn');
-            const bgMusic = document.getElementById('bgMusic');
-            
-            btn.innerText = isMuted ? "🔇" : "🔊";
-            
-            if (!isMuted) {
-                bgMusic.play().catch(e => console.log("Music blocked until click"));
-            } else {
-                bgMusic.pause();
-            }
-        }
-
-        function playSound(id) {
-            if (isMuted) return;
-            const sfx = document.getElementById(id);
-            sfx.currentTime = 0;
-            sfx.play();
-        }
-
-        // --- GAME LOGIC ---
-        function initGrid() {
+        function init() {
             const grid = document.getElementById('kenoGrid');
             for (let i = 1; i <= 80; i++) {
                 let cell = document.createElement('div');
                 cell.className = 'cell'; cell.innerText = i; cell.id = 'c' + i;
-                cell.onclick = () => { playSound('soundClick'); toggleNumber(i); };
+                cell.onclick = () => toggleNumber(i);
                 grid.appendChild(cell);
+            }
+            // Init Sideboard spots
+            const side = document.getElementById('sideBoard');
+            for (let i = 0; i < 20; i++) {
+                side.innerHTML += `<div class="draw-num" id="s${i}">-</div>`;
             }
             document.getElementById('user-bal').innerText = balance.toFixed(2);
             startTimer();
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
+            const bg = document.getElementById('bgMusic');
+            isMuted ? bg.pause() : bg.play();
         }
 
         function startTimer() {
@@ -146,14 +213,10 @@
                 if (timeLeft > 0) {
                     timeLeft--;
                     document.getElementById('timer-box').innerText = "00:" + (timeLeft < 10 ? "0" + timeLeft : timeLeft);
-                    if (timeLeft <= 3) {
-                        document.getElementById('timer-box').classList.add('locked');
-                        isLocked = true;
-                    }
+                    if (timeLeft <= 3) { isLocked = true; document.getElementById('playBtn').disabled = true; }
                 } else {
                     runDraw();
                     timeLeft = 60;
-                    document.getElementById('timer-box').classList.remove('locked');
                 }
             }, 1000);
         }
@@ -173,80 +236,74 @@
 
         function updateTicket() {
             const container = document.getElementById('ticketNumbers');
-            const btn = document.getElementById('playBtn');
             container.innerHTML = "";
-            if (selectedNumbers.length > 0) {
-                document.getElementById('ticketPrompt').style.display = 'none';
-                btn.disabled = false;
-                selectedNumbers.forEach(n => container.innerHTML += `<span class="ticket-num" id="t${n}">${n}</span>`);
-            } else {
-                document.getElementById('ticketPrompt').style.display = 'block';
-                btn.disabled = true;
-            }
+            selectedNumbers.forEach(n => {
+                container.innerHTML += `<span class="ticket-num" id="t${n}">${n}</span>`;
+            });
+            document.getElementById('playBtn').disabled = selectedNumbers.length === 0 || isLocked;
         }
 
         async function placeBet() {
-            let bet = parseFloat(document.getElementById('betAmount').value);
-            if (balance < bet) return alert("Insufficient Balance");
-            balance -= bet;
+            let stake = parseFloat(document.getElementById('betAmount').value);
+            if (balance < stake) return alert("Insufficient Balance");
+            balance -= stake;
             hasActiveBet = true;
             document.getElementById('user-bal').innerText = balance.toFixed(2);
-            playSound('soundClick');
-            // Cloud sync here...
+            document.getElementById('playBtn').disabled = true;
         }
 
         async function runDraw() {
             const popup = document.getElementById('number-popup');
-            let drawResults = [];
+            let results = [];
             let hits = 0;
 
             for (let i = 0; i < 20; i++) {
-                let num;
-                do { num = Math.floor(Math.random() * 80) + 1; } while (drawResults.includes(num));
-                drawResults.push(num);
+                let n; do { n = Math.floor(Math.random()*80)+1; } while(results.includes(n));
+                results.push(n);
 
-                // Sound and Visual for each number
-                playSound('soundPop');
-                popup.innerText = num;
+                // Sideboard update - No movement, just writing
+                const sideSpot = document.getElementById('s' + i);
+                sideSpot.innerText = n;
+                sideSpot.classList.add('active');
+
+                // Pop up and Sound
+                popup.innerText = n;
                 popup.style.display = 'block';
+                if(!isMuted) document.getElementById('soundPop').play();
 
-                const cell = document.getElementById('c' + num);
-                if (selectedNumbers.includes(num)) {
+                // Table Marking
+                const cell = document.getElementById('c' + n);
+                if (selectedNumbers.includes(n)) {
                     cell.classList.add('hit');
-                    document.getElementById('t' + num).classList.add('matched');
+                    if(document.getElementById('t' + n)) document.getElementById('t' + n).classList.add('matched');
                     hits++;
                 } else {
                     cell.classList.add('miss');
                 }
 
-                document.getElementById('sideBoard').innerHTML = `<div class="draw-num">${num}</div>` + document.getElementById('sideBoard').innerHTML;
                 await new Promise(r => setTimeout(r, 800));
                 popup.style.display = 'none';
             }
 
             if (hasActiveBet && hits >= 2) {
-                playSound('soundWin');
-                showWinModal(hits * 5); // Example payout
+                let win = parseFloat(document.getElementById('betAmount').value) * hits * 2;
+                balance += win;
+                document.getElementById('total-win-amount').innerText = win.toFixed(2);
+                document.getElementById('win-overlay').style.display = 'flex';
+                setTimeout(() => { document.getElementById('win-overlay').style.display = 'none'; }, 4000);
             }
             setTimeout(resetBoard, 4000);
-        }
-
-        function showWinModal(amount) {
-            document.getElementById('total-win-amount').innerText = amount;
-            document.getElementById('win-overlay').style.display = 'flex';
-            setTimeout(() => { document.getElementById('win-overlay').style.display = 'none'; }, 4000);
         }
 
         function resetBoard() {
             selectedNumbers = []; hasActiveBet = false; isLocked = false;
             document.querySelectorAll('.cell').forEach(c => c.className = 'cell');
-            document.getElementById('sideBoard').innerHTML = "";
-            document.getElementById('ticketNumbers').innerHTML = "";
-            document.getElementById('ticketPrompt').style.display = 'block';
+            document.querySelectorAll('.draw-num').forEach(s => { s.innerText = "-"; s.classList.remove('active'); });
             updateTicket();
+            document.getElementById('user-bal').innerText = balance.toFixed(2);
         }
 
-        initGrid();
+        init();
     </script>
 </body>
 </html>
