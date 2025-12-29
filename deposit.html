@@ -62,11 +62,11 @@
     <a href="index.html" class="back-link">← Cancel and Go Back</a>
 
     <script>
-        // UPDATED URL WITH YOUR NEW DEPLOYMENT ID
+        // YOUR DEPLOYMENT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeG_Ua6ZYrvIcmVjfuwgn8DY2ddCABFYhkvzMg4ieOnBiLDB57t9HXyYpN89gpMpIj2g/exec";
 
         async function submitDeposit() {
-            // Get user data from local storage to find their phone number
+            // 1. Get user data from local storage to find their phone number
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
             
             const name = document.getElementById('senderName').value.trim();
@@ -74,7 +74,7 @@
             const method = document.getElementById('method').value;
             const btn = document.getElementById('depositBtn');
 
-            // Security check: Make sure user is logged in
+            // 2. Ensure user is logged in
             if (!user || !user.phone) {
                 alert("Error: User session not found. Please log in again.");
                 return;
@@ -88,7 +88,7 @@
             btn.disabled = true;
             btn.innerText = "SENDING REQUEST...";
 
-            // Constructing the URL with the stored user phone to fix "undefined" in Telegram
+            // 3. FIXED URL: Now includes &phone= so Telegram is NOT undefined
             const finalUrl = `${SCRIPT_URL}?action=deposit&name=${encodeURIComponent(name)}&phone=${user.phone}&amount=${amount}&method=${method}`;
 
             try {
@@ -99,7 +99,6 @@
                 window.location.href = "index.html";
             } catch (error) {
                 console.error("Submission error:", error);
-                // Even if there's a CORS error, the data usually reaches Google
                 alert("Request Sent!");
                 window.location.href = "index.html";
             }
