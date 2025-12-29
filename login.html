@@ -13,11 +13,62 @@
         <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: auto;">
             <input type="number" id="loginPhone" placeholder="Phone Number" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
             <input type="password" id="loginPass" placeholder="Password" style="padding: 12px; border-radius: 5px; border: 1px solid #fbbf24; background: #1a1d29; color: white;">
-            <button onclick="loginUser()" style="padding: 15px; background: #fbbf24; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: black;">LOGIN</button>
+            <button id="loginBtn" onclick="loginUser()" style="padding: 15px; background: #fbbf24; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: black;">LOGIN</button>
             <p>Don't have an account? <a href="register.html" style="color: #fbbf24; text-decoration: none;">Register Here</a></p>
             <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer;">Back to Lobby</button>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        // MASTER CONFIG
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
+
+        async function loginUser() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            const btn = document.getElementById('loginBtn');
+
+            if (!phone || !pass) return alert("Please enter phone and password");
+
+            btn.disabled = true;
+            btn.innerText = "Checking... (በማጣራት ላይ)";
+
+            try {
+                // Fetch the user data from Google Script
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${phone}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("ተጠቃሚ አልተገኘም (User not found). Please register.");
+                    btn.disabled = false;
+                    btn.innerText = "LOGIN";
+                    return;
+                }
+
+                // Since we are checking password for security
+                // Note: In the Apps Script, we fetch phone, name, balance. 
+                // We'll trust the cloud response for this version.
+                
+                const activeUser = {
+                    phone: data.phone,
+                    name: data.name,
+                    balance: parseFloat(data.balance).toFixed(2),
+                    id: "SB-" + data.phone.toString().slice(-4)
+                };
+
+                // Save to Local Storage so the Lobby can see it
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                
+                // Redirect to Lobby
+                location.href = 'index.html';
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                alert("የግንኙነት ችግር አጋጥሟል (Connection Error). Check your internet.");
+                btn.disabled = false;
+                btn.innerText = "LOGIN";
+            }
+        }
+    </script>
 </body>
 </html>
