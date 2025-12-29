@@ -7,8 +7,8 @@
 </head>
 <body style="background: #0b0d17; color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
     
-    <div id="regBox" style="padding: 30px; background: #1a1d29; border: 2px solid #fbbf24; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
-        <h2 style="color: #fbbf24; margin-bottom: 25px;">CREATE ACCOUNT</h2>
+    <div id="regBox" style="padding: 30px; background: #1a1d29; border: 2px solid #00f2ff; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,242,255,0.3);">
+        <h2 style="color: #00f2ff; margin-bottom: 25px;">CREATE ACCOUNT</h2>
         
         <div id="formFields" style="display: flex; flex-direction: column; gap: 15px;">
             <input type="text" id="regName" placeholder="Full Name (የሙሉ ስም)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
@@ -16,22 +16,23 @@
             <input type="password" id="regPass" placeholder="Password (ቢያንስ 6 ሆሄ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             <input type="password" id="regConfirm" placeholder="Confirm Password" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             
-            <button id="regBtn" onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
-            <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none; font-weight: bold;">Login Here</a></p>
+            <button id="regBtn" onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #00f2ff, #0088cc); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
+            <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #00f2ff; text-decoration: none; font-weight: bold;">Login Here</a></p>
             <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer; font-size: 12px; margin-top: 10px;">Back to Lobby</button>
         </div>
 
         <div id="waitingState" style="display: none; padding: 20px;">
-            <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
-            <h3 style="color: #fbbf24;">ምዝገባ ተሳክቷል!</h3>
-            <p style="line-height: 1.6;">Your account has been created successfully. You can now login to play!</p>
-            <button onclick="location.href='login.html'" style="padding: 12px 25px; background: #fbbf24; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">GO TO LOGIN</button>
+            <div style="font-size: 50px; margin-bottom: 15px;">⏳</div>
+            <h3 style="color: #fbbf24;">ጥያቄዎ ተልኳል!</h3>
+            <p style="line-height: 1.6; color: #ccc;">Your registration request has been sent to the Admin. Please wait for approval to login.</p>
+            <p style="font-size: 13px; color: #888;">ይህ ብዙውን ጊዜ ጥቂት ደቂቃዎችን ይወስዳል። (This usually takes a few minutes.)</p>
+            <button onclick="location.href='login.html'" style="padding: 12px 25px; background: #00f2ff; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">CHECK LOGIN</button>
         </div>
     </div>
 
     <script>
-        // YOUR FINAL MASTER URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
+        // MASTER SCRIPT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeG_Ua6ZYrvIcmVjfuwgn8DY2ddCABFYhkvzMg4ieOnBiLDB57t9HXyYpN89gpMpIj2g/exec";
 
         async function handleRegister() {
             const name = document.getElementById('regName').value.trim();
@@ -40,7 +41,7 @@
             const confirm = document.getElementById('regConfirm').value;
             const btn = document.getElementById('regBtn');
 
-            // Validations
+            // 1. Standard Validation
             if (!name || !phone || !pass) {
                 alert("እባክዎ ሁሉንም ይሙሉ (Please fill all fields)");
                 return;
@@ -55,32 +56,23 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "Processing... (በመመዝገብ ላይ)";
+            btn.innerText = "Sending Request...";
 
-            // Build the query to trigger action=register in your Apps Script
+            // 2. Send to Google Script
+            // Action is 'register'. The script will notify your bot.
             const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
 
             try {
-                const response = await fetch(url);
-                const result = await response.json();
-
-                if (result.status === "success") {
-                    document.getElementById('formFields').style.display = 'none';
-                    document.getElementById('waitingState').style.display = 'block';
-                } else if (result.status === "exists") {
-                    alert("ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል (This phone number is already registered)");
-                    btn.disabled = false;
-                    btn.innerText = "REGISTER NOW";
-                } else {
-                    alert("የቴክኒክ ችግር አጋጥሟል (System error). Please try again.");
-                    btn.disabled = false;
-                    btn.innerText = "REGISTER NOW";
-                }
-            } catch (error) {
-                // In case of CORS/Network issues, if the data actually saved, we show success
-                console.log("Registration request processed.");
+                // Using no-cors because we just need to trigger the save/notify
+                fetch(url, { method: 'GET', mode: 'no-cors' });
+                
+                // Show the "Waiting for Admin Approval" screen
                 document.getElementById('formFields').style.display = 'none';
                 document.getElementById('waitingState').style.display = 'block';
+
+            } catch (error) {
+                console.error("Registration Error:", error);
+                alert("Network error. Your request might have been sent, please try logging in later.");
             }
         }
     </script>
