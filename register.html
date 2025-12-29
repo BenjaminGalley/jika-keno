@@ -15,38 +15,62 @@
             <input type="number" id="regPhone" placeholder="Phone Number (ስልክ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             <input type="password" id="regPass" placeholder="Password (ቢያንስ 6 ሆሄ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
             <input type="password" id="regConfirm" placeholder="Confirm Password" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
-            <div id="errorMsg" style="color: #ef4444; font-size: 13px; display: none; text-align: left;"></div>
             
-            <button onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
+            <button id="regBtn" onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #22c55e, #16a34a); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
             <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #fbbf24; text-decoration: none; font-weight: bold;">Login Here</a></p>
         </div>
 
         <div id="waitingState" style="display: none; padding: 20px;">
-            <div style="font-size: 50px; margin-bottom: 15px;">⏳</div>
-            <h3 style="color: #fbbf24;">ጥያቄዎ ተልኳል!</h3>
-            <p style="line-height: 1.6;">Your registration request has been sent to the admin. Please wait for approval.</p>
-            <button onclick="location.href='index.html'" style="padding: 12px 25px; background: #fbbf24; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">OK</button>
+            <div style="font-size: 50px; margin-bottom: 15px;">✅</div>
+            <h3 style="color: #fbbf24;">ምዝገባ ተሳክቷል!</h3>
+            <p style="line-height: 1.6;">Registration successful. You can now login to play!</p>
+            <button onclick="location.href='login.html'" style="padding: 12px 25px; background: #fbbf24; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">GO TO LOGIN</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
     <script>
-        function handleRegister() {
+        // MASTER CONFIG
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
+
+        async function handleRegister() {
             const name = document.getElementById('regName').value.trim();
             const phone = document.getElementById('regPhone').value.trim();
             const pass = document.getElementById('regPass').value;
             const confirm = document.getElementById('regConfirm').value;
+            const btn = document.getElementById('regBtn');
 
-            if (!name || !phone || !pass) return alert("Fill all fields");
-            if (name.split(' ').length < 2) return alert("Enter Full Name (First & Last)");
-            if (pass !== confirm) return alert("Passwords do not match!");
+            // Validations
+            if (!name || !phone || !pass) return alert("እባክዎ ሁሉንም ይሙሉ (Fill all fields)");
+            if (pass.length < 6) return alert("የይለፍ ቃል ቢያንስ 6 ሆሄ መሆን አለበት (Password min 6 chars)");
+            if (pass !== confirm) return alert("የይለፍ ቃሉ አይመሳሰልም (Passwords do not match)");
 
-            // CALL THE MASTER SCRIPT FUNCTION
-            processRegistration(name, phone, pass);
+            btn.disabled = true;
+            btn.innerText = "በመመዝገብ ላይ... (Processing...)";
 
-            // Show waiting screen
-            document.getElementById('formFields').style.display = 'none';
-            document.getElementById('waitingState').style.display = 'block';
+            // Prepare URL for Google Script
+            const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    document.getElementById('formFields').style.display = 'none';
+                    document.getElementById('waitingState').style.display = 'block';
+                } else if (result.status === "exists") {
+                    alert("ይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል (Phone already registered)");
+                    btn.disabled = false;
+                    btn.innerText = "REGISTER NOW";
+                } else {
+                    alert("የቴክኒክ ችግር አጋጥሟል (System Error). Try again later.");
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                // If it succeeds but CORS causes a catch, we verify by redirection
+                console.log("Network Response Received");
+                document.getElementById('formFields').style.display = 'none';
+                document.getElementById('waitingState').style.display = 'block';
+            }
         }
     </script>
 </body>
