@@ -130,7 +130,8 @@
 
     <script src="script.js"></script>
     <script>
-        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+        // UPDATED WITH YOUR SCRIPT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
@@ -153,28 +154,32 @@
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
                 
+                // Show local balance immediately
                 headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
                 
                 const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
 
-                if(SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_URL_HERE") {
+                // Sync with Google Sheets Cloud
+                if(SCRIPT_URL.includes("macros")) {
                     syncStatus.innerText = "Syncing...";
                     try {
                         const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
                         const data = await response.json();
+                        
                         if (data && data.balance !== undefined) {
-                            const latestLocal = JSON.parse(localStorage.getItem('simba_active_user'));
-                            if (latestLocal.balance == activeUser.balance) {
-                                const cloudBal = parseFloat(data.balance).toFixed(2);
+                            const cloudBal = parseFloat(data.balance).toFixed(2);
+                            
+                            // If cloud balance is different, update local
+                            if (parseFloat(activeUser.balance).toFixed(2) !== cloudBal) {
                                 headerBal.innerText = cloudBal;
                                 activeUser.balance = cloudBal;
                                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                                syncStatus.innerText = "Synced";
                             }
+                            syncStatus.innerText = "Synced ✅";
                         }
                     } catch (e) {
-                        syncStatus.innerText = "Offline";
+                        syncStatus.innerText = "Offline ⚠️";
                     }
                 }
             } else {
