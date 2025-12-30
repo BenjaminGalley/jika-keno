@@ -61,10 +61,8 @@
     </div>
 
     <script>
-        // YOUR FINAL MASTER URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbfS03T8V285v7H925_k_M2-qE8e6V3_nS_K4_u5K8_u5K8_u5K8_u5K8_u5K8/exec"; 
-        // Note: Using your verified URL provided in the last step:
-        const VERIFIED_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
+        // ✅ YOUR NEW MASTER URL - Matches your Sheet
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function loginUser() {
             const phone = document.getElementById('loginPhone').value.trim();
@@ -80,10 +78,11 @@
             btn.innerText = "Checking... (በማጣራት ላይ)";
 
             try {
-                // Fetch user data from Google Script using action=getUser
-                const response = await fetch(`${VERIFIED_URL}?action=getUser&phone=${phone}`);
+                // We ask the Google Sheet for this specific phone number
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${phone}`);
                 const data = await response.json();
 
+                // If the user isn't in the sheet, the sheet returns an error
                 if (data.error) {
                     alert("ተጠቃሚ አልተገኘም (User not found). Please register.");
                     btn.disabled = false;
@@ -91,19 +90,26 @@
                     return;
                 }
 
-                // Note: The Google Script currently returns phone, name, and balance.
-                // We construct the activeUser object to store in LocalStorage.
+                // SECURITY CHECK: Match password from Sheet
+                // If you haven't added password check to your GAS yet, this checks it on the website side
+                if(data.password && data.password != pass) {
+                    alert("የተሳሳተ የይለፍ ቃል (Incorrect Password)");
+                    btn.disabled = false;
+                    btn.innerText = "LOGIN";
+                    return;
+                }
+
+                // SUCCESS: Save user to local memory
                 const activeUser = {
                     phone: data.phone,
                     name: data.name,
-                    balance: parseFloat(data.balance).toFixed(2),
+                    balance: parseFloat(data.balance || 0).toFixed(2),
                     id: "SB-" + data.phone.toString().slice(-4)
                 };
 
-                // Save to Local Storage so the Lobby and Games can access the session
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                 
-                // Redirect to the Lobby
+                // Go to the Home Page
                 location.href = 'index.html';
 
             } catch (error) {
