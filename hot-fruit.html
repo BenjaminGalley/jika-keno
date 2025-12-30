@@ -11,310 +11,285 @@
             --bg: #05070a;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
         body { 
-            background: var(--bg);
-            background-image: url('assets/simba_bg.jpg');
+            background: var(--bg) url('assets/simba_bg.jpg') no-repeat center center fixed;
             background-size: cover;
             color: white; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden;
         }
 
-        /* Fancy Golden Header */
-        .game-title {
-            margin: 20px 0 10px 0;
-            font-size: 38px;
-            font-weight: 900;
-            text-transform: uppercase;
-            background: var(--fancy-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(255, 162, 0, 0.5));
-            letter-spacing: 3px;
-        }
-
         .top-bar {
             width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.6); border-bottom: 2px solid var(--gold);
+            background: rgba(0,0,0,0.8); border-bottom: 2px solid var(--gold); z-index: 10;
         }
-        .balance-display { color: var(--gold); font-weight: 900; font-size: 1.3rem; }
+        .balance-display { color: var(--gold); font-weight: 900; font-size: 1.3rem; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
 
-        /* Slot Machine Area */
-        .machine-wrapper {
-            position: relative;
-            padding: 20px;
-            background: url('assets/simba_card.jpg');
-            background-size: 100% 100%;
-            border-radius: 15px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        .game-title {
+            margin: 20px 0 10px 0; font-size: 40px; font-weight: 900; text-transform: uppercase;
+            background: var(--fancy-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); letter-spacing: 3px;
+        }
+
+        .machine-frame {
+            position: relative; padding: 15px; 
+            background: rgba(0,0,0,0.6);
+            border: 4px solid #8c5d00; border-radius: 20px;
+            box-shadow: 0 0 40px rgba(0,0,0,1);
         }
 
         .grid-3x3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 15px;
-            background: url('assets/grid_3x3.jpg');
-            background-size: cover;
-            border: 3px solid #444;
-            border-radius: 10px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+            background: url('assets/grid_3x3.jpg') no-repeat center;
+            background-size: cover; padding: 15px; border-radius: 10px;
             position: relative;
         }
 
         .slot-tile {
-            width: 90px; height: 90px;
-            background: url('assets/tile.jpg');
-            background-size: cover;
-            border-radius: 8px;
+            width: 90px; height: 90px; 
+            background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+            border: 2px solid #444; border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+            box-shadow: inset 0 0 10px #000;
         }
 
-        .symbol-img {
-            width: 75%; height: 75%;
-            object-fit: contain;
-            transition: transform 0.1s linear;
+        .symbol-img { width: 85%; height: 85%; object-fit: contain; }
+        .symbol-img.win-pop { animation: pop 0.4s ease infinite alternate; }
+
+        @keyframes pop { from { transform: scale(1); } to { transform: scale(1.15); } }
+
+        #lineCanvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 5; }
+
+        .tray {
+            margin-top: auto; margin-bottom: 50px; width: 90%; max-width: 380px;
+            background: rgba(0,0,0,0.9); padding: 15px 25px;
+            border-radius: 50px; border: 2px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        /* Payline Canvas */
-        #lineCanvas {
-            position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10;
+        .bet-ctrl { display: flex; align-items: center; gap: 12px; }
+        .btn-circle {
+            width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold);
+            background: transparent; color: var(--gold); font-size: 22px; cursor: pointer; font-weight: bold;
         }
-
-        /* Controls */
-        .tray-area {
-            width: 100%; max-width: 400px; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px;
-            background: rgba(0,0,0,0.4); border-radius: 20px; margin-top: 15px;
-        }
-
-        .control-row { display: flex; justify-content: space-between; align-items: center; }
-
-        .bet-selector {
-            display: flex; align-items: center; background: #000; 
-            border: 2px solid var(--gold); border-radius: 25px;
-        }
-        .btn-adj { background: none; border: none; color: var(--gold); font-size: 24px; padding: 5px 15px; cursor: pointer; font-weight: bold; }
-        #betDisplay { width: 50px; text-align: center; border: none; background: none; color: white; font-size: 18px; font-weight: bold; }
+        #betAmt { font-weight: bold; font-size: 20px; color: white; min-width: 30px; text-align: center; }
 
         .spin-btn {
-            height: 55px; flex: 1; margin-left: 15px;
-            background: var(--fancy-gold);
-            border: none; border-radius: 30px; font-size: 20px; font-weight: 900;
-            color: #432b00; cursor: pointer; box-shadow: 0 4px 0 #8c5d00;
+            height: 55px; width: 130px; border-radius: 30px; border: none;
+            background: var(--fancy-gold); color: #221a00; font-size: 22px;
+            font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 #5c4000;
         }
-        .spin-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8c5d00; }
-        .spin-btn:disabled { filter: grayscale(1); opacity: 0.6; }
+        .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #5c4000; }
+        .spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
 
-        /* Celebration Overlay */
-        .celebration {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+        .win-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92);
             display: none; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100; text-align: center;
+            z-index: 1000;
         }
-        .big-win-text {
-            font-size: 60px; font-weight: 900; color: var(--gold);
-            text-shadow: 0 0 20px gold; animation: pulse 0.5s infinite alternate;
+        .win-msg { 
+            font-size: 65px; font-weight: 900; background: var(--fancy-gold);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: winPulse 0.4s infinite alternate;
         }
 
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
-        .blur { filter: blur(3px); }
+        @keyframes winPulse { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.1); filter: brightness(1.5); } }
+        .blur { filter: blur(6px); transition: 0.05s; }
     </style>
 </head>
-<body onclick="initAudio()">
+<body onclick="playMusic()">
 
     <div class="top-bar">
-        <button onclick="location.reload()" style="background:#333; color:white; border:1px solid #777; padding:5px 10px;">LOBBY</button>
+        <button onclick="window.location.reload()" style="background:none; border:1px solid var(--gold); color:white; padding:5px 15px; border-radius:5px;">LOBBY</button>
         <div class="balance-display"><span id="balance">1716.50</span> ETB</div>
     </div>
 
     <h1 class="game-title">HOT FRUIT</h1>
 
-    <div class="machine-wrapper">
+    <div class="machine-frame">
         <div class="grid-3x3" id="mainGrid">
             <canvas id="lineCanvas"></canvas>
-            </div>
-    </div>
-
-    <div class="tray-area">
-        <div class="control-row">
-            <div class="bet-selector">
-                <button class="btn-adj" onclick="adjBet(-2)">-</button>
-                <input type="text" id="betDisplay" value="2" readonly>
-                <button class="btn-adj" onclick="adjBet(2)">+</button>
-            </div>
-            <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
         </div>
     </div>
 
-    <div id="celebration" class="celebration">
-        <div class="big-win-text">BIG WIN!</div>
-        <div id="winAmt" style="font-size:40px; color:white; margin:10px 0;">+150.00</div>
+    <div class="tray">
+        <div class="bet-ctrl">
+            <button class="btn-circle" onclick="changeBet(-2)">-</button>
+            <div id="betAmt">2</div>
+            <button class="btn-circle" onclick="changeBet(2)">+</button>
+        </div>
+        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
     </div>
 
-    <audio id="sndMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
-    <audio id="sndSpin" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-    <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+    <div id="winOverlay" class="win-overlay">
+        <div class="win-msg">BIG WIN!</div>
+        <div id="finalWin" style="font-size:45px; margin-top:10px; color:white; font-weight:bold;">+0.00 ETB</div>
+    </div>
+
+    <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
+    <audio id="sfxSpin" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+    <audio id="sfxWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <script>
-        // Assets Mapping based on your files
-        const ASSETS = [
+        const IMAGES = [
             'assets/cherry.jpg', 'assets/lemon.jpg', 'assets/orange.jpg', 
-            'assets/grapes.jpg', 'assets/melon.jpg', 'assets/gold_7.jpg', 'assets/star.png'
+            'assets/grapes.jpg', 'assets/melon.jpg', 'assets/gold_7.jpg'
         ];
 
         let balance = 1716.50;
-        let currentBet = 2;
-        let isSpinning = false;
-        let audioInit = false;
+        let bet = 2;
+        let spinning = false;
+        let musicStarted = false;
+        let winAnimationId = null;
 
-        function initGrid() {
+        function init() {
             const grid = document.getElementById('mainGrid');
             for(let i=0; i<9; i++) {
                 const tile = document.createElement('div');
                 tile.className = 'slot-tile';
-                tile.innerHTML = `<img src="${ASSETS[Math.floor(Math.random()*ASSETS.length)]}" class="symbol-img" id="s${i}">`;
+                tile.innerHTML = `<img src="${IMAGES[Math.floor(Math.random()*IMAGES.length)]}" class="symbol-img" id="img${i}">`;
                 grid.appendChild(tile);
             }
-            updateBalance();
             resizeCanvas();
         }
 
         function resizeCanvas() {
-            const canvas = document.getElementById('lineCanvas');
-            const grid = document.getElementById('mainGrid');
-            canvas.width = grid.offsetWidth;
-            canvas.height = grid.offsetHeight;
+            const c = document.getElementById('lineCanvas');
+            const g = document.getElementById('mainGrid');
+            c.width = g.offsetWidth; c.height = g.offsetHeight;
         }
 
-        function adjBet(v) {
-            if(isSpinning) return;
-            currentBet = Math.max(2, currentBet + v);
-            document.getElementById('betDisplay').value = currentBet;
+        function changeBet(v) {
+            if(spinning) return;
+            bet = Math.max(2, bet + v);
+            document.getElementById('betAmt').innerText = bet;
         }
 
         async function spin() {
-            if(balance < currentBet || isSpinning) return;
-
-            isSpinning = true;
-            balance -= currentBet;
-            updateBalance();
-            clearLines();
+            if(balance < bet || spinning) return;
+            spinning = true;
+            balance -= bet;
+            document.getElementById('balance').innerText = balance.toFixed(2);
             document.getElementById('spinBtn').disabled = true;
-            document.getElementById('sndSpin').play();
+            document.getElementById('sfxSpin').play();
+            stopWinAnimation();
+            clearLines();
 
-            // Visual Spin Effect
-            for(let step=0; step<15; step++) {
+            for(let s=0; s<18; s++) {
                 for(let i=0; i<9; i++) {
-                    const img = document.getElementById('s${i}');
-                    img.src = ASSETS[Math.floor(Math.random()*ASSETS.length)];
+                    const img = document.getElementById(`img${i}`);
+                    img.src = IMAGES[Math.floor(Math.random()*IMAGES.length)];
                     img.classList.add('blur');
+                    img.classList.remove('win-pop');
                 }
-                await new Promise(r => setTimeout(r, 60));
+                await new Promise(r => setTimeout(r, 50));
             }
 
-            // Final Result
             const results = [];
             for(let i=0; i<9; i++) {
-                const img = document.getElementById('s${i}');
+                const img = document.getElementById(`img${i}`);
                 img.classList.remove('blur');
-                const pick = ASSETS[Math.floor(Math.random()*ASSETS.length)];
+                const pick = IMAGES[Math.floor(Math.random()*IMAGES.length)];
                 img.src = pick;
                 results.push(pick);
             }
 
-            checkWins(results);
-            isSpinning = false;
+            checkResults(results);
+            spinning = false;
             document.getElementById('spinBtn').disabled = false;
         }
 
-        function checkWins(res) {
-            const lines = [
-                [0,1,2], [3,4,5], [6,7,8], // Horizontal
-                [0,3,6], [1,4,7], [2,5,8], // Vertical
-                [0,4,8], [2,4,6]           // Diagonal
-            ];
+        function checkResults(res) {
+            const lines = [[0,1,2], [3,4,5], [6,7,8], [0,4,8], [2,4,6]];
+            let win = 0;
+            let winners = [];
 
-            let winTotal = 0;
-            let winningLines = [];
-
-            lines.forEach(line => {
-                if(res[line[0]] === res[line[1]] && res[line[1]] === res[line[2]]) {
-                    const sym = res[line[0]];
-                    let multiplier = 5;
-                    if(sym.includes('gold_7')) multiplier = 50;
-                    if(sym.includes('star')) multiplier = 20;
-                    
-                    winTotal += currentBet * multiplier;
-                    winningLines.push(line);
+            lines.forEach(l => {
+                if(res[l[0]] === res[l[1]] && res[l[1]] === res[l[2]]) {
+                    let m = res[l[0]].includes('gold_7') ? 50 : 10;
+                    win += bet * m;
+                    winners.push(l);
+                    // Pop symbols
+                    l.forEach(idx => document.getElementById(`img${idx}`).classList.add('win-pop'));
                 }
             });
 
-            if(winTotal > 0) {
-                balance += winTotal;
-                updateBalance();
-                document.getElementById('sndWin').play();
-                drawWinningLines(winningLines);
-                
-                if(winTotal >= 100) {
-                    showCelebration(winTotal);
-                }
+            if(win > 0) {
+                balance += win;
+                document.getElementById('balance').innerText = balance.toFixed(2);
+                document.getElementById('sfxWin').play();
+                startWinAnimation(winners);
+                if(win >= 100) showWin(win);
             }
         }
 
-        function drawWinningLines(lines) {
+        function startWinAnimation(winners) {
             const canvas = document.getElementById('lineCanvas');
             const ctx = canvas.getContext('2d');
             const tiles = document.getElementsByClassName('slot-tile');
-            
-            ctx.strokeStyle = '#FFD700';
-            ctx.lineWidth = 6;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = 'gold';
+            let hue = 0;
 
-            lines.forEach(line => {
-                const start = tiles[line[0]].getBoundingClientRect();
-                const end = tiles[line[2]].getBoundingClientRect();
-                const parent = document.getElementById('mainGrid').getBoundingClientRect();
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                hue = (hue + 5) % 360;
+                
+                winners.forEach(l => {
+                    ctx.beginPath();
+                    ctx.lineWidth = 8;
+                    ctx.lineCap = 'round';
+                    // Cycling color effect
+                    ctx.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+                    
+                    const startX = tiles[l[0]].offsetLeft + 45;
+                    const startY = tiles[l[0]].offsetTop + 45;
+                    const endX = tiles[l[2]].offsetLeft + 45;
+                    const endY = tiles[l[2]].offsetTop + 45;
+                    
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                    
+                    // Inner white core for "sparkle"
+                    ctx.beginPath();
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = 'white';
+                    ctx.shadowBlur = 0;
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                });
+                winAnimationId = requestAnimationFrame(animate);
+            }
+            animate();
+        }
 
-                ctx.beginPath();
-                ctx.moveTo(
-                    tiles[line[0]].offsetLeft + 45, 
-                    tiles[line[0]].offsetTop + 45
-                );
-                ctx.lineTo(
-                    tiles[line[2]].offsetLeft + 45, 
-                    tiles[line[2]].offsetTop + 45
-                );
-                ctx.stroke();
-            });
+        function stopWinAnimation() {
+            if(winAnimationId) cancelAnimationFrame(winAnimationId);
         }
 
         function clearLines() {
-            const canvas = document.getElementById('lineCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const c = document.getElementById('lineCanvas');
+            c.getContext('2d').clearRect(0,0,c.width,c.height);
         }
 
-        function showCelebration(amt) {
-            const el = document.getElementById('celebration');
-            document.getElementById('winAmt').innerText = "+" + amt.toFixed(2) + " ETB";
-            el.style.display = 'flex';
-            setTimeout(() => el.style.display = 'none', 3000);
+        function showWin(a) {
+            document.getElementById('finalWin').innerText = "+" + a.toFixed(2) + " ETB";
+            document.getElementById('winOverlay').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('winOverlay').style.display = 'none';
+            }, 3000);
         }
 
-        function updateBalance() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
-        }
-
-        function initAudio() {
-            if(!audioInit) {
-                const music = document.getElementById('sndMusic');
-                music.volume = 0.2;
-                music.play();
-                audioInit = true;
+        function playMusic() {
+            if(!musicStarted) {
+                const m = document.getElementById('bgm');
+                m.volume = 0.15; m.play(); musicStarted = true;
             }
         }
 
-        window.onload = initGrid;
+        window.onload = init;
         window.onresize = resizeCanvas;
     </script>
 </body>
