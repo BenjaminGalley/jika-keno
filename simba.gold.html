@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simba's Gold Classic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --fancy-gold: linear-gradient(180deg, #fff7ad 0%, #ffa200 50%, #8c5d00 100%);
+            --glass: rgba(0, 0, 0, 0.8);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        body { 
+            background: #000 url('assets/simba_bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white; font-family: 'Goldman', sans-serif;
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        /* Top Header */
+        .top-nav { 
+            padding: 12px 20px; background: var(--glass); border-bottom: 2px solid var(--gold); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+        }
+        .lobby-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 6px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+        /* Title Area */
+        .title-area { margin-top: 20px; text-align: center; }
+        .title-area h1 { 
+            font-family: 'Cinzel', serif; font-size: 32px; letter-spacing: 3px;
+            background: var(--fancy-gold); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* The Machine Frame */
+        .machine-wrap {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        .slot-body { 
+            background: linear-gradient(145deg, #333, #111); 
+            border: 5px solid #8c5d00; border-radius: 25px;
+            padding: 15px; box-shadow: 0 0 50px rgba(0,0,0,1), inset 0 0 20px #000;
+            position: relative;
+        }
+
+        .reels-container { 
+            background: #ffffff; border-radius: 12px; padding: 12px;
+            display: flex; gap: 12px; border: 4px solid #555;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .reel { 
+            width: 85px; height: 110px; background: #f0f0f0; 
+            border-radius: 10px; overflow: hidden; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #ccc;
+        }
+
+        .reel img { width: 80%; height: 80%; object-fit: contain; transition: transform 0.1s; }
+
+        /* Animation State */
+        .reel.spinning img { filter: blur(5px); transform: scale(1.1) translateY(10px); }
+
+        /* Winning Message */
+        #msg { 
+            margin: 25px; font-size: 26px; color: var(--gold); 
+            text-shadow: 0 0 15px rgba(255,215,0,0.7); font-weight: 900;
+            height: 35px; text-transform: uppercase;
+        }
+
+        /* Bottom Controls */
+        .controls-tray {
+            background: var(--glass); padding: 25px 20px 45px 20px;
+            border-top: 3px solid var(--gold); border-radius: 40px 40px 0 0;
+            text-align: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.6);
+        }
+
+        .bet-display { font-size: 22px; margin-bottom: 18px; color: #ddd; letter-spacing: 1px; }
+        
+        .spin-btn { 
+            background: var(--fancy-gold); color: #1a1500; font-size: 28px; 
+            font-weight: 900; padding: 18px; border: none; border-radius: 50px; 
+            cursor: pointer; width: 95%; max-width: 420px;
+            box-shadow: 0 6px 0 #5c4000; transition: 0.1s;
+        }
+        .spin-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #5c4000; }
+        .spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
+
+    </style>
+</head>
+<body onclick="handleAudioInit()">
+
+    <div class="top-nav">
+        <button class="lobby-btn" onclick="location.href='index.html'">LOBBY</button>
+        <div style="color:var(--gold); font-weight:bold; font-size:20px;"><span id="balDisplay">0.00</span> ETB</div>
+    </div>
+
+    <div class="title-area">
+        <h1>SIMBA'S GOLD</h1>
+    </div>
+
+    <div class="machine-wrap">
+        <div class="slot-body">
+            <div class="reels-container">
+                <div class="reel" id="r1"><img src="assets/gold_7.jpg"></div>
+                <div class="reel" id="r2"><img src="assets/gold_7.jpg"></div>
+                <div class="reel" id="r3"><img src="assets/gold_7.jpg"></div>
+            </div>
+        </div>
+        <div id="msg">SPIN TO WIN</div>
+    </div>
+
+    <div class="controls-tray">
+        <div class="bet-display">STAKE: 10.00 ETB</div>
+        <button class="spin-btn" id="spinBtn" onclick="startSpin()">SPIN</button>
+    </div>
+
+    <audio id="bgm" loop src="https://cdn.pixabay.com/audio/2022/03/10/audio_c0c8b350f4.mp3"></audio>
+    <audio id="sndSpin" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+    <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <script>
+        // Data Handling
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: "1716.50" };
+        let balance = parseFloat(user.balance);
+        const betValue = 10.00;
+        let isSpinning = false;
+        let audioRunning = false;
+
+        const SYMBOLS = [
+            'assets/cherry.jpg', 
+            'assets/lemon.jpg', 
+            'assets/orange.jpg', 
+            'assets/grapes.jpg', 
+            'assets/melon.jpg', 
+            'assets/gold_7.jpg'
+        ];
+
+        function syncData() {
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
+        }
+
+        async function startSpin() {
+            if(balance < betValue || isSpinning) return;
+            
+            isSpinning = true;
+            balance -= betValue;
+            syncData();
+            
+            document.getElementById('spinBtn').disabled = true;
+            document.getElementById('msg').innerText = "SPINNING...";
+            document.getElementById('sndSpin').play();
+
+            const reels = [document.getElementById('r1'), document.getElementById('r2'), document.getElementById('r3')];
+            
+            // Start Visual Blur
+            reels.forEach(r => r.classList.add('spinning'));
+
+            // Animation loop for 1.5 seconds
+            for(let i=0; i<18; i++) {
+                reels.forEach(r => {
+                    const randomSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                    r.querySelector('img').src = randomSym;
+                });
+                await new Promise(resolve => setTimeout(resolve, 70));
+            }
+
+            // Stop and Finalize Results
+            const finalResults = [];
+            reels.forEach(r => {
+                r.classList.remove('spinning');
+                const finalPick = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                r.querySelector('img').src = finalPick;
+                finalResults.push(finalPick);
+            });
+
+            checkPayout(finalResults);
+        }
+
+        function checkPayout(results) {
+            const [s1, s2, s3] = results;
+
+            if(s1 === s2 && s2 === s3) {
+                // If all three match
+                let multiplier = s1.includes('gold_7') ? 50 : 15;
+                let winAmt = betValue * multiplier;
+                balance += winAmt;
+                document.getElementById('msg').innerText = "JACKPOT! +" + winAmt.toFixed(2);
+                document.getElementById('sndWin').play();
+            } else if (s1 === s2 || s2 === s3 || s1 === s3) {
+                // Pair Bonus (Small win)
+                let winAmt = betValue * 2;
+                balance += winAmt;
+                document.getElementById('msg').innerText = "PAIR! +" + winAmt.toFixed(2);
+                document.getElementById('sndWin').play();
+            } else {
+                document.getElementById('msg').innerText = "TRY AGAIN";
+            }
+            
+            syncData();
+            isSpinning = false;
+            document.getElementById('spinBtn').disabled = false;
+        }
+
+        function handleAudioInit() {
+            if(!audioRunning) {
+                const bgm = document.getElementById('bgm');
+                bgm.volume = 0.15;
+                bgm.play().catch(() => {});
+                audioRunning = true;
+            }
+        }
+
+        // Initialize UI
+        syncData();
+    </script>
+</body>
+</html>
