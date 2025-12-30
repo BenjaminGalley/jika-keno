@@ -12,74 +12,46 @@
         input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 18px; }
         .btn-send { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
         .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; }
-        .status { margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h2 style="color:var(--gold)">💰 Deposit Funds</h2>
-        <p>Enter the amount you sent via Bank/Telebirr:</p>
-
+        <p>Enter the amount you sent:</p>
         <input type="number" id="depAmount" placeholder="Amount (ETB)">
         
         <div class="payment-methods">
             <strong>Transfer to:</strong><br>
-            🏦 CBE: 1000XXXXXXXXX<br>
-            📱 Telebirr: 09XXXXXXXX<br>
+            🏦 CBE: 1000547845214 (Alemu K.)<br>
+            📱 Telebirr: 0923584758<br>
             <small>*Ensure you use your registered phone number as a reference.</small>
         </div>
 
         <button class="btn-send" id="depBtn" onclick="handleDeposit()">SUBMIT DEPOSIT</button>
-        
-        <div id="depStatus" class="status"></div>
-
+        <div id="depStatus" style="margin-top:15px;"></div>
         <a href="index.html" class="back-link">⬅ Back to Games</a>
     </div>
 
     <script>
-        // ✅ YOUR MASTER URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function handleDeposit() {
             const amount = document.getElementById('depAmount').value;
             const btn = document.getElementById('depBtn');
-            const status = document.getElementById('depStatus');
-            
-            // Get user from local memory
             let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
-            if (!activeUser) {
-                alert("Please login first!");
-                window.location.href = 'login.html';
-                return;
-            }
-
-            if (!amount || amount < 10) {
-                alert("Minimum deposit is 10 ETB");
-                return;
-            }
+            if (!activeUser) { alert("Please login first!"); return; }
+            if (!amount || amount < 10) { alert("Minimum deposit is 10 ETB"); return; }
 
             btn.disabled = true;
-            btn.innerText = "Sending Request...";
-            status.style.color = "white";
-            status.innerText = "Notifying Admin...";
-
-            // Send data to the Sheet
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&amount=${amount}`;
+            btn.innerText = "Sending...";
 
             try {
-                await fetch(finalUrl, { mode: 'no-cors' });
-                
-                status.style.color = var(--gold);
-                status.innerText = "✅ Request Sent! Your balance will update once confirmed.";
-                btn.innerText = "REQUEST SUBMITTED";
-                
-                alert("Deposit request submitted! Please allow 5-10 minutes for verification.");
-                
-            } catch (error) {
-                status.style.color = "#ff4444";
-                status.innerText = "Error connecting. Try again.";
+                await fetch(`${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&amount=${amount}`, { mode: 'no-cors' });
+                alert("Request Sent! We will verify your deposit shortly.");
+                window.location.href = "index.html";
+            } catch (e) {
+                alert("Error. Try again.");
                 btn.disabled = false;
                 btn.innerText = "SUBMIT DEPOSIT";
             }
