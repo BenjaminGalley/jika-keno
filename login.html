@@ -6,62 +6,27 @@
     <title>Login | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; }
-        body { 
-            background: var(--bg); color: white; text-align: center; 
-            font-family: sans-serif; margin: 0; padding: 0;
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh;
-        }
-        .login-card {
-            background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px;
-            padding: 30px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .logo-img {
-            width: 80px; height: 80px; border-radius: 50%; 
-            border: 2px solid var(--gold); margin-bottom: 20px;
-        }
-        h2 { color: var(--gold); margin-bottom: 25px; font-size: 22px; }
-        .input-group { display: flex; flex-direction: column; gap: 15px; }
-        input {
-            padding: 12px; border-radius: 8px; border: 1px solid #333; 
-            background: #0b0d17; color: white; font-size: 16px; outline: none;
-        }
-        input:focus { border-color: var(--gold); }
-        .login-btn {
-            padding: 15px; background: var(--gold); border: none; 
-            border-radius: 8px; font-weight: bold; cursor: pointer; 
-            color: black; font-size: 16px; margin-top: 10px;
-            transition: transform 0.2s;
-        }
-        .login-btn:active { transform: scale(0.98); }
-        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        p { font-size: 14px; margin-top: 20px; color: #ccc; }
-        a { color: var(--gold); text-decoration: none; font-weight: bold; }
-        .back-link {
-            display: block; margin-top: 15px; background: none; 
-            border: none; color: #777; cursor: pointer; font-size: 13px;
-        }
+        body { background: var(--bg); color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .login-card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; }
+        .login-btn { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; }
+        .login-btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <img src="assets/assets/gold_7.jpg" class="logo-img" alt="Logo">
-        <h2>SIMBA BET LOGIN</h2>
+        <h2 style="color:var(--gold)">SIMBA BET LOGIN</h2>
+        <input type="number" id="loginPhone" placeholder="Phone Number (ስልክ)">
+        <input type="password" id="loginPass" placeholder="Password (የይለፍ ቃል)">
         
-        <div class="input-group">
-            <input type="number" id="loginPhone" placeholder="Phone Number (ስልክ)">
-            <input type="password" id="loginPass" placeholder="Password (የይለፍ ቃል)">
-            
-            <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN</button>
-            
-            <p>Don't have an account? <a href="register.html">Register Here</a></p>
-            <button class="back-link" onclick="location.href='index.html'">Back to Lobby</button>
-        </div>
+        <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN</button>
+        
+        <p style="font-size:14px; margin-top:20px;">Don't have an account? <a href="register.html" style="color:var(--gold)">Register Here</a></p>
     </div>
 
     <script>
-        // ✅ YOUR NEW MASTER URL - Matches your Sheet
+        // ✅ YOUR MASTER URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function loginUser() {
@@ -70,7 +35,7 @@
             const btn = document.getElementById('loginBtn');
 
             if (!phone || !pass) {
-                alert("እባክዎ ስልክ እና የይለፍ ቃል ያስገቡ (Please enter phone and password)");
+                alert("Please enter phone and password");
                 return;
             }
 
@@ -78,43 +43,39 @@
             btn.innerText = "Checking... (በማጣራት ላይ)";
 
             try {
-                // We ask the Google Sheet for this specific phone number
+                // This talks to your Google Sheet
                 const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${phone}`);
                 const data = await response.json();
 
-                // If the user isn't in the sheet, the sheet returns an error
                 if (data.error) {
-                    alert("ተጠቃሚ አልተገኘም (User not found). Please register.");
+                    alert("User not found. Please register.");
                     btn.disabled = false;
                     btn.innerText = "LOGIN";
                     return;
                 }
 
-                // SECURITY CHECK: Match password from Sheet
-                // If you haven't added password check to your GAS yet, this checks it on the website side
+                // Check password
                 if(data.password && data.password != pass) {
-                    alert("የተሳሳተ የይለፍ ቃል (Incorrect Password)");
+                    alert("Incorrect Password!");
                     btn.disabled = false;
                     btn.innerText = "LOGIN";
                     return;
                 }
 
-                // SUCCESS: Save user to local memory
+                // Success: Save user session
                 const activeUser = {
                     phone: data.phone,
                     name: data.name,
                     balance: parseFloat(data.balance || 0).toFixed(2),
                     id: "SB-" + data.phone.toString().slice(-4)
                 };
-
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                 
-                // Go to the Home Page
-                location.href = 'index.html';
+                window.location.href = 'index.html';
 
             } catch (error) {
-                console.error("Login Error:", error);
-                alert("የግንኙነት ችግር አጋጥሟል (Connection Error). Please check your internet.");
+                console.error(error);
+                alert("Connection Error. Check internet.");
                 btn.disabled = false;
                 btn.innerText = "LOGIN";
             }
