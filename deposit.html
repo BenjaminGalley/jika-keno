@@ -54,22 +54,21 @@
         <input type="text" id="senderName" placeholder="Enter your name">
 
         <label>Amount / መጠን (ETB)</label>
-        <input type="number" id="amount" placeholder="Minimum 10 ETB">
+        <input type="number" id="amount" placeholder="Minimum 100 ETB">
 
-        <button class="btn" id="depositBtn" onclick="submitDeposit()">SUBMIT DEPOSIT / አረጋግጥ</button>
+        <button class="btn" id="depositBtn" onclick="submitDepositRequest()">SUBMIT DEPOSIT / አረጋግጥ</button>
     </div>
 
     <a href="index.html" class="back-link">← Cancel and Go Back</a>
 
     <script>
-        // ✅ WORKING MASTER URL (Connected to your Sheet)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
-        async function submitDeposit() {
+        async function submitDepositRequest() {
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            const method = document.getElementById('method').value;
             const name = document.getElementById('senderName').value.trim();
             const amount = document.getElementById('amount').value.trim();
-            const method = document.getElementById('method').value;
             const btn = document.getElementById('depositBtn');
 
             if (!user || !user.phone) {
@@ -78,21 +77,26 @@
             }
 
             if (!name || !amount) {
-                alert("Please enter name and amount.");
+                alert("እባክዎን ሁሉንም መረጃ ይሙሉ (Please fill all info)");
+                return;
+            }
+
+            if (parseFloat(amount) < 100) {
+                alert("ዝቅተኛው ማስገቢያ 100 ብር ነው (Min 100 ETB)");
                 return;
             }
 
             btn.disabled = true;
             btn.innerText = "SENDING REQUEST...";
 
-            const finalUrl = `${SCRIPT_URL}?action=deposit&name=${encodeURIComponent(name)}&phone=${user.phone}&amount=${amount}&method=${method}`;
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(name)}&amount=${amount}&method=${method}`;
 
             try {
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("Deposit Request Sent! Please wait for approval.");
+                alert("ጥያቄዎ ተልኳል! (Deposit Request Sent!)");
                 window.location.href = "index.html";
             } catch (error) {
-                alert("Request Sent!");
+                alert("ጥያቄዎ ተልኳል!");
                 window.location.href = "index.html";
             }
         }
