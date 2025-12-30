@@ -7,116 +7,111 @@
     <style>
         :root {
             --gold: #FFD700;
-            --red: #d40000;
-            --panel: #1a1a1a;
+            --bg: #000;
+            --panel: #0a0e17;
         }
 
         body { 
-            background: #000; color: white; font-family: 'Segoe UI', Arial, sans-serif; 
+            background: var(--bg); color: white; font-family: 'Segoe UI', Arial, sans-serif; 
             margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* Top Navigation */
+        /* Top Header: Name & Speaker */
         .header { 
-            background: #111; padding: 10px 15px; border-bottom: 2px solid var(--gold); 
-            display: flex; justify-content: space-between; align-items: center; z-index: 10;
+            background: var(--panel); height: 60px; display: flex; 
+            justify-content: space-between; align-items: center; padding: 0 15px;
+            border-bottom: 2px solid var(--gold); flex-shrink: 0; z-index: 10;
         }
-        .lobby-btn { background: #333; color: white; border: 1px solid #555; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
-        .balance-box { color: var(--gold); font-weight: bold; font-size: 1.1rem; }
+        .game-title { color: var(--gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; }
+        
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        
+        .mute-btn {
+            background: none; border: none; cursor: pointer; color: var(--gold);
+            font-size: 24px; padding: 5px; display: flex; align-items: center;
+        }
 
-        /* Slot Machine Area */
+        .balance-box { color: var(--gold); font-weight: bold; font-size: 16px; text-align: right; }
+
+        /* Game Area */
         .game-container {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; display: flex; align-items: center; justify-content: center;
             position: relative; padding: 10px;
         }
 
         .slot-frame {
-            width: 340px; height: 220px; border: 6px solid #444; border-radius: 8px;
+            width: 340px; height: 220px; border: 6px solid #444; border-radius: 12px;
             background: #000; position: relative; overflow: hidden;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
         }
 
-        .reels-container {
-            display: flex; width: 100%; height: 100%; position: relative;
+        /* The Grid Image */
+        .reels-container { 
+            display: flex; width: 100%; height: 100%; 
+            background-image: url('assets/assets/grid.jpg');
+            background-size: 100% 100%;
         }
 
-        .reel {
-            flex: 1; height: 100%; border-right: 1px solid #222; position: relative;
-            overflow: hidden; background: linear-gradient(180deg, #111 0%, #000 50%, #111 100%);
-        }
+        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; }
 
-        .reel-strip {
-            position: absolute; width: 100%; top: 0; transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
-        }
+        .reel-strip { position: absolute; width: 100%; top: 0; transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
 
-        .symbol {
-            height: 73px; width: 100%; display: flex; align-items: center; justify-content: center;
-            box-sizing: border-box; border-bottom: 1px solid #111;
-        }
+        .symbol { height: 73.3px; width: 100%; display: flex; align-items: center; justify-content: center; }
 
-        .symbol img { width: 55px; height: 55px; object-fit: contain; }
+        .symbol img { width: 52px; height: 52px; object-fit: contain; }
 
-        /* Payline Canvas Overlay */
-        #payline-canvas {
-            position: absolute; top: 0; left: 0; pointer-events: none; z-index: 5;
-        }
-
-        /* Controls Panel */
-        .controls {
-            background: #111; border-top: 3px solid var(--gold); padding: 15px 10px;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        /* Bottom Controls: Bet Selector & Spin */
+        .bottom-ui {
+            background: var(--panel); border-top: 3px solid #1e293b;
+            padding: 15px 15px 30px 15px; flex-shrink: 0; display: flex;
+            flex-direction: column; align-items: center; gap: 15px;
         }
 
         .bet-selector {
-            display: flex; align-items: center; gap: 15px; background: #222; 
-            padding: 5px 15px; border-radius: 25px; border: 1px solid var(--gold);
+            display: flex; align-items: center; gap: 20px; background: #1a1a1a; 
+            padding: 8px 25px; border-radius: 30px; border: 1.5px solid var(--gold);
         }
 
         .step-btn { 
-            background: var(--gold); color: black; border: none; width: 30px; height: 30px; 
-            border-radius: 50%; font-weight: bold; font-size: 20px; cursor: pointer;
+            background: var(--gold); color: black; border: none; width: 38px; height: 38px; 
+            border-radius: 50%; font-weight: bold; font-size: 24px; cursor: pointer;
         }
 
-        .bet-display { color: var(--gold); font-weight: bold; font-size: 1.1rem; min-width: 80px; }
+        .bet-display { color: var(--gold); font-weight: bold; font-size: 20px; min-width: 100px; text-align: center; }
 
         .spin-btn {
             background: linear-gradient(180deg, var(--gold), #b8860b);
-            border: none; padding: 12px 80px; font-weight: bold; border-radius: 30px;
-            font-size: 1.2rem; color: black; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 4px 0 #8b6b00; transition: transform 0.1s;
+            border: none; width: 95%; height: 60px; font-weight: 900; border-radius: 35px;
+            font-size: 22px; color: black; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 5px 0 #8b6b00; transition: 0.1s;
         }
 
-        .spin-btn:active { transform: translateY(4px); box-shadow: none; }
-        .spin-btn:disabled { background: #555; box-shadow: none; color: #888; }
+        .spin-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6b00; }
+        .spin-btn:disabled { background: #333; color: #666; box-shadow: none; transform: none; }
 
-        /* Animations */
-        #win-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 100;
+        /* Big Win Overlay */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            display: none; flex-direction: column; align-items: center; 
+            justify-content: center; z-index: 100;
         }
-
-        .big-win-text {
-            font-size: 3rem; color: var(--gold); text-shadow: 0 0 20px var(--gold);
-            animation: pulse 0.5s infinite alternate;
-        }
-
-        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
     </style>
 </head>
 <body>
 
-    <audio id="spinSound" src="https://assets.mixkit.co/active_storage/sfx/2014/2014-preview.mp3"></audio>
-    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
-
     <div class="header">
-        <button class="lobby-btn" onclick="location.href='index.html'">LOBBY</button>
-        <div class="balance-box"><span id="bal">0.00</span> ETB</div>
+        <div class="game-title">MULTI HOT 5</div>
+        <div class="header-right">
+            <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+            <div class="balance-box">
+                <div style="font-size: 10px; opacity: 0.8; color: white;">BALANCE</div>
+                <span id="balDisplay">0.00</span> ETB
+            </div>
+        </div>
     </div>
 
     <div class="game-container">
         <div class="slot-frame">
-            <canvas id="payline-canvas" width="340" height="220"></canvas>
             <div class="reels-container" id="reels">
                 <div class="reel"><div class="reel-strip" id="strip0"></div></div>
                 <div class="reel"><div class="reel-strip" id="strip1"></div></div>
@@ -127,121 +122,96 @@
         </div>
     </div>
 
-    <div class="controls">
+    <div class="bottom-ui">
         <div class="bet-selector">
             <button class="step-btn" onclick="changeBet(-2)">-</button>
-            <div class="bet-display">BET: <span id="bet">2</span></div>
+            <div class="bet-display">BET: <span id="betAmt">2</span></div>
             <button class="step-btn" onclick="changeBet(2)">+</button>
         </div>
-        <button class="spin-btn" id="sBtn" onclick="spin()">SPIN</button>
+        <button class="spin-btn" id="spinBtn" onclick="runSpin()">SPIN</button>
     </div>
 
-    <div id="win-overlay">
-        <div class="big-win-text">BIG WIN!</div>
-        <div style="font-size: 2rem; color: white; margin-top: 10px;"><span id="win-amt">0.00</span> ETB</div>
+    <div id="winPop" class="modal">
+        <div style="font-size: 48px; color: var(--gold); font-weight: 900; text-shadow: 0 0 20px gold;">BIG WIN!</div>
+        <div style="font-size: 32px; color: white; margin-top: 10px;"><span id="winVal">0</span> ETB</div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4mHgkhNimPEi8HSWbIbNIrIdLno8zYnYxbAQTtrk96MC6ILvN1QY-zRgwmJfmRMxADA/exec";
-        const SYMBOLS = ['cherry.png', 'lemon.png', 'orange.png', 'plum.png', 'bell.png', 'seven.png'];
-        const ASSET_PATH = 'assets/assets/';
+        // Only PNG symbols (no multiplier)
+        const SYMBOLS = [
+            'bell.png', 'collector.png', 'crown.png', 'double.star.png', 
+            'purple.gift.png', 'red.gift.png', 'seven.triple.png', 'star.png'
+        ];
+        const PATH = 'assets/assets/';
         
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 0, phone: 'guest' };
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1000 };
         let balance = parseFloat(user.balance);
-        let currentBet = 2;
-        let isSpinning = false;
+        let bet = 2;
+        let spinning = false;
+        let isMuted = false;
 
         function init() {
-            document.getElementById('bal').innerText = balance.toFixed(2);
+            updateUI();
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                for(let j=0; j<20; j++) {
-                    const sym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                    strip.innerHTML += `<div class="symbol"><img src="${ASSET_PATH}${sym}"></div>`;
+                for(let j=0; j<60; j++) {
+                    const imgName = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                    strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}"></div>`;
                 }
             }
         }
 
-        function changeBet(amt) {
-            if(isSpinning) return;
-            currentBet = Math.max(2, currentBet + amt);
-            document.getElementById('bet').innerText = currentBet;
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').innerText = isMuted ? '' : '🔊';
         }
 
-        async function sync() {
+        function changeBet(v) {
+            if(spinning) return;
+            bet = Math.max(2, bet + v);
+            document.getElementById('betAmt').innerText = bet;
+        }
+
+        function updateUI() {
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
             user.balance = balance.toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
-            document.getElementById('bal').innerText = balance.toFixed(2);
-            try { fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`); } catch(e){}
         }
 
-        function drawPayline(row) {
-            const canvas = document.getElementById('payline-canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#FFD700';
-            ctx.lineWidth = 5;
-            ctx.beginPath();
-            let y = 36 + (row * 73);
-            ctx.moveTo(0, y);
-            ctx.lineTo(340, y);
-            ctx.stroke();
+        function runSpin() {
+            if(balance < bet || spinning) return;
             
-            // Add text on the line
-            ctx.fillStyle = "white";
-            ctx.font = "bold 16px Arial";
-            ctx.fillText("WIN!", 150, y - 10);
-        }
+            spinning = true;
+            balance -= bet;
+            updateUI();
+            document.getElementById('spinBtn').disabled = true;
 
-        async function spin() {
-            if(balance < currentBet || isSpinning) return alert("Low Balance");
-            
-            isSpinning = true;
-            balance -= currentBet;
-            await sync();
-            
-            document.getElementById('sBtn').disabled = true;
-            document.getElementById('spinSound').play();
-            const canvas = document.getElementById('payline-canvas');
-            canvas.getContext('2d').clearRect(0,0, canvas.width, canvas.height);
-
-            const results = [];
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                const stopPos = Math.floor(Math.random() * 15) + 2;
+                const stopOffset = Math.floor(Math.random() * 40) + 10;
                 strip.style.transition = 'none';
                 strip.style.top = '0px';
                 
                 setTimeout(() => {
                     strip.style.transition = 'top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
-                    strip.style.top = `-${stopPos * 73}px`;
-                }, 50);
-                
-                // Track symbols at index stopPos+1 (center row)
-                results.push(stopPos + 1);
+                    strip.style.top = `-${stopOffset * 73.3}px`;
+                }, 50 + (i * 120));
             }
 
-            setTimeout(async () => {
-                isSpinning = false;
-                document.getElementById('sBtn').disabled = false;
+            setTimeout(() => {
+                spinning = false;
+                document.getElementById('spinBtn').disabled = false;
                 
-                // Basic Win Logic: Check center row for 3+ matches
-                let win = 0;
-                if (Math.random() > 0.7) { // 30% hit rate
-                    win = currentBet * 5;
+                // Win Logic
+                if(Math.random() > 0.85) {
+                    let win = bet * 12;
                     balance += win;
-                    await sync();
-                    
-                    document.getElementById('winSound').play();
-                    drawPayline(1); // Draw through center row
-                    
-                    if(win >= currentBet * 5) {
-                        document.getElementById('win-amt').innerText = win.toFixed(2);
-                        document.getElementById('win-overlay').style.display = 'flex';
-                        setTimeout(() => { document.getElementById('win-overlay').style.display = 'none'; }, 3000);
-                    }
+                    updateUI();
+                    document.getElementById('winVal').innerText = win.toFixed(2);
+                    document.getElementById('winPop').style.display = 'flex';
+                    setTimeout(() => { document.getElementById('winPop').style.display = 'none'; }, 2500);
                 }
-            }, 2100);
+            }, 2800);
         }
 
         init();
