@@ -1,96 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Register | Simba Bet</title>
-    <style>
-        :root { --gold: #fcc201; --dark: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .auth-container { background: #222; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #333; text-align: center; }
-        .brand { font-size: 24px; font-weight: bold; color: var(--gold); margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; font-size: 16px; }
-        input:focus { border-color: var(--gold); outline: none; }
-        button { width: 100%; padding: 14px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; }
-        button:disabled { background: #555; cursor: not-allowed; }
-        .links { margin-top: 20px; font-size: 14px; }
-        .links a { color: var(--gold); text-decoration: none; }
-        #statusMsg { margin-top: 15px; font-size: 14px; min-height: 20px; }
-    </style>
-</head>
-<body>
+<script>
+    // ✅ 1. YOUR MASTER URL (Double check this is the one from your Sheet)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
-    <div class="auth-container">
-        <div class="brand">🦁 SIMBA BET</div>
-        <h2 style="margin-top:0">Create Account</h2>
-        
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="number" id="regPhone" placeholder="Phone Number (09...)">
-        <input type="password" id="regPass" placeholder="Create Password">
-        
-        <button id="regBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
-        
-        <div id="statusMsg"></div>
+    async function handleRegister() {
+        // These MUST match the "id" of your input boxes
+        const name = document.querySelector('input[placeholder="Full Name"]').value;
+        const phone = document.querySelector('input[placeholder="Phone Number (09...)"]').value;
+        const pass = document.querySelector('input[placeholder="Create Password"]').value;
+        const btn = document.getElementById('regBtn') || document.querySelector('button');
 
-        <div class="links">
-            Already have an account? <a href="login.html">Login here</a>
-        </div>
-    </div>
-
-    <script>
-        // ✅ YOUR MASTER URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
-
-        async function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const pass = document.getElementById('regPass').value;
-            const btn = document.getElementById('regBtn');
-            const msg = document.getElementById('statusMsg');
-
-            if (!name || !phone || !pass) {
-                alert("Please fill in all fields");
-                return;
-            }
-
-            // UI Feedback
-            btn.disabled = true;
-            btn.innerText = "Connecting to Server...";
-            msg.style.color = "white";
-            msg.innerText = "Registering your account on the sheet...";
-
-            const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-
-            try {
-                // We use 'no-cors' for fast silent submission, or regular fetch if the script returns JSON
-                await fetch(finalUrl, { mode: 'no-cors' });
-
-                // Since we can't easily read 'no-cors' response, we assume success after the fetch completes
-                msg.style.color = "#28a745";
-                msg.innerText = "Success! Saving locally...";
-
-                // AUTO-LOGIN: Save user data to the browser memory
-                const userData = {
-                    name: name,
-                    phone: phone,
-                    balance: 0,
-                    id: "SB-" + phone.toString().slice(-4)
-                };
-                localStorage.setItem('simba_active_user', JSON.stringify(userData));
-
-                setTimeout(() => {
-                    alert("Welcome to Simba Bet, " + name + "!");
-                    window.location.href = 'index.html';
-                }, 1500);
-
-            } catch (error) {
-                console.error(error);
-                msg.style.color = "#ff4444";
-                msg.innerText = "Connection error. Please try again.";
-                btn.disabled = false;
-                btn.innerText = "CREATE ACCOUNT";
-            }
+        if (!name || !phone || !pass) {
+            alert("Please fill in all fields!");
+            return;
         }
-    </script>
-</body>
-</html>
+
+        btn.innerText = "Connecting...";
+        btn.disabled = true;
+
+        // ✅ 2. This sends the data to your Google Sheet
+        const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+
+        try {
+            // Using 'no-cors' mode to bypass browser blocks
+            await fetch(finalUrl, { mode: 'no-cors' });
+
+            // Save user data locally so they stay logged in
+            const userData = {
+                name: name,
+                phone: phone,
+                balance: 0,
+                id: "SB-" + phone.slice(-4)
+            };
+            localStorage.setItem('simba_active_user', JSON.stringify(userData));
+
+            alert("Registration Successful! Redirecting...");
+            window.location.href = 'index.html';
+
+        } catch (error) {
+            alert("Connection error. Check your internet.");
+            btn.innerText = "Create Account";
+            btn.disabled = false;
+        }
+    }
+</script>
