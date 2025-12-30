@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simba Shuffle | Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #FFD700;
+            --panel: rgba(0, 0, 0, 0.85);
+            --fancy-gold: linear-gradient(180deg, #fff7ad 0%, #ffa200 50%, #8c5d00 100%);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        
+        body { 
+            background: #0a0a0a url('assets/simba_bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white; font-family: 'Goldman', sans-serif; 
+            height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* Header */
+        .header { 
+            padding: 12px 20px; background: var(--panel); border-bottom: 2px solid var(--gold); 
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        .exit-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 6px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* Status Text */
+        #status { 
+            text-align: center; font-size: 24px; margin-top: 30px; 
+            color: var(--gold); text-shadow: 0 0 15px rgba(255,215,0,0.6);
+            font-weight: bold; min-height: 30px;
+        }
+
+        /* Game Board */
+        .game-area { 
+            display: flex; justify-content: center; align-items: center; 
+            gap: 15px; flex: 1; perspective: 1000px; padding-bottom: 20px;
+        }
+
+        .card { 
+            width: 100px; height: 155px; position: relative;
+            transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .card-inner {
+            width: 100%; height: 100%; position: relative;
+            transform-style: preserve-3d; transition: transform 0.6s;
+        }
+
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 12px; border: 3px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+        }
+
+        .card-front { 
+            background: linear-gradient(135deg, #222, #000); 
+            font-size: 55px; 
+        }
+
+        .card-back { 
+            background: white; transform: rotateY(180deg); 
+            overflow: hidden;
+        }
+
+        .card-back img { width: 90%; height: 90%; object-fit: contain; }
+
+        /* Control Tray - Positioned Higher for Mobile Reach */
+        .controls { 
+            background: var(--panel); padding: 25px 20px 45px 20px; 
+            border-top: 3px solid var(--gold); border-radius: 35px 35px 0 0;
+            text-align: center; box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+
+        .bet-box { 
+            display: flex; justify-content: center; align-items: center; 
+            gap: 25px; margin-bottom: 20px;
+        }
+        .bet-btn { 
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold);
+            background: transparent; color: var(--gold); font-size: 26px; font-weight: bold;
+            cursor: pointer;
+        }
+        .bet-btn:active { background: var(--gold); color: black; }
+
+        .play-btn { 
+            background: var(--fancy-gold); 
+            border: none; padding: 18px; font-size: 22px; font-weight: 900; 
+            border-radius: 40px; width: 90%; max-width: 380px;
+            box-shadow: 0 6px 0 #5c4000; color: #1
