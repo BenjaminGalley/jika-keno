@@ -2,33 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Register | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; --cyan: #00f2ff; }
         body { background: var(--bg); color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .reg-card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(251,191,36,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; }
-        .reg-btn { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; }
-        .reg-btn:disabled { opacity: 0.5; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--gold); }
+        .reg-btn { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; transition: 0.3s; }
+        .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         a { color: var(--gold); text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="reg-card">
-        <h2 style="color:var(--gold)">CREATE ACCOUNT</h2>
+        <h2 style="color:var(--gold); margin-bottom: 5px;">CREATE ACCOUNT</h2>
+        <p style="font-size: 12px; color: #888; margin-bottom: 20px;">JOIN THE PRIDE / ቤተሰቡን ይቀላቀሉ</p>
+        
         <input type="text" id="regName" placeholder="Full Name (ሙሉ ስም)">
         <input type="number" id="regPhone" placeholder="Phone Number (09...)">
         <input type="password" id="regPass" placeholder="Create Password (የይለፍ ቃል)">
         
         <button id="regBtn" class="reg-btn" onclick="handleRegister()">REGISTER / ተመዝገብ</button>
         
-        <p style="margin-top:20px;">Already have an account? <br> <a href="login.html">Login Here / ግባ</a></p>
+        <p style="margin-top:20px;">Already have an account? <br> 
+            <a href="login.html" style="font-weight: bold; display: inline-block; margin-top: 10px;">Login Here / ግባ</a>
+        </p>
     </div>
 
     <script>
-        // ✅ MASTER URL (Synced with Login, Deposit, and Script)
+        // ✅ MASTER URL (Synced with Google Sheet Master Script)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function handleRegister() {
@@ -50,29 +55,46 @@
             btn.disabled = true;
             btn.innerText = "Processing... (በመመዝገብ ላይ)";
 
-            // action=register matches your Google Script logic
+            // Build URL for the Master Script
             const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
 
             try {
-                // Using no-cors to ensure registration data hits the sheet
-                await fetch(finalUrl, { mode: 'no-cors' });
-                
-                // Set initial local session for the user
-                const activeUser = {
-                    phone: phone,
-                    name: name,
-                    balance: "0.00"
-                };
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                
-                alert("Success! Account Created. / በተሳካ ሁኔታ ተመዝግበዋል!");
-                window.location.href = 'index.html';
+                // NOTE: We removed 'no-cors' so we can read the Simba ID from the response
+                const response = await fetch(finalUrl);
+                const data = await response.json();
+
+                if (data.status === "exists") {
+                    alert("This phone is already registered! / ይህ ስልክ ቀድሞ ተመዝግቧል");
+                    resetBtn(btn);
+                    return;
+                }
+
+                if (data.status === "success") {
+                    // Save initial local session WITH the new Simba ID
+                    const activeUser = {
+                        phone: phone,
+                        name: name,
+                        id: data.id, // This is the SB-XXX ID from Google
+                        balance: "0.00"
+                    };
+                    
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    
+                    alert("Success! Welcome to Simba Bet. Your ID: " + data.id);
+                    window.location.href = 'index.html';
+                }
 
             } catch (error) {
-                console.error(error);
-                alert("Success! Welcome to Simba Bet.");
-                window.location.href = 'index.html';
+                console.error("Registration Error:", error);
+                // Fallback for network issues
+                alert("Connection error. Please try again.");
+                resetBtn(btn);
             }
+        }
+
+        function resetBtn(btn) {
+            btn.disabled = false;
+            btn.innerText = "REGISTER / ተመዝገብ";
         }
     </script>
 </body>
