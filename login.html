@@ -5,28 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Simba Bet</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; }
+        :root { --gold: #fbbf24; --bg: #0b0d17; --cyan: #00f2ff; }
         body { background: var(--bg); color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .login-card { background: #1a1d29; border: 2px solid var(--gold); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; }
-        .login-btn { width: 100%; padding: 15px; background: var(--gold); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; }
+        .login-card { background: #1a1d29; border: 2px solid var(--cyan); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; }
+        .login-btn { width: 100%; padding: 15px; background: var(--cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; }
         .login-btn:disabled { opacity: 0.5; }
+        a { color: var(--cyan); text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2 style="color:var(--gold)">SIMBA BET LOGIN</h2>
+        <h2 style="color:var(--cyan)">SIMBA BET LOGIN</h2>
         <input type="number" id="loginPhone" placeholder="Phone Number (ስልክ)">
         <input type="password" id="loginPass" placeholder="Password (የይለፍ ቃል)">
         
-        <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN</button>
+        <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN / ግባ</button>
         
-        <p style="font-size:14px; margin-top:20px;">Don't have an account? <a href="register.html" style="color:var(--gold)">Register Here</a></p>
+        <p style="margin-top:20px;">Don't have an account? <br> <a href="register.html">Register Here / ተመዝገብ</a></p>
     </div>
 
     <script>
-        // ✅ YOUR MASTER URL
+        // ✅ MASTER URL (Synced with Deposit and Script)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function loginUser() {
@@ -43,7 +44,7 @@
             btn.innerText = "Checking... (በማጣራት ላይ)";
 
             try {
-                // This talks to your Google Sheet
+                // Talk to the Google Sheet to verify the user
                 const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${phone}`);
                 const data = await response.json();
 
@@ -54,20 +55,19 @@
                     return;
                 }
 
-                // Check password
-                if(data.password && data.password != pass) {
-                    alert("Incorrect Password!");
+                // Verify Password
+                if(data.password && data.password.toString() !== pass.toString()) {
+                    alert("Incorrect Password! / የተሳሳተ የይለፍ ቃል");
                     btn.disabled = false;
                     btn.innerText = "LOGIN";
                     return;
                 }
 
-                // Success: Save user session
+                // Success: Save user session locally
                 const activeUser = {
                     phone: data.phone,
                     name: data.name,
-                    balance: parseFloat(data.balance || 0).toFixed(2),
-                    id: "SB-" + data.phone.toString().slice(-4)
+                    balance: parseFloat(data.balance || 0).toFixed(2)
                 };
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                 
