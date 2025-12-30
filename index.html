@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
-        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; }
+        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; z-index: 100; }
         
         .mega-spin-box {
             background: linear-gradient(45deg, #fcc201, #92400e) !important;
@@ -15,7 +15,6 @@
             height: 55px; border-radius: 5px; font-size: 24px;
         }
 
-        /* Fast Keno Specific Style */
         .fast-keno-box {
             background: linear-gradient(135deg, #004488, #001122) !important;
             border: 1px solid #00CCFF;
@@ -24,7 +23,6 @@
             text-shadow: 0 0 8px #00CCFF;
         }
 
-        /* HD Multi Hot 5 Tile Style */
         .multihot-box {
             background: linear-gradient(135deg, #053305, #000) !important;
             border: 1px solid #FFD700;
@@ -42,20 +40,26 @@
         }
 
         .syncing { opacity: 0.7; font-style: italic; }
+        
+        /* Sidebar Fix */
+        .side-menu {
+            position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
+            background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
+        }
     </style>
 </head>
 <body>
     <div id="sideMenu" class="side-menu">
-        <div class="menu-header">
-            <span id="menuUserName">Guest Player</span>
-            <button class="close-btn" onclick="toggleMenu()">×</button>
+        <div class="menu-header" style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center;">
+            <span id="menuUserName" style="color:#fcc201; font-weight: bold;">Guest Player</span>
+            <button class="close-btn" onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px; cursor: pointer;">×</button>
         </div>
-        <nav class="menu-links">
-            <a href="deposit.html">💰 Deposit Funds</a>
-            <a href="withdraw.html">💸 Withdraw Funds</a>
-            <a href="#" onclick="alert('Loading History...'); toggleMenu();">📜 History</a>
+        <nav class="menu-links" style="display: flex; flex-direction: column; padding: 10px;">
+            <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💰 Deposit Funds</a>
+            <a href="withdraw.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💸 Withdraw Funds</a>
+            <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">📜 History</a>
             <hr style="border: 0.5px solid #333; margin: 10px 0;">
-            <a href="#" class="logout-link" onclick="logout()">🚪 Logout</a>
+            <a href="#" class="logout-link" onclick="logout()" style="color: #ff4444; padding: 15px; text-decoration: none;">🚪 Logout</a>
         </nav>
     </div>
 
@@ -83,7 +87,7 @@
     <div class="section-label">NEW & HOT</div>
 
     <div class="games-container">
-        <div class="game-card" onclick="playGame('fast.keno.html')">
+        <div class="game-card" onclick="playGame('fast_keno.html')">
             <div class="img-wrap fast-keno-box">FAST K6</div>
             <p>Fast Keno</p>
         </div>
@@ -93,29 +97,14 @@
             <p>Multi Hot 5</p>
         </div>
 
-        <div class="game-card" onclick="playGame('hot-fruit.html')">
-            <div class="img-wrap"><img src="assets/assets/melon.jpg" class="game-tile-img"></div>
-            <p>Hot Fruit</p>
-        </div>
-        
-        <div class="game-card" onclick="playGame('fruit.html')">
-            <div class="img-wrap"><img src="assets/assets/cherry.jpg" class="game-tile-img"></div>
-            <p>Fruit Mania</p>
+        <div class="game-card" onclick="playGame('lion.scratch.html')">
+            <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
+            <p>Lion Scratch</p>
         </div>
 
         <div class="game-card" onclick="playGame('mega-spin.html')">
             <div class="img-wrap mega-spin-box">🎰</div>
             <p>Simba's Gold</p>
-        </div>
-        
-        <div class="game-card" onclick="playGame('game.html')">
-            <div class="img-wrap"><img src="assets/assets/gold_7.jpg" class="game-tile-img"></div>
-            <p>Simba Shuffle</p>
-        </div>
-
-        <div class="game-card" onclick="playGame('lion.html')">
-            <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
-            <p>Lion Scratch</p>
         </div>
     </div>
 
@@ -125,7 +114,6 @@
     </footer>
 
     <script>
-        // ✅ UPDATED TO YOUR LIVE URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         function toggleMenu() { 
@@ -158,20 +146,23 @@
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
-                
                 headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
-                const uid = "SB-" + activeUser.phone.toString().slice(-4);
-                userIDDisplay.innerText = uid;
+                
+                // Show SIMBA ID from local data
+                userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
 
                 syncStatus.innerText = "Syncing...";
                 try {
-                    const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
+                    // CHANGED action=getUser to action=checkStatus to match our new script
+                    const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${activeUser.phone}`);
                     const data = await response.json();
                     
-                    if (data && data.balance !== undefined) {
-                        const cloudBal = parseFloat(data.balance).toFixed(2);
-                        headerBal.innerText = cloudBal;
-                        activeUser.balance = cloudBal;
+                    if (data && data.approvedAmount > 0) {
+                        let currentBal = parseFloat(activeUser.balance || 0);
+                        currentBal += parseFloat(data.approvedAmount);
+                        
+                        activeUser.balance = currentBal.toFixed(2);
+                        headerBal.innerText = activeUser.balance;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                         syncStatus.innerText = "Synced ✅";
                     } else {
