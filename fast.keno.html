@@ -5,232 +5,262 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fast Keno | Simba Bet</title>
     <style>
-        :root {
-            --gold: #FFD700;
-            --cyan: #00f2ff;
-            --panel: #0a0e17;
+        :root { 
+            --gold: #FFD700; --cyan: #00f2ff; --green: #2ecc71; 
+            --red: #e74c3c; --bg: #05070a; --panel: #0a0e17;
         }
-
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { 
-            background: #000; color: white; font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column;
+            background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; 
+            overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* Top Header */
         .header { 
-            background: var(--panel); height: 50px; display: flex; 
+            background: var(--panel); height: 45px; display: flex; 
             justify-content: space-between; align-items: center; padding: 0 15px;
             border-bottom: 2px solid var(--gold); flex-shrink: 0;
         }
-        .lobby-btn { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; }
-        .game-title { color: var(--cyan); font-weight: 900; font-size: 18px; text-transform: uppercase; }
 
-        /* Timer Strip */
-        .timer-strip {
-            background: #000; color: var(--cyan); text-align: center;
-            font-size: 28px; font-weight: bold; padding: 5px 0;
-            border-bottom: 2px solid var(--cyan); flex-shrink: 0;
+        .timer-bar { 
+            background: #000; color: var(--cyan); text-align: center; 
+            font-size: 26px; font-weight: bold; height: 40px; line-height: 40px;
+            border-bottom: 1px solid #222; flex-shrink: 0;
         }
 
-        /* Main Game Layout */
-        .game-body {
-            flex: 1; display: flex; position: relative; min-height: 0;
+        .main-layout { display: flex; flex: 1; min-height: 0; padding: 5px; gap: 5px; justify-content: center; }
+        
+        .side-history { 
+            width: 35px; background: #111; border: 1px solid #333; 
+            display: flex; flex-direction: column; height: 320px; overflow: hidden;
         }
+        .hist-ball { height: 16px; border-bottom: 1px solid #222; font-size: 10px; text-align: center; line-height: 16px; color: var(--cyan); }
+        .hist-ball.active { background: var(--gold); color: black; font-weight: bold; }
 
-        /* Side Bar for Draw Numbers */
-        .side-bar {
-            width: 30px; background: #111; border-right: 1px solid #333;
-            display: flex; flex-direction: column; align-items: center; padding-top: 5px; gap: 2px;
+        .grid { 
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; 
+            width: 100%; max-width: 400px;
         }
-        .side-ball {
-            width: 22px; height: 22px; border-radius: 50%; background: #333;
-            font-size: 10px; display: flex; align-items: center; justify-content: center; color: white;
+        .cell { 
+            background: #1e293b; aspect-ratio: 1; display: flex; 
+            align-items: center; justify-content: center; font-size: 14px; 
+            font-weight: bold; border: 1px solid #334155; border-radius: 4px;
         }
-        .side-ball.active { background: var(--gold); color: black; font-weight: bold; }
+        .cell.selected { background: var(--cyan); color: black; }
+        .cell.hit { background: var(--green) !important; color: white; }
 
-        /* Grid Area */
-        .grid-container {
-            flex: 1; display: flex; align-items: center; justify-content: center; padding: 5px;
-        }
-        .keno-grid {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
-            width: 100%; max-width: 360px; background: #222; padding: 2px;
-        }
-        .num-cell {
-            aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: bold; cursor: pointer;
-        }
-        .num-cell.selected { background: var(--cyan); color: black; }
-        .num-cell.hit { background: var(--gold); color: black; box-shadow: inset 0 0 10px white; }
-
-        /* Selected Numbers Bar (Below Table) */
-        .selected-bar {
-            height: 40px; display: flex; align-items: center; padding: 0 10px; gap: 8px;
-            background: #050505; border-top: 1px solid #222; overflow-x: auto;
-        }
-        .sel-ball {
-            min-width: 30px; height: 30px; border-radius: 50%; background: #333;
-            display: flex; align-items: center; justify-content: center; font-weight: bold;
-        }
-
-        /* Bottom UI Panel */
+        /* PULL UP UI CONSOLE */
         .bottom-ui {
-            background: var(--panel); padding: 10px 15px 25px 15px; flex-shrink: 0;
-        }
-        .status-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
-        .controls-row { display: flex; justify-content: space-between; align-items: center; }
-        
-        .balance-val { color: var(--gold); font-weight: 900; font-size: 20px; }
-        
-        .bet-selector {
-            display: flex; align-items: center; gap: 10px; background: #000; 
-            padding: 5px 15px; border-radius: 25px; border: 2px solid var(--gold);
-        }
-        .step-btn { background: var(--gold); border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; font-size: 22px; }
-        .bet-display { color: white; font-weight: bold; min-width: 60px; text-align: center; }
-
-        .play-btn {
-            background: linear-gradient(180deg, var(--gold), #b8860b);
-            border: none; width: 100%; height: 50px; font-weight: 900; border-radius: 25px;
-            font-size: 20px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 0 #8b6b00;
+            background: var(--panel); border-top: 2px solid #333;
+            padding: 10px 15px 30px 15px; flex-shrink: 0;
         }
 
-        /* Draw Pop-up */
-        #drawPopup {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 120px; background: var(--gold); border-radius: 50%;
-            display: none; align-items: center; justify-content: center;
-            font-size: 60px; font-weight: 900; color: black; border: 8px solid white; z-index: 1000;
+        .stats-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 10px; }
+
+        .ticket-area { 
+            display: flex; flex-wrap: wrap; gap: 5px; min-height: 35px; 
+            margin-bottom: 15px; padding: 5px; background: #000; border-radius: 5px;
         }
+        .t-num { width: 28px; height: 28px; line-height: 28px; text-align: center; border-radius: 50%; background: #333; font-size: 12px; font-weight: bold; }
+        .t-num.hit { background: var(--green); }
+        .t-num.miss { background: var(--red); opacity: 0.5; }
+
+        .controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+        .bet-box { display: flex; align-items: center; background: #000; border: 2px solid var(--gold); border-radius: 25px; height: 45px; }
+        .b-btn { background: none; border: none; color: var(--gold); padding: 0 15px; font-size: 24px; font-weight: bold; }
+        #betVal { width: 40px; text-align: center; background: none; border: none; color: white; font-weight: bold; font-size: 18px; }
+
+        .bal-display { color: var(--gold); font-weight: 900; font-size: 18px; }
+
+        .place-btn { 
+            flex: 1; height: 50px; background: linear-gradient(180deg, var(--gold), #b8860b); 
+            color: black; border: none; border-radius: 25px; font-weight: 900; 
+            font-size: 18px; text-transform: uppercase;
+        }
+        .place-btn:disabled { background: #444; color: #777; }
+
+        .pop-msg { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        #draw-ball { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 90px; font-weight: 900; color: white; display: none; z-index: 999; }
     </style>
 </head>
 <body>
 
+    <audio id="sndPop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
     <div class="header">
         <button class="lobby-btn">LOBBY</button>
-        <div class="game-title">FAST KENO</div>
-        <div style="font-size: 20px;">🔊</div>
+        <div style="color:var(--cyan); font-weight:900;">FAST KENO</div>
+        <div id="muteBtn" onclick="toggleMute()" style="cursor:pointer; font-size:20px;">🔊</div>
     </div>
 
-    <div class="timer-strip" id="timer">00:47</div>
+    <div class="timer-bar" id="timer">00:60</div>
 
-    <div class="game-body">
-        <div class="side-bar" id="sideBar">
-            </div>
-        <div class="grid-container">
-            <div class="keno-grid" id="grid"></div>
-        </div>
+    <div class="main-layout">
+        <div class="side-history" id="sideHist"></div>
+        <div class="grid" id="mainGrid"></div>
     </div>
 
-    <div class="selected-bar" id="selNumbers">
-        </div>
+    <div id="draw-ball">0</div>
 
     <div class="bottom-ui">
-        <div class="status-row">
-            <span>PICKED: <span id="pickedCount" style="color:var(--cyan)">0</span>/10</span>
-            <span>POTENTIAL: <span id="potential" style="color:#4caf50">0.00</span></span>
+        <div class="stats-row">
+            <span>PICKED: <span id="sCount" style="color:var(--cyan)">0</span>/10</span>
+            <span class="bal-display"><span id="liveBal">0.00</span> ETB</span>
         </div>
-        <div class="controls-row">
-            <div class="balance-val"><span id="balDisplay">1716.50</span> ETB</div>
-            <div class="bet-selector">
-                <button class="step-btn" onclick="updateBet(-2)">-</button>
-                <div class="bet-display">BET: <span id="betAmt">2</span></div>
-                <button class="step-btn" onclick="updateBet(2)">+</button>
+
+        <div class="ticket-area" id="ticketArea"></div>
+
+        <div class="controls">
+            <div class="bet-box">
+                <button class="b-btn" onclick="adjBet(-2)">-</button>
+                <input type="number" id="betVal" value="2" readonly>
+                <button class="b-btn" onclick="adjBet(2)">+</button>
             </div>
+            
+            <button class="place-btn" id="betBtn" onclick="handleBet()" disabled>PLAY NOW</button>
         </div>
-        <button class="play-btn" onclick="startDraw()">PLAY NOW</button>
+        <div style="text-align: center; margin-top: 5px; font-size: 12px; color: var(--green);">
+            POTENTIAL WIN: <span id="sPot">0.00</span>
+        </div>
     </div>
 
-    <div id="drawPopup">0</div>
+    <div id="winPop" class="pop-msg">
+        <h1 style="color:var(--gold); font-size:45px;">WINNER!</h1>
+        <p id="winText" style="font-size:30px;"></p>
+    </div>
 
     <script>
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1716.50 };
+        let balance = parseFloat(user.balance);
         let selected = [];
-        let bet = 2;
-        let balance = 1716.50; // From Screenshot
-        let timeLeft = 47;
+        let currentBet = 2;
+        let isMuted = false;
+        let timeLeft = 60;
+        let tableLocked = false;
+        let activeTickets = [];
 
-        // Create Grid
-        const grid = document.getElementById('grid');
-        for (let i = 1; i <= 80; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'num-cell';
-            cell.id = 'cell-' + i;
-            cell.innerText = i;
-            cell.onclick = () => toggleNumber(i);
-            grid.appendChild(cell);
-        }
+        // Updated Multiplier Logic (Value per 2 Birr)
+        // 2 numbers = 50 birr (25x), 3 numbers = 100 birr (50x), etc.
+        const MULTIPLIERS = { 
+            1:0, 2:25, 3:50, 4:80, 5:150, 6:500, 7:2500, 8:7500, 9:25000, 10:50000 
+        };
 
-        function toggleNumber(num) {
-            const idx = selected.indexOf(num);
-            if (idx > -1) {
-                selected.splice(idx, 1);
-                document.getElementById('cell-' + num).classList.remove('selected');
-            } else if (selected.length < 10) {
-                selected.push(num);
-                document.getElementById('cell-' + num).classList.add('selected');
+        function init() {
+            const grid = document.getElementById('mainGrid');
+            for(let i=1; i<=80; i++) {
+                let c = document.createElement('div');
+                c.className = 'cell'; c.innerText = i; c.id = 'n'+i;
+                c.onclick = () => toggleNum(i);
+                grid.appendChild(c);
             }
-            updateUI();
+            const side = document.getElementById('sideHist');
+            for(let i=0; i<20; i++) side.innerHTML += `<div class="hist-ball" id="h${i}">-</div>`;
+            
+            document.getElementById('liveBal').innerText = balance.toFixed(2);
+            startGlobalLoop();
         }
 
-        function updateUI() {
-            document.getElementById('pickedCount').innerText = selected.length;
-            document.getElementById('betAmt').innerText = bet;
-            document.getElementById('balDisplay').innerText = balance.toFixed(2);
-            document.getElementById('potential').innerText = (bet * (selected.length * 5)).toFixed(2);
-            
-            // Numbers below table
-            const bar = document.getElementById('selNumbers');
-            bar.innerHTML = selected.map(n => `<div class="sel-ball">${n}</div>`).join('');
+        function toggleNum(n) {
+            if(tableLocked) return;
+            const el = document.getElementById('n'+n);
+            if(selected.includes(n)) {
+                selected = selected.filter(x => x !== n);
+                el.classList.remove('selected');
+            } else if(selected.length < 10) {
+                selected.push(n);
+                el.classList.add('selected');
+            }
+            updatePreview();
         }
 
-        function updateBet(val) {
-            bet = Math.max(2, bet + val);
-            updateUI();
+        function updatePreview() {
+            document.getElementById('sCount').innerText = selected.length;
+            const pot = (MULTIPLIERS[selected.length] || 0) * currentBet;
+            document.getElementById('sPot').innerText = pot.toFixed(2);
+            document.getElementById('betBtn').disabled = (selected.length === 0 || tableLocked);
+            
+            const area = document.getElementById('ticketArea');
+            area.innerHTML = selected.sort((a,b)=>a-b).map(n => `<div class="t-num" id="t${n}">${n}</div>`).join('');
         }
 
-        // Timer Logic
-        setInterval(() => {
-            if (timeLeft > 0) timeLeft--;
-            else timeLeft = 59;
-            const m = Math.floor(timeLeft / 60);
-            const s = timeLeft % 60;
-            document.getElementById('timer').innerText = `0${m}:${s < 10 ? '0' + s : s}`;
-        }, 1000);
+        function adjBet(v) {
+            if(tableLocked) return;
+            currentBet = Math.max(2, currentBet + v);
+            document.getElementById('betVal').value = currentBet;
+            updatePreview();
+        }
 
-        function startDraw() {
-            if (selected.length === 0) return alert("Select numbers!");
-            if (balance < bet) return alert("Low balance!");
-            
-            balance -= bet;
-            updateUI();
-            
-            let drawCount = 0;
-            const sideBar = document.getElementById('sideBar');
-            const popup = document.getElementById('drawPopup');
-            sideBar.innerHTML = "";
-            
-            const interval = setInterval(() => {
-                drawCount++;
-                const drawn = Math.floor(Math.random() * 80) + 1;
-                
-                // Pop-up and Sidebar logic
-                popup.innerText = drawn;
-                popup.style.display = "flex";
-                sideBar.innerHTML += `<div class="side-ball active">${drawn}</div>`;
-                
-                if (selected.includes(drawn)) {
-                    document.getElementById('cell-' + drawn).classList.add('hit');
+        function handleBet() {
+            if(balance < currentBet) return alert("Insufficient Balance");
+            balance -= currentBet;
+            activeTickets.push({ nums: [...selected], bet: currentBet });
+            document.getElementById('liveBal').innerText = balance.toFixed(2);
+            document.getElementById('betBtn').innerText = "TICKET OK";
+            document.getElementById('betBtn').disabled = true;
+            localStorage.setItem('simba_active_user', JSON.stringify({balance: balance.toFixed(2)}));
+        }
+
+        function startGlobalLoop() {
+            setInterval(() => {
+                if(timeLeft > 0) {
+                    timeLeft--;
+                    document.getElementById('timer').innerText = "00:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
+                    if(timeLeft <= 3) {
+                        tableLocked = true;
+                        document.getElementById('betBtn').disabled = true;
+                    }
+                } else {
+                    runDrawSequence();
+                    timeLeft = 60;
                 }
-
-                if (drawCount >= 20) {
-                    clearInterval(interval);
-                    setTimeout(() => popup.style.display = "none", 1000);
-                }
-            }, 800);
+            }, 1000);
         }
 
-        updateUI();
+        async function runDrawSequence() {
+            let drawn = [];
+            const ball = document.getElementById('draw-ball');
+
+            for(let i=0; i<20; i++) {
+                let n; do { n = Math.floor(Math.random()*80)+1; } while(drawn.includes(n));
+                drawn.push(n);
+                document.getElementById('h'+i).innerText = n;
+                document.getElementById('h'+i).classList.add('active');
+                ball.innerText = n; ball.style.display = 'block';
+                document.getElementById('n'+n).classList.add('hit');
+                if(document.getElementById('t'+n)) document.getElementById('t'+n).classList.add('hit');
+                if(!isMuted) document.getElementById('sndPop').play();
+                await new Promise(r => setTimeout(r, 600));
+                ball.style.display = 'none';
+            }
+
+            let totalWin = 0;
+            activeTickets.forEach(t => {
+                let hits = t.nums.filter(n => drawn.includes(n)).length;
+                totalWin += t.bet * (MULTIPLIERS[hits] || 0);
+            });
+
+            if(totalWin > 0) {
+                balance += totalWin;
+                document.getElementById('winText').innerText = totalWin.toFixed(2) + " ETB";
+                document.getElementById('winPop').style.display = 'flex';
+            }
+
+            await new Promise(r => setTimeout(r, 5000));
+            resetGame();
+        }
+
+        function resetGame() {
+            document.getElementById('winPop').style.display = 'none';
+            document.querySelectorAll('.cell').forEach(c => c.className = 'cell');
+            document.querySelectorAll('.hist-ball').forEach(h => { h.innerText = '-'; h.classList.remove('active'); });
+            selected = []; activeTickets = []; tableLocked = false;
+            document.getElementById('betBtn').innerText = "PLAY NOW";
+            updatePreview();
+            document.getElementById('liveBal').innerText = balance.toFixed(2);
+        }
+
+        function toggleMute() { isMuted = !isMuted; document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊"; }
+        init();
     </script>
 </body>
 </html>
