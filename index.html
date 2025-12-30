@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
-        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid var(--gold); position: fixed; bottom: 0; width: 100%; box-sizing: border-box; }
+        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; }
         
         .mega-spin-box {
             background: linear-gradient(45deg, #fcc201, #92400e) !important;
@@ -83,55 +83,64 @@
     <div class="section-label">NEW & HOT</div>
 
     <div class="games-container">
-        <div class="game-card" onclick="location.href='fast.keno.html'">
+        <div class="game-card" onclick="playGame('fast.keno.html')">
             <div class="img-wrap fast-keno-box">FAST K6</div>
             <p>Fast Keno</p>
         </div>
 
-        <div class="game-card" onclick="location.href='multi-hot-5.html'">
+        <div class="game-card" onclick="playGame('multi-hot-5.html')">
             <div class="img-wrap multihot-box">HOT 5</div>
             <p>Multi Hot 5</p>
         </div>
 
-        <div class="game-card" onclick="location.href='hot-fruit.html'">
+        <div class="game-card" onclick="playGame('hot-fruit.html')">
             <div class="img-wrap"><img src="assets/assets/melon.jpg" class="game-tile-img"></div>
             <p>Hot Fruit</p>
         </div>
         
-        <div class="game-card" onclick="location.href='fruit.html'">
+        <div class="game-card" onclick="playGame('fruit.html')">
             <div class="img-wrap"><img src="assets/assets/cherry.jpg" class="game-tile-img"></div>
             <p>Fruit Mania</p>
         </div>
 
-        <div class="game-card" onclick="location.href='mega-spin.html'">
+        <div class="game-card" onclick="playGame('mega-spin.html')">
             <div class="img-wrap mega-spin-box">🎰</div>
             <p>Simba's Gold</p>
         </div>
         
-        <div class="game-card" onclick="location.href='game.html'">
+        <div class="game-card" onclick="playGame('game.html')">
             <div class="img-wrap"><img src="assets/assets/gold_7.jpg" class="game-tile-img"></div>
             <p>Simba Shuffle</p>
         </div>
 
-        <div class="game-card" onclick="location.href='lion.html'">
+        <div class="game-card" onclick="playGame('lion.html')">
             <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
             <p>Lion Scratch</p>
         </div>
     </div>
 
     <footer class="footer-stats">
-        <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:var(--gold)">0000</span></div>
-        <div class="stat-item">STATUS: <span id="syncStatus" style="color:var(--gold)">Online</span></div>
+        <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:#fcc201">0000</span></div>
+        <div class="stat-item">STATUS: <span id="syncStatus" style="color:#fcc201">Online</span></div>
     </footer>
 
-    <script src="script.js"></script>
     <script>
-        // YOUR FINAL MASTER URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz3-9pzR0vNt9pS7bPdCzY07PLOSA_0_ubOso6UfJXAVfo6bgIUQONuHCWHt8Qw1EOnfQ/exec";
+        // ✅ UPDATED TO YOUR LIVE URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
+        }
+
+        function playGame(page) {
+            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+            if (!activeUser) {
+                alert("Please LOGIN or REGISTER to play!");
+                location.href = 'login.html';
+            } else {
+                location.href = page;
+            }
         }
 
         async function checkAuthStatus() {
@@ -150,13 +159,10 @@
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
                 
-                // 1. Show local balance immediately for speed
-                headerBal.innerText = parseFloat(activeUser.balance).toFixed(2);
-                
-                const uid = activeUser.id || "SB-" + activeUser.phone.toString().slice(-4);
+                headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
+                const uid = "SB-" + activeUser.phone.toString().slice(-4);
                 userIDDisplay.innerText = uid;
 
-                // 2. Fetch the latest balance from the Cloud (Google Sheets)
                 syncStatus.innerText = "Syncing...";
                 try {
                     const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${activeUser.phone}`);
@@ -164,25 +170,20 @@
                     
                     if (data && data.balance !== undefined) {
                         const cloudBal = parseFloat(data.balance).toFixed(2);
-                        
-                        // Update UI and LocalStorage with Cloud data
                         headerBal.innerText = cloudBal;
                         activeUser.balance = cloudBal;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                        
                         syncStatus.innerText = "Synced ✅";
                     } else {
                         syncStatus.innerText = "Online";
                     }
                 } catch (e) {
-                    console.error("Sync Error:", e);
-                    syncStatus.innerText = "Offline ⚠️";
+                    syncStatus.innerText = "Online (Local)";
                 }
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
                 menuBtn.style.display = 'none';
-                userIDDisplay.innerText = "0000";
             }
         }
 
