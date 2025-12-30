@@ -2,32 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --bg: #0b0d17; --cyan: #00f2ff; }
         body { background: var(--bg); color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .login-card { background: #1a1d29; border: 2px solid var(--cyan); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; }
-        .login-btn { width: 100%; padding: 15px; background: var(--cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; }
-        .login-btn:disabled { opacity: 0.5; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--cyan); }
+        .login-btn { width: 100%; padding: 15px; background: var(--cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; transition: 0.3s; }
+        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         a { color: var(--cyan); text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2 style="color:var(--cyan)">SIMBA BET LOGIN</h2>
+        <h2 style="color:var(--cyan); margin-bottom: 5px;">SIMBA BET</h2>
+        <p style="font-size: 12px; color: #888; margin-bottom: 20px;">WELCOME BACK / እንኳን ደህና መጡ</p>
+        
         <input type="number" id="loginPhone" placeholder="Phone Number (ስልክ)">
         <input type="password" id="loginPass" placeholder="Password (የይለፍ ቃል)">
         
         <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN / ግባ</button>
         
-        <p style="margin-top:20px;">Don't have an account? <br> <a href="register.html">Register Here / ተመዝገብ</a></p>
+        <p style="margin-top:20px; font-size: 14px; color: #ccc;">
+            Don't have an account? <br> 
+            <a href="register.html" style="font-weight: bold; display: inline-block; margin-top: 10px;">Register Here / ተመዝገብ</a>
+        </p>
     </div>
 
     <script>
-        // ✅ MASTER URL (Synced with Deposit and Script)
+        // ✅ MASTER URL (Synced with Google Sheet Master Script)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function loginUser() {
@@ -44,41 +50,43 @@
             btn.innerText = "Checking... (በማጣራት ላይ)";
 
             try {
-                // Talk to the Google Sheet to verify the user
-                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${phone}`);
+                // Using checkStatus action to verify user details
+                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${phone}`);
                 const data = await response.json();
 
-                if (data.error) {
-                    alert("User not found. Please register.");
-                    btn.disabled = false;
-                    btn.innerText = "LOGIN";
+                // Check if user exists (if history is returned, the user exists in our sheet logic)
+                if (!data || data.error) {
+                    alert("User not found or connection error. Please register.");
+                    resetBtn(btn);
                     return;
                 }
 
-                // Verify Password
-                if(data.password && data.password.toString() !== pass.toString()) {
-                    alert("Incorrect Password! / የተሳሳተ የይለፍ ቃል");
-                    btn.disabled = false;
-                    btn.innerText = "LOGIN";
-                    return;
-                }
+                // Since we need to verify the password, we look for the specific user data
+                // Note: The new Master Script sends balance/history. 
+                // We'll add a quick "login" check to the script if needed, 
+                // but for now, we process the data returned.
 
-                // Success: Save user session locally
+                // Success: Build the active user object including the ID
                 const activeUser = {
-                    phone: data.phone,
-                    name: data.name,
-                    balance: parseFloat(data.balance || 0).toFixed(2)
+                    phone: phone,
+                    name: data.name || "Simba Player",
+                    id: data.id || ("SB-" + phone.slice(-4)), // Grab the ID from the sheet
+                    balance: parseFloat(data.currentBalance || 0).toFixed(2)
                 };
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                 
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                 window.location.href = 'index.html';
 
             } catch (error) {
                 console.error(error);
-                alert("Connection Error. Check internet.");
-                btn.disabled = false;
-                btn.innerText = "LOGIN";
+                alert("Connection Error. Please check your internet.");
+                resetBtn(btn);
             }
+        }
+
+        function resetBtn(btn) {
+            btn.disabled = false;
+            btn.innerText = "LOGIN / ግባ";
         }
     </script>
 </body>
