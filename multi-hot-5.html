@@ -137,12 +137,12 @@
     </div>
 
     <script>
-        // Only PNG symbols (no multiplier)
         const SYMBOLS = [
             'bell.png', 'collector.png', 'crown.png', 'double.star.png', 
             'purple.gift.png', 'red.gift.png', 'seven.triple.png', 'star.png'
         ];
         const PATH = 'assets/assets/';
+        const SYMBOL_HEIGHT = 73.3;
         
         let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1000 };
         let balance = parseFloat(user.balance);
@@ -154,16 +154,19 @@
             updateUI();
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                for(let j=0; j<60; j++) {
+                // Fill strip with 80 symbols for a long downward spin
+                for(let j=0; j<80; j++) {
                     const imgName = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
                     strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}"></div>`;
                 }
+                // Set initial position to the bottom of the strip
+                strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
             }
         }
 
         function toggleMute() {
             isMuted = !isMuted;
-            document.getElementById('muteBtn').innerText = isMuted ? '' : '🔊';
+            document.getElementById('muteBtn').innerText = isMuted ? '🔇' : '🔊';
         }
 
         function changeBet(v) {
@@ -188,13 +191,16 @@
 
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                const stopOffset = Math.floor(Math.random() * 40) + 10;
-                strip.style.transition = 'none';
-                strip.style.top = '0px';
                 
+                // 1. Reset to top instantly
+                strip.style.transition = 'none';
+                strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
+                
+                // 2. Animate downward to a random offset near the top of the strip
                 setTimeout(() => {
+                    const stopOffset = Math.floor(Math.random() * 5); // Stops at one of the first 5 symbols
                     strip.style.transition = 'top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
-                    strip.style.top = `-${stopOffset * 73.3}px`;
+                    strip.style.top = `-${stopOffset * SYMBOL_HEIGHT}px`;
                 }, 50 + (i * 120));
             }
 
@@ -202,7 +208,6 @@
                 spinning = false;
                 document.getElementById('spinBtn').disabled = false;
                 
-                // Win Logic
                 if(Math.random() > 0.85) {
                     let win = bet * 12;
                     balance += win;
