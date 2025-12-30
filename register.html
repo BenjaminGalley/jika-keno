@@ -2,77 +2,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Register | Simba Bet</title>
+    <style>
+        :root { --gold: #fcc201; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .auth-container { background: #222; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #333; text-align: center; }
+        .brand { font-size: 24px; font-weight: bold; color: var(--gold); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; font-size: 16px; }
+        input:focus { border-color: var(--gold); outline: none; }
+        button { width: 100%; padding: 14px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; }
+        button:disabled { background: #555; cursor: not-allowed; }
+        .links { margin-top: 20px; font-size: 14px; }
+        .links a { color: var(--gold); text-decoration: none; }
+        #statusMsg { margin-top: 15px; font-size: 14px; min-height: 20px; }
+    </style>
 </head>
-<body style="background: #0b0d17; color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0;">
-    
-    <div id="regBox" style="padding: 30px; background: #1a1d29; border: 2px solid #00f2ff; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,242,255,0.3);">
-        <h2 style="color: #00f2ff; margin-bottom: 25px;">CREATE ACCOUNT</h2>
-        
-        <div id="formFields" style="display: flex; flex-direction: column; gap: 15px;">
-            <input type="text" id="regName" placeholder="Full Name (የሙሉ ስም)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
-            <input type="number" id="regPhone" placeholder="Phone Number (ስልክ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
-            <input type="password" id="regPass" placeholder="Password (ቢያንስ 6 ሆሄ)" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
-            <input type="password" id="regConfirm" placeholder="Confirm Password" style="padding: 12px; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; outline: none;">
-            
-            <button id="regBtn" onclick="handleRegister()" style="padding: 15px; background: linear-gradient(180deg, #00f2ff, #0088cc); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px;">REGISTER NOW</button>
-            <p style="font-size: 14px; margin-top: 15px;">Already have an account? <a href="login.html" style="color: #00f2ff; text-decoration: none; font-weight: bold;">Login Here</a></p>
-            <button onclick="location.href='index.html'" style="background:none; border:none; color:#777; cursor:pointer; font-size: 12px; margin-top: 10px;">Back to Lobby</button>
-        </div>
+<body>
 
-        <div id="waitingState" style="display: none; padding: 20px;">
-            <div style="font-size: 50px; margin-bottom: 15px;">⏳</div>
-            <h3 style="color: #fbbf24;">ጥያቄዎ ተልኳል!</h3>
-            <p style="line-height: 1.6; color: #ccc;">Your registration request has been sent to the Admin. Please wait for approval to login.</p>
-            <p style="font-size: 13px; color: #888;">ይህ ብዙውን ጊዜ ጥቂት ደቂቃዎችን ይወስዳል። (This usually takes a few minutes.)</p>
-            <button onclick="location.href='login.html'" style="padding: 12px 25px; background: #00f2ff; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">CHECK LOGIN</button>
+    <div class="auth-container">
+        <div class="brand">🦁 SIMBA BET</div>
+        <h2 style="margin-top:0">Create Account</h2>
+        
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="number" id="regPhone" placeholder="Phone Number (09...)">
+        <input type="password" id="regPass" placeholder="Create Password">
+        
+        <button id="regBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
+        
+        <div id="statusMsg"></div>
+
+        <div class="links">
+            Already have an account? <a href="login.html">Login here</a>
         </div>
     </div>
 
     <script>
-        // MASTER SCRIPT URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeG_Ua6ZYrvIcmVjfuwgn8DY2ddCABFYhkvzMg4ieOnBiLDB57t9HXyYpN89gpMpIj2g/exec";
+        // ✅ YOUR MASTER URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function handleRegister() {
-            const name = document.getElementById('regName').value.trim();
-            const phone = document.getElementById('regPhone').value.trim();
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
             const pass = document.getElementById('regPass').value;
-            const confirm = document.getElementById('regConfirm').value;
             const btn = document.getElementById('regBtn');
+            const msg = document.getElementById('statusMsg');
 
-            // 1. Standard Validation
             if (!name || !phone || !pass) {
-                alert("እባክዎ ሁሉንም ይሙሉ (Please fill all fields)");
-                return;
-            }
-            if (pass.length < 6) {
-                alert("የይለፍ ቃል ቢያንስ 6 ሆሄ መሆን አለበት (Password must be at least 6 characters)");
-                return;
-            }
-            if (pass !== confirm) {
-                alert("የይለፍ ቃሉ አይመሳሰልም (Passwords do not match)");
+                alert("Please fill in all fields");
                 return;
             }
 
+            // UI Feedback
             btn.disabled = true;
-            btn.innerText = "Sending Request...";
+            btn.innerText = "Connecting to Server...";
+            msg.style.color = "white";
+            msg.innerText = "Registering your account on the sheet...";
 
-            // 2. Send to Google Script
-            // Action is 'register'. The script will notify your bot.
-            const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+            const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
 
             try {
-                // Using no-cors because we just need to trigger the save/notify
-                fetch(url, { method: 'GET', mode: 'no-cors' });
-                
-                // Show the "Waiting for Admin Approval" screen
-                document.getElementById('formFields').style.display = 'none';
-                document.getElementById('waitingState').style.display = 'block';
+                // We use 'no-cors' for fast silent submission, or regular fetch if the script returns JSON
+                await fetch(finalUrl, { mode: 'no-cors' });
+
+                // Since we can't easily read 'no-cors' response, we assume success after the fetch completes
+                msg.style.color = "#28a745";
+                msg.innerText = "Success! Saving locally...";
+
+                // AUTO-LOGIN: Save user data to the browser memory
+                const userData = {
+                    name: name,
+                    phone: phone,
+                    balance: 0,
+                    id: "SB-" + phone.toString().slice(-4)
+                };
+                localStorage.setItem('simba_active_user', JSON.stringify(userData));
+
+                setTimeout(() => {
+                    alert("Welcome to Simba Bet, " + name + "!");
+                    window.location.href = 'index.html';
+                }, 1500);
 
             } catch (error) {
-                console.error("Registration Error:", error);
-                alert("Network error. Your request might have been sent, please try logging in later.");
+                console.error(error);
+                msg.style.color = "#ff4444";
+                msg.innerText = "Connection error. Please try again.";
+                btn.disabled = false;
+                btn.innerText = "CREATE ACCOUNT";
             }
         }
     </script>
