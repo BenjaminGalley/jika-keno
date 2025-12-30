@@ -12,9 +12,8 @@
         }
 
         body { 
-            background: #000; color: white; font-family: sans-serif; 
-            margin: 0; padding: 0; overflow: hidden; 
-            height: 100vh; display: flex; flex-direction: column;
+            background: #000; color: white; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
 
         /* Top Header */
@@ -26,175 +25,212 @@
         .lobby-btn { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; }
         .game-title { color: var(--cyan); font-weight: 900; font-size: 18px; text-transform: uppercase; }
 
-        /* Timer Bar */
-        .timer-bar {
+        /* Timer Strip */
+        .timer-strip {
             background: #000; color: var(--cyan); text-align: center;
-            font-size: 24px; font-weight: bold; padding: 5px 0;
+            font-size: 28px; font-weight: bold; padding: 5px 0;
             border-bottom: 2px solid var(--cyan); flex-shrink: 0;
         }
 
-        /* Keno Grid - Scaled to fit screen */
+        /* Main Game Layout */
+        .game-body {
+            flex: 1; display: flex; position: relative; min-height: 0;
+        }
+
+        /* Side Bar for Draw Numbers */
+        .side-bar {
+            width: 30px; background: #111; border-right: 1px solid #333;
+            display: flex; flex-direction: column; align-items: center; padding-top: 5px; gap: 2px;
+        }
+        .side-ball {
+            width: 22px; height: 22px; border-radius: 50%; background: #333;
+            font-size: 10px; display: flex; align-items: center; justify-content: center; color: white;
+        }
+        .side-ball.active { background: var(--gold); color: black; font-weight: bold; }
+
+        /* Grid Area */
         .grid-container {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            padding: 5px; min-height: 0;
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 5px;
         }
-
         .keno-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
-            width: 100%;
-            max-width: 360px;
-            background: #222;
-            padding: 2px;
-            border: 1px solid #444;
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px;
+            width: 100%; max-width: 360px; background: #222; padding: 2px;
         }
-
         .num-cell {
-            aspect-ratio: 1;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+            aspect-ratio: 1; background: #1a1a1a; border: 1px solid #333;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; cursor: pointer;
+        }
+        .num-cell.selected { background: var(--cyan); color: black; }
+        .num-cell.hit { background: var(--gold); color: black; box-shadow: inset 0 0 10px white; }
+
+        /* Selected Numbers Bar (Below Table) */
+        .selected-bar {
+            height: 40px; display: flex; align-items: center; padding: 0 10px; gap: 8px;
+            background: #050505; border-top: 1px solid #222; overflow-x: auto;
+        }
+        .sel-ball {
+            min-width: 30px; height: 30px; border-radius: 50%; background: #333;
+            display: flex; align-items: center; justify-content: center; font-weight: bold;
         }
 
-        .num-cell.selected { background: var(--cyan); color: black; border-color: white; }
-        .num-cell.hit { background: var(--gold); color: black; }
-
-        /* Bottom UI - Fixed and Visible */
+        /* Bottom UI Panel */
         .bottom-ui {
-            background: var(--panel); border-top: 2px solid #333;
-            padding: 10px; flex-shrink: 0;
-            display: flex; flex-direction: column; gap: 10px;
+            background: var(--panel); padding: 10px 15px 25px 15px; flex-shrink: 0;
         }
-
-        .stats-row {
-            display: flex; justify-content: space-between; font-size: 13px; color: #aaa;
-        }
-
-        .controls-row {
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .balance-box { color: var(--gold); font-weight: bold; font-size: 16px; }
-
+        .status-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+        .controls-row { display: flex; justify-content: space-between; align-items: center; }
+        
+        .balance-val { color: var(--gold); font-weight: 900; font-size: 20px; }
+        
         .bet-selector {
-            display: flex; align-items: center; gap: 8px; background: #1a1a1a; 
-            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold);
+            display: flex; align-items: center; gap: 10px; background: #000; 
+            padding: 5px 15px; border-radius: 25px; border: 2px solid var(--gold);
         }
-
-        .step-btn { 
-            background: var(--gold); border: none; width: 28px; height: 28px; 
-            border-radius: 50%; font-weight: bold; font-size: 18px;
-        }
+        .step-btn { background: var(--gold); border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; font-size: 22px; }
+        .bet-display { color: white; font-weight: bold; min-width: 60px; text-align: center; }
 
         .play-btn {
             background: linear-gradient(180deg, var(--gold), #b8860b);
-            border: none; width: 100%; height: 45px; font-weight: 900; border-radius: 22px;
-            font-size: 18px; color: black; text-transform: uppercase;
-            box-shadow: 0 4px 0 #8b6b00;
+            border: none; width: 100%; height: 50px; font-weight: 900; border-radius: 25px;
+            font-size: 20px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 0 #8b6b00;
         }
 
-        .play-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8b6b00; }
+        /* Draw Pop-up */
+        #drawPopup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 120px; background: var(--gold); border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+            font-size: 60px; font-weight: 900; color: black; border: 8px solid white; z-index: 1000;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <button class="lobby-btn" onclick="location.href='index.html'">LOBBY</button>
+        <button class="lobby-btn">LOBBY</button>
         <div class="game-title">FAST KENO</div>
-        <div id="speaker" onclick="toggleMute()" style="cursor:pointer">🔊</div>
+        <div style="font-size: 20px;">🔊</div>
     </div>
 
-    <div class="timer-bar" id="timer">00:47</div>
+    <div class="timer-strip" id="timer">00:47</div>
 
-    <div class="grid-container">
-        <div class="keno-grid" id="grid">
+    <div class="game-body">
+        <div class="side-bar" id="sideBar">
             </div>
+        <div class="grid-container">
+            <div class="keno-grid" id="grid"></div>
+        </div>
     </div>
+
+    <div class="selected-bar" id="selNumbers">
+        </div>
 
     <div class="bottom-ui">
-        <div class="stats-row">
-            <span>PICKED: <span id="pickCount" style="color:var(--cyan)">0</span>/10</span>
+        <div class="status-row">
+            <span>PICKED: <span id="pickedCount" style="color:var(--cyan)">0</span>/10</span>
             <span>POTENTIAL: <span id="potential" style="color:#4caf50">0.00</span></span>
         </div>
-        
         <div class="controls-row">
-            <div class="balance-box"><span id="balDisplay">0.00</span> ETB</div>
+            <div class="balance-val"><span id="balDisplay">1716.50</span> ETB</div>
             <div class="bet-selector">
-                <button class="step-btn" onclick="changeBet(-2)">-</button>
-                <div style="min-width: 60px; text-align: center;">BET: <span id="betAmt">2</span></div>
-                <button class="step-btn" onclick="changeBet(2)">+</button>
+                <button class="step-btn" onclick="updateBet(-2)">-</button>
+                <div class="bet-display">BET: <span id="betAmt">2</span></div>
+                <button class="step-btn" onclick="updateBet(2)">+</button>
             </div>
         </div>
-
-        <button class="play-btn" id="playBtn" onclick="playKeno()">PLAY NOW</button>
+        <button class="play-btn" onclick="startDraw()">PLAY NOW</button>
     </div>
 
-    <script>
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1694.50 };
-        let balance = parseFloat(user.balance);
-        let bet = 2;
-        let selectedNumbers = [];
+    <div id="drawPopup">0</div>
 
-        function initGrid() {
-            const grid = document.getElementById('grid');
-            for (let i = 1; i <= 80; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'num-cell';
-                cell.innerText = i;
-                cell.onclick = () => toggleNumber(i, cell);
-                grid.appendChild(cell);
+    <script>
+        let selected = [];
+        let bet = 2;
+        let balance = 1716.50; // From Screenshot
+        let timeLeft = 47;
+
+        // Create Grid
+        const grid = document.getElementById('grid');
+        for (let i = 1; i <= 80; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'num-cell';
+            cell.id = 'cell-' + i;
+            cell.innerText = i;
+            cell.onclick = () => toggleNumber(i);
+            grid.appendChild(cell);
+        }
+
+        function toggleNumber(num) {
+            const idx = selected.indexOf(num);
+            if (idx > -1) {
+                selected.splice(idx, 1);
+                document.getElementById('cell-' + num).classList.remove('selected');
+            } else if (selected.length < 10) {
+                selected.push(num);
+                document.getElementById('cell-' + num).classList.add('selected');
             }
             updateUI();
-        }
-
-        function toggleNumber(num, element) {
-            if (selectedNumbers.includes(num)) {
-                selectedNumbers = selectedNumbers.filter(n => n !== num);
-                element.classList.remove('selected');
-            } else if (selectedNumbers.length < 10) {
-                selectedNumbers.push(num);
-                element.classList.add('selected');
-            }
-            document.getElementById('pickCount').innerText = selectedNumbers.length;
-            document.getElementById('potential').innerText = (bet * (selectedNumbers.length * 2.5)).toFixed(2);
-        }
-
-        function changeBet(v) {
-            bet = Math.max(2, bet + v);
-            document.getElementById('betAmt').innerText = bet;
-            document.getElementById('potential').innerText = (bet * (selectedNumbers.length * 2.5)).toFixed(2);
         }
 
         function updateUI() {
+            document.getElementById('pickedCount').innerText = selected.length;
+            document.getElementById('betAmt').innerText = bet;
             document.getElementById('balDisplay').innerText = balance.toFixed(2);
-            user.balance = balance.toFixed(2);
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
+            document.getElementById('potential').innerText = (bet * (selected.length * 5)).toFixed(2);
+            
+            // Numbers below table
+            const bar = document.getElementById('selNumbers');
+            bar.innerHTML = selected.map(n => `<div class="sel-ball">${n}</div>`).join('');
         }
 
-        function toggleMute() {
-            const s = document.getElementById('speaker');
-            s.innerText = s.innerText === '🔊' ? '🔇' : '🔊';
+        function updateBet(val) {
+            bet = Math.max(2, bet + val);
+            updateUI();
         }
 
-        function playKeno() {
-            if (selectedNumbers.length === 0) return alert("Select numbers first!");
+        // Timer Logic
+        setInterval(() => {
+            if (timeLeft > 0) timeLeft--;
+            else timeLeft = 59;
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            document.getElementById('timer').innerText = `0${m}:${s < 10 ? '0' + s : s}`;
+        }, 1000);
+
+        function startDraw() {
+            if (selected.length === 0) return alert("Select numbers!");
             if (balance < bet) return alert("Low balance!");
-
+            
             balance -= bet;
             updateUI();
             
-            // Draw logic (Simplified)
-            alert("Waiting for draw...");
+            let drawCount = 0;
+            const sideBar = document.getElementById('sideBar');
+            const popup = document.getElementById('drawPopup');
+            sideBar.innerHTML = "";
+            
+            const interval = setInterval(() => {
+                drawCount++;
+                const drawn = Math.floor(Math.random() * 80) + 1;
+                
+                // Pop-up and Sidebar logic
+                popup.innerText = drawn;
+                popup.style.display = "flex";
+                sideBar.innerHTML += `<div class="side-ball active">${drawn}</div>`;
+                
+                if (selected.includes(drawn)) {
+                    document.getElementById('cell-' + drawn).classList.add('hit');
+                }
+
+                if (drawCount >= 20) {
+                    clearInterval(interval);
+                    setTimeout(() => popup.style.display = "none", 1000);
+                }
+            }, 800);
         }
 
-        initGrid();
+        updateUI();
     </script>
 </body>
 </html>
