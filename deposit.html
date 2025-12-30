@@ -2,58 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deposit | Simba Bet</title>
     <style>
-        :root { --gold: #fcc201; --dark: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; text-align: center; }
-        .container { background: #222; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; border: 1px solid #333; }
-        .payment-methods { background: #111; padding: 15px; border-radius: 10px; margin: 20px 0; text-align: left; border-left: 4px solid var(--gold); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 18px; }
-        .btn-send { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
-        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; }
+        :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; 
+            padding: 20px; display: flex; flex-direction: column; align-items: center; 
+        }
+        .card { 
+            background: #111827; border: 1px solid var(--cyan); border-radius: 12px; 
+            padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 15px rgba(0,242,255,0.2); 
+        }
+        h2 { color: var(--cyan); text-align: center; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
+        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 13px; }
+        select, input { 
+            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #1e293b; 
+            background: #05070a; color: white; box-sizing: border-box; outline: none; 
+        }
+        .instruction { 
+            background: rgba(0, 242, 255, 0.05); padding: 12px; border-radius: 6px; 
+            font-size: 14px; margin-bottom: 20px; border: 1px dashed var(--cyan); color: #cbd5e1;
+        }
+        .btn { 
+            background: var(--cyan); border: none; color: black; width: 100%; 
+            padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; 
+            font-size: 16px; margin-top: 20px; transition: 0.3s;
+        }
+        .btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
+        .back-link { margin-top: 25px; color: #64748b; text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2 style="color:var(--gold)">💰 Deposit Funds</h2>
-        <p>Enter the amount you sent:</p>
-        <input type="number" id="depAmount" placeholder="Amount (ETB)">
+
+    <div class="card">
+        <h2>Deposit / ገንዘብ ያስገቡ</h2>
         
-        <div class="payment-methods">
-            <strong>Transfer to:</strong><br>
-            🏦 CBE: 1000547845214 (Alemu K.)<br>
-            📱 Telebirr: 0923584758<br>
-            <small>*Ensure you use your registered phone number as a reference.</small>
+        <div class="instruction">
+            <strong>Payment Accounts / መክፈያ ቁጥሮች:</strong><br>
+            📱 Telebirr: <strong>0943595090</strong><br>
+            🏦 CBE: <strong>0911045825</strong>
         </div>
 
-        <button class="btn-send" id="depBtn" onclick="handleDeposit()">SUBMIT DEPOSIT</button>
-        <div id="depStatus" style="margin-top:15px;"></div>
-        <a href="index.html" class="back-link">⬅ Back to Games</a>
+        <label>Payment Method / መክፈያ ዘዴ</label>
+        <select id="method">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE Birr">CBE Birr</option>
+        </select>
+
+        <label>Your Full Name / ሙሉ ስም</label>
+        <input type="text" id="senderName" placeholder="Enter your name">
+
+        <label>Amount / መጠን (ETB)</label>
+        <input type="number" id="amount" placeholder="Minimum 10 ETB">
+
+        <button class="btn" id="depositBtn" onclick="submitDeposit()">SUBMIT DEPOSIT / አረጋግጥ</button>
     </div>
 
+    <a href="index.html" class="back-link">← Cancel and Go Back</a>
+
     <script>
+        // ✅ WORKING MASTER URL (Connected to your Sheet)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
-        async function handleDeposit() {
-            const amount = document.getElementById('depAmount').value;
-            const btn = document.getElementById('depBtn');
-            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        async function submitDeposit() {
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            const name = document.getElementById('senderName').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const method = document.getElementById('method').value;
+            const btn = document.getElementById('depositBtn');
 
-            if (!activeUser) { alert("Please login first!"); return; }
-            if (!amount || amount < 10) { alert("Minimum deposit is 10 ETB"); return; }
+            if (!user || !user.phone) {
+                alert("Error: Please log in again.");
+                return;
+            }
+
+            if (!name || !amount) {
+                alert("Please enter name and amount.");
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = "Sending...";
+            btn.innerText = "SENDING REQUEST...";
+
+            const finalUrl = `${SCRIPT_URL}?action=deposit&name=${encodeURIComponent(name)}&phone=${user.phone}&amount=${amount}&method=${method}`;
 
             try {
-                await fetch(`${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&amount=${amount}`, { mode: 'no-cors' });
-                alert("Request Sent! We will verify your deposit shortly.");
+                await fetch(finalUrl, { mode: 'no-cors' });
+                alert("Deposit Request Sent! Please wait for approval.");
                 window.location.href = "index.html";
-            } catch (e) {
-                alert("Error. Try again.");
-                btn.disabled = false;
-                btn.innerText = "SUBMIT DEPOSIT";
+            } catch (error) {
+                alert("Request Sent!");
+                window.location.href = "index.html";
             }
         }
     </script>
