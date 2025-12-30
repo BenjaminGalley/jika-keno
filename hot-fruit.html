@@ -3,193 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hot Fruit | Simba Bet</title>
+    <title>Hot Fruit Premium</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; margin: 0; overflow: hidden; }
-        
-        .header {
+        :root {
+            --gold: #FFD700;
+            --fancy-gold: linear-gradient(180deg, #fff7ad 0%, #ffa200 50%, #8c5d00 100%);
+            --bg: #05070a;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { 
+            background: var(--bg);
+            background-image: url('assets/simba_bg.jpg');
+            background-size: cover;
+            color: white; margin: 0; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden;
+        }
+
+        /* Fancy Golden Header */
+        .game-title {
+            margin: 20px 0 10px 0;
+            font-size: 38px;
+            font-weight: 900;
+            text-transform: uppercase;
+            background: var(--fancy-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 162, 0, 0.5));
+            letter-spacing: 3px;
+        }
+
+        .top-bar {
+            width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.6); border-bottom: 2px solid var(--gold);
+        }
+        .balance-display { color: var(--gold); font-weight: 900; font-size: 1.3rem; }
+
+        /* Slot Machine Area */
+        .machine-wrapper {
+            position: relative;
+            padding: 20px;
+            background: url('assets/simba_card.jpg');
+            background-size: 100% 100%;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
             padding: 15px;
-            background: linear-gradient(to bottom, #222, #000);
-            border-bottom: 2px solid #ff4500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .bal-box { color: #ffcc00; font-weight: bold; font-size: 20px; text-shadow: 0 0 5px rgba(255, 204, 0, 0.5); }
-
-        .slot-container {
-            margin: 50px auto;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .reel {
-            width: 90px;
-            height: 120px;
-            background: #111;
+            background: url('assets/grid_3x3.jpg');
+            background-size: cover;
+            border: 3px solid #444;
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 55px;
-            border: 3px solid #ff4500;
-            box-shadow: 0 0 15px rgba(255, 69, 0, 0.4);
+            position: relative;
         }
 
-        .controls {
-            background: #111;
-            padding: 25px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            box-sizing: border-box;
-            border-top: 2px solid #ff4500;
+        .slot-tile {
+            width: 90px; height: 90px;
+            background: url('assets/tile.jpg');
+            background-size: cover;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
         }
+
+        .symbol-img {
+            width: 75%; height: 75%;
+            object-fit: contain;
+            transition: transform 0.1s linear;
+        }
+
+        /* Payline Canvas */
+        #lineCanvas {
+            position: absolute; top: 0; left: 0; pointer-events: none; z-index: 10;
+        }
+
+        /* Controls */
+        .tray-area {
+            width: 100%; max-width: 400px; padding: 20px;
+            display: flex; flex-direction: column; gap: 15px;
+            background: rgba(0,0,0,0.4); border-radius: 20px; margin-top: 15px;
+        }
+
+        .control-row { display: flex; justify-content: space-between; align-items: center; }
+
+        .bet-selector {
+            display: flex; align-items: center; background: #000; 
+            border: 2px solid var(--gold); border-radius: 25px;
+        }
+        .btn-adj { background: none; border: none; color: var(--gold); font-size: 24px; padding: 5px 15px; cursor: pointer; font-weight: bold; }
+        #betDisplay { width: 50px; text-align: center; border: none; background: none; color: white; font-size: 18px; font-weight: bold; }
 
         .spin-btn {
-            background: linear-gradient(to bottom, #ff4500, #b22222);
-            border: none;
-            padding: 18px;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            border-radius: 12px;
-            width: 90%;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(255, 69, 0, 0.5);
-            text-transform: uppercase;
+            height: 55px; flex: 1; margin-left: 15px;
+            background: var(--fancy-gold);
+            border: none; border-radius: 30px; font-size: 20px; font-weight: 900;
+            color: #432b00; cursor: pointer; box-shadow: 0 4px 0 #8c5d00;
+        }
+        .spin-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8c5d00; }
+        .spin-btn:disabled { filter: grayscale(1); opacity: 0.6; }
+
+        /* Celebration Overlay */
+        .celebration {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; text-align: center;
+        }
+        .big-win-text {
+            font-size: 60px; font-weight: 900; color: var(--gold);
+            text-shadow: 0 0 20px gold; animation: pulse 0.5s infinite alternate;
         }
 
-        .spin-btn:active { transform: scale(0.96); }
-        .spin-btn:disabled { opacity: 0.4; filter: grayscale(1); }
-
-        .bet-row { margin-bottom: 20px; font-size: 20px; display: flex; justify-content: center; align-items: center; gap: 25px; }
-        .win-display { margin: 25px; font-size: 28px; color: #ff4500; height: 40px; font-weight: bold; text-shadow: 0 0 10px rgba(255,69,0,0.6); }
-        
-        .adj-btn { background: #333; color: #fff; border: 2px solid #ff4500; width: 45px; height: 45px; border-radius: 50%; font-size: 24px; font-weight: bold; }
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .blur { filter: blur(3px); }
     </style>
 </head>
-<body>
+<body onclick="initAudio()">
 
-    <div class="header">
-        <button onclick="location.href='index.html'" style="background:#ff4500; color:#fff; border:none; padding:10px 20px; border-radius:8px; font-weight:bold; cursor:pointer;">LOBBY</button>
-        <div class="bal-box"><span id="balance">0.00</span> ETB</div>
+    <div class="top-bar">
+        <button onclick="location.reload()" style="background:#333; color:white; border:1px solid #777; padding:5px 10px;">LOBBY</button>
+        <div class="balance-display"><span id="balance">1716.50</span> ETB</div>
     </div>
 
-    <div class="win-display" id="status">FEEL THE HEAT!</div>
+    <h1 class="game-title">HOT FRUIT</h1>
 
-    <div class="slot-container">
-        <div class="reel" id="r1">🔥</div>
-        <div class="reel" id="r2">🍋</div>
-        <div class="reel" id="r3">🍇</div>
+    <div class="machine-wrapper">
+        <div class="grid-3x3" id="mainGrid">
+            <canvas id="lineCanvas"></canvas>
+            </div>
     </div>
 
-    <div class="controls">
-        <div class="bet-row">
-            <button class="adj-btn" onclick="changeBet(-10)">-</button>
-            <span style="font-weight:bold; color: #fff;">BET: <span id="bet" style="color:#ffcc00">20</span></span>
-            <button class="adj-btn" onclick="changeBet(10)">+</button>
+    <div class="tray-area">
+        <div class="control-row">
+            <div class="bet-selector">
+                <button class="btn-adj" onclick="adjBet(-2)">-</button>
+                <input type="text" id="betDisplay" value="2" readonly>
+                <button class="btn-adj" onclick="adjBet(2)">+</button>
+            </div>
+            <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN</button>
         </div>
-        <button class="spin-btn" id="spinBtn" onclick="spin()">SPIN HOT</button>
     </div>
+
+    <div id="celebration" class="celebration">
+        <div class="big-win-text">BIG WIN!</div>
+        <div id="winAmt" style="font-size:40px; color:white; margin:10px 0;">+150.00</div>
+    </div>
+
+    <audio id="sndMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3"></audio>
+    <audio id="sndSpin" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+    <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <script>
-        // --- SECURE BALANCE SYSTEM ---
-        let user = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = user ? parseFloat(user.balance) : 0;
-        let bet = 20;
+        // Assets Mapping based on your files
+        const ASSETS = [
+            'assets/cherry.jpg', 'assets/lemon.jpg', 'assets/orange.jpg', 
+            'assets/grapes.jpg', 'assets/melon.jpg', 'assets/gold_7.jpg', 'assets/star.png'
+        ];
+
+        let balance = 1716.50;
+        let currentBet = 2;
         let isSpinning = false;
-        const fruits = ['🔥', '🍊', '🍋', '🍇', '🍉', '⭐', '7️⃣'];
+        let audioInit = false;
 
-        function init() {
-            if(!user) {
-                location.href = 'index.html';
-                return;
+        function initGrid() {
+            const grid = document.getElementById('mainGrid');
+            for(let i=0; i<9; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'slot-tile';
+                tile.innerHTML = `<img src="${ASSETS[Math.floor(Math.random()*ASSETS.length)]}" class="symbol-img" id="s${i}">`;
+                grid.appendChild(tile);
             }
-            document.getElementById('balance').innerText = balance.toFixed(2);
+            updateBalance();
+            resizeCanvas();
         }
 
-        function saveBalance() {
-            // Immediately sync with LocalStorage to prevent Lobby rollback
-            user.balance = balance.toFixed(2);
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        function resizeCanvas() {
+            const canvas = document.getElementById('lineCanvas');
+            const grid = document.getElementById('mainGrid');
+            canvas.width = grid.offsetWidth;
+            canvas.height = grid.offsetHeight;
         }
 
-        function changeBet(val) {
+        function adjBet(v) {
             if(isSpinning) return;
-            if(bet + val >= 10 && bet + val <= 2000) {
-                bet += val;
-                document.getElementById('bet').innerText = bet;
-            }
+            currentBet = Math.max(2, currentBet + v);
+            document.getElementById('betDisplay').value = currentBet;
         }
 
-        function spin() {
-            if(balance < bet) {
-                alert("Insufficient Balance!");
-                return;
-            }
-
-            // DEDUCT & SAVE IMMEDIATELY
-            balance -= bet;
-            saveBalance();
-            document.getElementById('balance').innerText = balance.toFixed(2);
+        async function spin() {
+            if(balance < currentBet || isSpinning) return;
 
             isSpinning = true;
+            balance -= currentBet;
+            updateBalance();
+            clearLines();
             document.getElementById('spinBtn').disabled = true;
-            document.getElementById('status').innerText = "HEATING UP...";
+            document.getElementById('sndSpin').play();
 
-            let count = 0;
-            let interval = setInterval(() => {
-                document.getElementById('r1').innerText = fruits[Math.floor(Math.random() * fruits.length)];
-                document.getElementById('r2').innerText = fruits[Math.floor(Math.random() * fruits.length)];
-                document.getElementById('r3').innerText = fruits[Math.floor(Math.random() * fruits.length)];
-                count++;
-                
-                if(count > 18) {
-                    clearInterval(interval);
-                    determineResult();
+            // Visual Spin Effect
+            for(let step=0; step<15; step++) {
+                for(let i=0; i<9; i++) {
+                    const img = document.getElementById('s${i}');
+                    img.src = ASSETS[Math.floor(Math.random()*ASSETS.length)];
+                    img.classList.add('blur');
                 }
-            }, 70);
-        }
-
-        function determineResult() {
-            const s1 = fruits[Math.floor(Math.random() * fruits.length)];
-            const s2 = fruits[Math.floor(Math.random() * fruits.length)];
-            const s3 = fruits[Math.floor(Math.random() * fruits.length)];
-
-            document.getElementById('r1').innerText = s1;
-            document.getElementById('r2').innerText = s2;
-            document.getElementById('r3').innerText = s3;
-
-            let win = 0;
-
-            if(s1 === s2 && s2 === s3) {
-                // Triple Match - High Payout
-                if(s1 === '7️⃣') win = bet * 150;
-                else if(s1 === '🔥') win = bet * 75;
-                else if(s1 === '⭐') win = bet * 40;
-                else win = bet * 15;
-            } else if(s1 === s2 || s2 === s3 || s1 === s3) {
-                // Double Match
-                win = bet * 1.8;
+                await new Promise(r => setTimeout(r, 60));
             }
 
-            if(win > 0) {
-                balance += win;
-                saveBalance(); // SAVE WIN IMMEDIATELY
-                document.getElementById('status').innerText = `HOT WIN: +${win.toFixed(2)} ETB!`;
-            } else {
-                document.getElementById('status').innerText = "COLD SPIN!";
+            // Final Result
+            const results = [];
+            for(let i=0; i<9; i++) {
+                const img = document.getElementById('s${i}');
+                img.classList.remove('blur');
+                const pick = ASSETS[Math.floor(Math.random()*ASSETS.length)];
+                img.src = pick;
+                results.push(pick);
             }
 
-            document.getElementById('balance').innerText = balance.toFixed(2);
+            checkWins(results);
             isSpinning = false;
             document.getElementById('spinBtn').disabled = false;
         }
 
-        window.onload = init;
+        function checkWins(res) {
+            const lines = [
+                [0,1,2], [3,4,5], [6,7,8], // Horizontal
+                [0,3,6], [1,4,7], [2,5,8], // Vertical
+                [0,4,8], [2,4,6]           // Diagonal
+            ];
+
+            let winTotal = 0;
+            let winningLines = [];
+
+            lines.forEach(line => {
+                if(res[line[0]] === res[line[1]] && res[line[1]] === res[line[2]]) {
+                    const sym = res[line[0]];
+                    let multiplier = 5;
+                    if(sym.includes('gold_7')) multiplier = 50;
+                    if(sym.includes('star')) multiplier = 20;
+                    
+                    winTotal += currentBet * multiplier;
+                    winningLines.push(line);
+                }
+            });
+
+            if(winTotal > 0) {
+                balance += winTotal;
+                updateBalance();
+                document.getElementById('sndWin').play();
+                drawWinningLines(winningLines);
+                
+                if(winTotal >= 100) {
+                    showCelebration(winTotal);
+                }
+            }
+        }
+
+        function drawWinningLines(lines) {
+            const canvas = document.getElementById('lineCanvas');
+            const ctx = canvas.getContext('2d');
+            const tiles = document.getElementsByClassName('slot-tile');
+            
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 6;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'gold';
+
+            lines.forEach(line => {
+                const start = tiles[line[0]].getBoundingClientRect();
+                const end = tiles[line[2]].getBoundingClientRect();
+                const parent = document.getElementById('mainGrid').getBoundingClientRect();
+
+                ctx.beginPath();
+                ctx.moveTo(
+                    tiles[line[0]].offsetLeft + 45, 
+                    tiles[line[0]].offsetTop + 45
+                );
+                ctx.lineTo(
+                    tiles[line[2]].offsetLeft + 45, 
+                    tiles[line[2]].offsetTop + 45
+                );
+                ctx.stroke();
+            });
+        }
+
+        function clearLines() {
+            const canvas = document.getElementById('lineCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function showCelebration(amt) {
+            const el = document.getElementById('celebration');
+            document.getElementById('winAmt').innerText = "+" + amt.toFixed(2) + " ETB";
+            el.style.display = 'flex';
+            setTimeout(() => el.style.display = 'none', 3000);
+        }
+
+        function updateBalance() {
+            document.getElementById('balance').innerText = balance.toFixed(2);
+        }
+
+        function initAudio() {
+            if(!audioInit) {
+                const music = document.getElementById('sndMusic');
+                music.volume = 0.2;
+                music.play();
+                audioInit = true;
+            }
+        }
+
+        window.onload = initGrid;
+        window.onresize = resizeCanvas;
     </script>
 </body>
 </html>
