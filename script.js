@@ -2,8 +2,8 @@
 // SIMBA BET - MASTER WEBSITE SCRIPT (FINAL)
 // ==========================================
 
-// ✅ MATCHES YOUR CORRECT GOOGLE SCRIPT DEPLOYMENT
-const scriptURL = 'https://script.google.com/macros/s/AKfycbzeG_Ua6ZYrvIcmVjfuwgn8DY2ddCABFYhkvzMg4ieOnBiLDB57t9HXyYpN89gpMpIj2g/exec'; 
+// ✅ MATCHES YOUR MASTER GOOGLE SCRIPT DEPLOYMENT
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec'; 
 
 // 1. SYNC BALANCE FROM GOOGLE
 async function updateDisplay() {
@@ -28,7 +28,7 @@ async function updateDisplay() {
     }
 }
 
-// 2. SUBMIT DEPOSIT (Sends data to Google Script which alerts Telegram)
+// 2. SUBMIT DEPOSIT (Sends data to Google Script)
 function submitDepositRequest() {
     const method = document.getElementById('method').value;
     const sName = document.getElementById('senderName').value.trim();
@@ -38,9 +38,9 @@ function submitDepositRequest() {
     if (!user) return alert("Please login first");
     if (!sName || !amt) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ (Fill all info)");
 
-    if (parseFloat(amt) < 100) return alert("ዝቅተኛው ማስገቢያ 100 ብር ነው (Min 100 ETB)");
+    if (parseFloat(amt) < 10) return alert("ዝቅተኛው ማስገቢያ 10 ብር ነው (Min 10 ETB)");
 
-    // ✅ MATCHES GOOGLE SCRIPT PARAMETERS: action, phone, name, amount, method
+    // ✅ MATCHES GOOGLE SCRIPT PARAMETERS
     const finalURL = `${scriptURL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(sName)}&amount=${amt}&method=${method}`;
     
     fetch(finalURL, { method: 'GET', mode: 'no-cors' });
@@ -58,3 +58,19 @@ function processWithdraw() {
 
     if (!user) return alert("Please login first");
     if (!receivePhone || !amount) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
+    
+    if (amount > parseFloat(user.balance)) {
+        return alert("በቂ ቀሪ ሂሳብ የለም (Insufficient Balance)");
+    }
+
+    const finalURL = `${scriptURL}?action=withdraw&phone=${user.phone}&amount=${amount}&method=${method}&target=${receivePhone}`;
+
+    fetch(finalURL, { method: 'GET', mode: 'no-cors' });
+
+    alert("የመውጣት ጥያቄ ተልኳል! (Withdrawal Request Sent!)");
+    window.location.href = 'index.html';
+}
+
+// Auto-update balance every 30 seconds
+setInterval(updateDisplay, 30000);
+window.onload = updateDisplay;
