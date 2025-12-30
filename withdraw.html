@@ -2,120 +2,95 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdraw | Simba Bet</title>
     <style>
-        :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; --red: #ef4444; }
-        body { 
-            background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; 
-            padding: 20px; display: flex; flex-direction: column; align-items: center; 
-        }
-        .card { 
-            background: #111827; border: 1px solid var(--red); border-radius: 12px; 
-            padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); 
-        }
-        h2 { color: var(--red); text-align: center; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .balance-box { 
-            background: #1e293b; padding: 10px; border-radius: 6px; 
-            text-align: center; margin-bottom: 20px; border: 1px solid #334155;
-        }
-        .balance-box span { color: var(--gold); font-weight: bold; font-size: 1.2rem; }
-        
-        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 13px; }
-        select, input { 
-            width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #1e293b; 
-            background: #05070a; color: white; box-sizing: border-box; outline: none; 
-        }
-        .btn { 
-            background: var(--red); border: none; color: white; width: 100%; 
-            padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; 
-            font-size: 16px; margin-top: 20px; transition: 0.3s;
-        }
-        .btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
-        .back-link { margin-top: 25px; color: #64748b; text-decoration: none; font-size: 14px; }
+        :root { --gold: #fcc201; --dark: #1a1a1a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; text-align: center; }
+        .container { background: #222; padding: 20px; border-radius: 15px; max-width: 400px; margin: auto; border: 1px solid #333; }
+        .balance-card { background: #111; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px dashed var(--gold); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #000; color: white; box-sizing: border-box; font-size: 18px; }
+        .btn-withdraw { width: 100%; padding: 15px; background: #d9534f; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-withdraw:disabled { background: #555; }
+        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; }
+        .info-text { font-size: 13px; color: #aaa; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Withdraw</h2>
+    <div class="container">
+        <h2 style="color:var(--gold)">💸 Withdraw Funds</h2>
         
-        <div class="balance-box">
-            Current Balance: <span id="display-bal">0.00</span> ETB
+        <div class="balance-card">
+            <small>YOUR CURRENT BALANCE</small>
+            <div id="displayBal" style="font-size: 24px; font-weight: bold; color: var(--gold);">0.00 ETB</div>
         </div>
 
-        <label>Withdrawal Method</label>
-        <select id="method">
-            <option value="Telebirr">Telebirr</option>
-            <option value="CBE Birr">CBE Birr</option>
-        </select>
+        <p>Enter amount to withdraw:</p>
+        <input type="number" id="witAmount" placeholder="Amount (Min: 50)">
+        
+        <p class="info-text">Money will be sent to your registered phone number via Telebirr/Bank.</p>
 
-        <label>Recipient Phone Number (to receive payment)</label>
-        <input type="number" id="wdPhone" placeholder="09...">
+        <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL</button>
+        
+        <div id="witStatus" style="margin-top:15px; font-weight:bold;"></div>
 
-        <label>Amount to Withdraw (ETB)</label>
-        <input type="number" id="amount" placeholder="Minimum 50 ETB">
-
-        <button class="btn" id="withdrawBtn" onclick="submitWithdrawal()">SUBMIT WITHDRAWAL</button>
+        <a href="index.html" class="back-link">⬅ Back to Games</a>
     </div>
 
-    <a href="index.html" class="back-link">← Cancel and Go Back</a>
-
     <script>
-        // UPDATED URL WITH YOUR NEW DEPLOYMENT ID
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzeG_Ua6ZYrvIcmVjfuwgn8DY2ddCABFYhkvzMg4ieOnBiLDB57t9HXyYpN89gpMpIj2g/exec";
-        
-        // Load user data
-        const user = JSON.parse(localStorage.getItem('simba_active_user'));
-        if (user) {
-            document.getElementById('display-bal').innerText = parseFloat(user.balance).toFixed(2);
+        // ✅ YOUR MASTER URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+
+        // Load balance on start
+        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        if (activeUser) {
+            document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
         }
 
-        async function submitWithdrawal() {
-            const amount = parseFloat(document.getElementById('amount').value);
-            const wdPhone = document.getElementById('wdPhone').value.trim();
-            const method = document.getElementById('method').value;
-            const btn = document.getElementById('withdrawBtn');
+        async function handleWithdraw() {
+            const amount = document.getElementById('witAmount').value;
+            const btn = document.getElementById('witBtn');
+            const status = document.getElementById('witStatus');
 
-            if (!user || !user.phone) {
-                alert("Session expired. Please log in again.");
+            if (!activeUser) {
+                alert("Please login first!");
+                window.location.href = 'login.html';
                 return;
             }
 
-            if (!amount || !wdPhone) {
-                alert("Please fill in all fields.");
+            if (!amount || amount < 50) {
+                alert("Minimum withdrawal is 50 ETB");
                 return;
             }
 
-            if (amount < 50) {
-                alert("Minimum withdrawal is 50 ETB.");
-                return;
-            }
-
-            if (amount > parseFloat(user.balance)) {
+            if (amount > parseFloat(activeUser.balance)) {
                 alert("Insufficient balance!");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "PROCESSING...";
+            btn.innerText = "Processing...";
+            status.style.color = "white";
+            status.innerText = "Sending request to Admin...";
 
-            // Send request to Google Script
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${user.phone}&amount=${amount}&wdPhone=${wdPhone}&method=${method}`;
+            // Send to Google Sheets (using action=withdraw)
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&amount=${amount}`;
 
             try {
                 await fetch(finalUrl, { mode: 'no-cors' });
                 
-                // Update local balance immediately
-                user.balance = (parseFloat(user.balance) - amount).toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(user));
+                status.style.color = var(--gold);
+                status.innerText = "✅ Request Received! Your balance will be deducted after approval.";
+                btn.innerText = "REQUEST SENT";
                 
-                alert("Withdrawal request sent successfully!");
-                window.location.href = "index.html";
+                alert("Withdrawal request sent! We will process your payment shortly.");
+                
             } catch (error) {
-                console.error("Error:", error);
-                alert("Request Sent!");
-                window.location.href = "index.html";
+                status.style.color = "#ff4444";
+                status.innerText = "Error. Please try again.";
+                btn.disabled = false;
+                btn.innerText = "REQUEST WITHDRAWAL";
             }
         }
     </script>
