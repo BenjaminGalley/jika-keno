@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deposit | Simba Bet</title>
     <style>
         :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; }
@@ -73,7 +73,6 @@
     <a href="index.html" class="back-link">← Go Back to Lobby</a>
 
     <script>
-        // Use your specific Apps Script URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function submitDepositRequest() {
@@ -88,25 +87,26 @@
                 return;
             }
 
-            if (!name || !amount) {
-                alert("Please fill all info");
+            if (!name || !amount || amount < 100) {
+                alert("Please enter a valid name and minimum 100 ETB.");
                 return;
             }
 
             btn.disabled = true;
             btn.innerText = "SENDING...";
 
-            // Action "deposit" tells the sheet to add a new row with "PENDING"
+            // Action "deposit" adds a row with "PENDING"
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(name)}&amount=${amount}&method=${method}`;
 
             try {
-                // Using 'no-cors' allows the request to reach the sheet even if browser blocks the response
+                // Using 'no-cors' for the send-only action
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("Request Sent! Wait for admin to change status to 'Approve' on the sheet.");
-                btn.innerText = "REQUEST SENT";
+                alert("Request Sent! Please send the money via " + method + " now. Your balance will update once Admin approves.");
+                btn.innerText = "REQUEST SENT ✅";
             } catch (error) {
                 console.log(error);
                 alert("Request Processed!");
+                btn.innerText = "REQUEST SENT ✅";
             }
         }
 
@@ -119,13 +119,14 @@
 
             syncBtn.disabled = true;
             syncBtn.innerText = "CHECKING SHEET...";
+            statusLabel.innerText = "Verifying with Simba Server...";
 
             try {
-                // Action "checkStatus" tells the script to look for "Approve" rows for this phone
+                // Fetch WITHOUT no-cors to read data
                 const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
                 const data = await response.json();
 
-                if (data.approvedAmount > 0) {
+                if (data.approvedAmount && data.approvedAmount > 0) {
                     // Update Local Balance
                     let currentBal = parseFloat(user.balance) || 0;
                     currentBal += parseFloat(data.approvedAmount);
@@ -133,17 +134,17 @@
                     user.balance = currentBal.toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                     
-                    alert(`✅ DEPOSIT APPROVED! ${data.approvedAmount} ETB added to your balance.`);
-                    statusLabel.innerText = "Balance Updated!";
+                    alert(`✅ DEPOSIT APPROVED! ${data.approvedAmount} ETB added.`);
                     window.location.href = "index.html";
                 } else {
-                    alert("Status is still PENDING or not found. Please wait for Admin.");
+                    alert("Status: PENDING. Please ensure you have sent the money and Admin has marked it 'Approve'.");
                     syncBtn.disabled = false;
                     syncBtn.innerText = "CHECK APPROVAL STATUS";
+                    statusLabel.innerText = "No approved deposits found yet.";
                 }
             } catch (error) {
                 console.error(error);
-                alert("Error connecting to sheet. Make sure you wrote 'Approve' exactly.");
+                alert("Connection error. Try again in a moment.");
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
