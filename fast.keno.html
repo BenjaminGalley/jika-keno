@@ -5,289 +5,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fast Keno | Simba Bet</title>
     <style>
-        :root { 
-            --gold: #FFD700; 
+        :root {
+            --gold: #FFD700;
             --cyan: #00f2ff;
-            --green: #2ecc71; 
-            --red: #e74c3c; 
-            --bg: #05070a; 
-            --blue-msg: #3498db;
+            --panel: #0a0e17;
         }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
         body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
-            overflow: hidden; display: flex; flex-direction: column; height: 100vh;
+            background: #000; color: white; font-family: sans-serif; 
+            margin: 0; padding: 0; overflow: hidden; 
+            height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* Top Nav */
-        .top-nav { 
-            background: #0a0e17; height: 45px; display: flex; 
+        /* Top Header */
+        .header { 
+            background: var(--panel); height: 50px; display: flex; 
             justify-content: space-between; align-items: center; padding: 0 15px;
+            border-bottom: 2px solid var(--gold); flex-shrink: 0;
+        }
+        .lobby-btn { background: #333; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 12px; }
+        .game-title { color: var(--cyan); font-weight: 900; font-size: 18px; text-transform: uppercase; }
+
+        /* Timer Bar */
+        .timer-bar {
+            background: #000; color: var(--cyan); text-align: center;
+            font-size: 24px; font-weight: bold; padding: 5px 0;
             border-bottom: 2px solid var(--cyan); flex-shrink: 0;
         }
-        .lobby-btn { background:#333; color:white; border:none; padding:5px 10px; border-radius:4px; font-size:12px; cursor:pointer; }
 
-        /* Timer - High Visibility */
-        .timer-area { text-align: center; padding: 5px 0; background: #000; height: 35px; flex-shrink: 0; }
-        #timer-box { font-size: 22px; font-weight: bold; color: var(--cyan); }
-
-        /* Main Table - Pulled Up */
-        .game-content { 
-            display: flex; justify-content: center; gap: 5px; padding: 5px; 
-            flex: 1; min-height: 0; align-items: flex-start; /* Keeps it at the top */
+        /* Keno Grid - Scaled to fit screen */
+        .grid-container {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 5px; min-height: 0;
         }
 
-        .side-history { 
-            width: 35px; background: #111; border: 1px solid #333; 
-            display: flex; flex-direction: column; height: 320px; overflow: hidden;
+        .keno-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            width: 100%;
+            max-width: 360px;
+            background: #222;
+            padding: 2px;
+            border: 1px solid #444;
         }
-        .draw-spot { height: 16px; border-bottom: 1px solid #222; font-size: 10px; text-align: center; color: var(--cyan); }
 
-        .grid { 
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; 
-            width: 100%; max-width: 400px;
+        .num-cell {
+            aspect-ratio: 1;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .cell { 
-            background: #1e293b; aspect-ratio: 1; display: flex; 
-            align-items: center; justify-content: center; font-size: 14px; 
-            font-weight: bold; border: 1px solid #334155; border-radius: 4px;
-        }
-        .cell.selected { background: var(--cyan); color: black; }
-        .cell.hit { background: var(--green) !important; color: white; }
 
-        /* BOTTOM CONSOLE - Fixed at bottom */
+        .num-cell.selected { background: var(--cyan); color: black; border-color: white; }
+        .num-cell.hit { background: var(--gold); color: black; }
+
+        /* Bottom UI - Fixed and Visible */
         .bottom-ui {
-            background: #0a0e17; border-top: 3px solid #1e293b;
-            padding: 10px 15px 20px 15px; flex-shrink: 0; width: 100%;
+            background: var(--panel); border-top: 2px solid #333;
+            padding: 10px; flex-shrink: 0;
+            display: flex; flex-direction: column; gap: 10px;
         }
 
-        .stats { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; color: #94a3b8; }
-
-        .ticket-view { 
-            display: flex; flex-wrap: wrap; gap: 4px; min-height: 35px; 
-            align-items: center; border-bottom: 1px solid #222; margin-bottom: 10px; padding-bottom: 5px;
-        }
-        .t-ball { width: 24px; height: 24px; line-height: 24px; text-align: center; border-radius: 50%; background: #333; font-size: 11px; font-weight: bold; }
-        .t-ball.hit { background: var(--green); }
-        .t-ball.miss { background: var(--red); opacity: 0.6; }
-
-        .controls { display: flex; align-items: center; gap: 10px; }
-
-        /* Bet Stepper */
-        .stepper { display: flex; align-items: center; background: #000; border: 2px solid var(--cyan); border-radius: 8px; }
-        .s-btn { background: none; border: none; color: var(--cyan); padding: 8px 12px; font-size: 20px; font-weight: bold; }
-        #betVal { width: 40px; text-align: center; background: none; border: none; color: white; font-weight: bold; font-size: 16px; }
-
-        /* Live Balance */
-        .bal-display { 
-            background: #111; border: 1px solid #444; padding: 10px; border-radius: 8px; 
-            min-width: 90px; text-align: center; color: var(--gold); font-weight: bold; font-size: 14px;
+        .stats-row {
+            display: flex; justify-content: space-between; font-size: 13px; color: #aaa;
         }
 
-        /* Bet Button */
-        .bet-btn { 
-            flex: 1; height: 50px; background: var(--cyan); color: black; 
-            border: none; border-radius: 8px; font-weight: 900; font-size: 16px; text-transform: uppercase;
+        .controls-row {
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .bet-btn:disabled { background: #333; color: #666; }
 
-        /* Overlays */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 999; }
-        #ball-anim { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: 900; color: white; display: none; z-index: 100; text-shadow: 0 0 20px var(--cyan); }
+        .balance-box { color: var(--gold); font-weight: bold; font-size: 16px; }
+
+        .bet-selector {
+            display: flex; align-items: center; gap: 8px; background: #1a1a1a; 
+            padding: 4px 12px; border-radius: 20px; border: 1px solid var(--gold);
+        }
+
+        .step-btn { 
+            background: var(--gold); border: none; width: 28px; height: 28px; 
+            border-radius: 50%; font-weight: bold; font-size: 18px;
+        }
+
+        .play-btn {
+            background: linear-gradient(180deg, var(--gold), #b8860b);
+            border: none; width: 100%; height: 45px; font-weight: 900; border-radius: 22px;
+            font-size: 18px; color: black; text-transform: uppercase;
+            box-shadow: 0 4px 0 #8b6b00;
+        }
+
+        .play-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #8b6b00; }
     </style>
 </head>
 <body>
 
-    <div class="top-nav">
+    <div class="header">
         <button class="lobby-btn" onclick="location.href='index.html'">LOBBY</button>
-        <div style="color:var(--cyan); font-weight:bold;">FAST KENO</div>
-        <div></div>
+        <div class="game-title">FAST KENO</div>
+        <div id="speaker" onclick="toggleMute()" style="cursor:pointer">🔊</div>
     </div>
 
-    <div class="timer-area"><span id="timer-box">00:60</span></div>
+    <div class="timer-bar" id="timer">00:47</div>
 
-    <div class="game-content">
-        <div class="side-history" id="sideHist"></div>
-        <div class="grid" id="mainGrid"></div>
+    <div class="grid-container">
+        <div class="keno-grid" id="grid">
+            </div>
     </div>
-
-    <div id="ball-anim"></div>
 
     <div class="bottom-ui">
-        <div class="stats">
-            <span>PICKED: <span id="count" style="color:var(--cyan)">0</span>/10</span>
-            <span>POTENTIAL: <span id="pot" style="color:var(--green)">0.00</span></span>
+        <div class="stats-row">
+            <span>PICKED: <span id="pickCount" style="color:var(--cyan)">0</span>/10</span>
+            <span>POTENTIAL: <span id="potential" style="color:#4caf50">0.00</span></span>
         </div>
-
-        <div class="ticket-view" id="ticketArea"></div>
-
-        <div class="controls">
-            <div class="stepper">
-                <button class="s-btn" onclick="changeBet(-2)">-</button>
-                <input type="number" id="betVal" value="2" readonly>
-                <button class="s-btn" onclick="changeBet(2)">+</button>
+        
+        <div class="controls-row">
+            <div class="balance-box"><span id="balDisplay">0.00</span> ETB</div>
+            <div class="bet-selector">
+                <button class="step-btn" onclick="changeBet(-2)">-</button>
+                <div style="min-width: 60px; text-align: center;">BET: <span id="betAmt">2</span></div>
+                <button class="step-btn" onclick="changeBet(2)">+</button>
             </div>
-            <div class="bal-display"><span id="liveBal">0.00</span></div>
-            <button class="bet-btn" id="betBtn" onclick="doBet()" disabled>PLACE BET</button>
         </div>
-    </div>
 
-    <div id="winPop" class="modal">
-        <h1 style="color:var(--gold); font-size:40px;">YOU WON!</h1>
-        <p id="winAmtText" style="font-size:24px;"></p>
-    </div>
-    <div id="lossPop" class="modal">
-        <h1 style="color:var(--blue-msg); font-size:40px;">Try again</h1>
+        <button class="play-btn" id="playBtn" onclick="playKeno()">PLAY NOW</button>
     </div>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 100 };
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1694.50 };
         let balance = parseFloat(user.balance);
-        let picked = [];
-        let betAmt = 2;
-        let betPlaced = false;
-        let locked = false;
-        let time = 60;
+        let bet = 2;
+        let selectedNumbers = [];
 
-        const ODDS = { 2:25, 3:50, 4:80, 5:250, 6:1000, 7:5000, 8:15000, 9:50000, 10:100000 };
-
-        function init() {
-            const grid = document.getElementById('mainGrid');
-            for(let i=1; i<=80; i++) {
-                let c = document.createElement('div');
-                c.className = 'cell'; c.innerText = i; c.id = 'n'+i;
-                c.onclick = () => select(i);
-                grid.appendChild(c);
+        function initGrid() {
+            const grid = document.getElementById('grid');
+            for (let i = 1; i <= 80; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'num-cell';
+                cell.innerText = i;
+                cell.onclick = () => toggleNumber(i, cell);
+                grid.appendChild(cell);
             }
-            const side = document.getElementById('sideHist');
-            for(let i=0; i<20; i++) side.innerHTML += `<div class="draw-spot" id="h${i}">-</div>`;
-            document.getElementById('liveBal').innerText = balance.toFixed(2);
-            startTimer();
+            updateUI();
+        }
+
+        function toggleNumber(num, element) {
+            if (selectedNumbers.includes(num)) {
+                selectedNumbers = selectedNumbers.filter(n => n !== num);
+                element.classList.remove('selected');
+            } else if (selectedNumbers.length < 10) {
+                selectedNumbers.push(num);
+                element.classList.add('selected');
+            }
+            document.getElementById('pickCount').innerText = selectedNumbers.length;
+            document.getElementById('potential').innerText = (bet * (selectedNumbers.length * 2.5)).toFixed(2);
         }
 
         function changeBet(v) {
-            if(locked || betPlaced) return;
-            betAmt = Math.max(2, betAmt + v);
-            document.getElementById('betVal').value = betAmt;
-            updatePot();
+            bet = Math.max(2, bet + v);
+            document.getElementById('betAmt').innerText = bet;
+            document.getElementById('potential').innerText = (bet * (selectedNumbers.length * 2.5)).toFixed(2);
         }
 
-        function select(n) {
-            if(locked || betPlaced) return;
-            const el = document.getElementById('n'+n);
-            if(picked.includes(n)) {
-                picked = picked.filter(x => x !== n);
-                el.classList.remove('selected');
-            } else if(picked.length < 10) {
-                picked.push(n);
-                el.classList.add('selected');
-            }
-            document.getElementById('count').innerText = picked.length;
-            updateTicket();
-            updatePot();
-        }
-
-        function updatePot() {
-            let m = ODDS[picked.length] || 0;
-            document.getElementById('pot').innerText = (betAmt * m).toFixed(2);
-        }
-
-        function updateTicket() {
-            const area = document.getElementById('ticketArea');
-            area.innerHTML = "";
-            picked.sort((a,b)=>a-b).forEach(n => {
-                area.innerHTML += `<div class="t-ball" id="tb${n}">${n}</div>`;
-            });
-            document.getElementById('betBtn').disabled = (picked.length === 0 || locked);
-        }
-
-        function doBet() {
-            if(balance < betAmt) return alert("Low Balance");
-            balance -= betAmt;
-            betPlaced = true;
-            document.getElementById('liveBal').innerText = balance.toFixed(2);
-            document.getElementById('betBtn').innerText = "PLACED";
-            document.getElementById('betBtn').disabled = true;
-            saveUser();
-        }
-
-        function startTimer() {
-            setInterval(() => {
-                if(time > 0) {
-                    time--;
-                    document.getElementById('timer-box').innerText = "00:" + (time < 10 ? "0"+time : time);
-                    if(time <= 5) { locked = true; document.getElementById('betBtn').disabled = true; }
-                } else {
-                    runDraw();
-                    time = 60; locked = false;
-                }
-            }, 1000);
-        }
-
-        async function runDraw() {
-            let drawn = [];
-            let hits = 0;
-            const anim = document.getElementById('ball-anim');
-
-            for(let i=0; i<20; i++) {
-                let n; do { n = Math.floor(Math.random()*80)+1; } while(drawn.includes(n));
-                drawn.push(n);
-                
-                document.getElementById('h'+i).innerText = n;
-                anim.innerText = n; anim.style.display = 'block';
-                document.getElementById('n'+n).classList.add('hit');
-                
-                if(picked.includes(n)) {
-                    hits++;
-                    if(document.getElementById('tb'+n)) document.getElementById('tb'+n).classList.add('hit');
-                }
-                await new Promise(r => setTimeout(r, 700));
-                anim.style.display = 'none';
-            }
-
-            // Mark Misses
-            picked.forEach(n => {
-                let el = document.getElementById('tb'+n);
-                if(el && !drawn.includes(n)) el.classList.add('miss');
-            });
-
-            if(betPlaced) {
-                let win = betAmt * (ODDS[hits] || 0);
-                if(win > 0) {
-                    balance += win;
-                    document.getElementById('winAmtText').innerText = win.toFixed(2) + " ETB";
-                    document.getElementById('winPop').style.display = 'flex';
-                } else {
-                    document.getElementById('lossPop').style.display = 'flex';
-                }
-                setTimeout(() => {
-                    document.getElementById('winPop').style.display = 'none';
-                    document.getElementById('lossPop').style.display = 'none';
-                    reset();
-                }, 4000);
-            } else {
-                setTimeout(reset, 3000);
-            }
-        }
-
-        function reset() {
-            picked = []; betPlaced = false;
-            document.querySelectorAll('.cell').forEach(c => c.className = 'cell');
-            document.querySelectorAll('.draw-spot').forEach(s => s.innerText = '-');
-            updateTicket();
-            document.getElementById('betBtn').innerText = "PLACE BET";
-            document.getElementById('liveBal').innerText = balance.toFixed(2);
-            saveUser();
-        }
-
-        function saveUser() {
+        function updateUI() {
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
             user.balance = balance.toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
 
-        init();
+        function toggleMute() {
+            const s = document.getElementById('speaker');
+            s.innerText = s.innerText === '🔊' ? '🔇' : '🔊';
+        }
+
+        function playKeno() {
+            if (selectedNumbers.length === 0) return alert("Select numbers first!");
+            if (balance < bet) return alert("Low balance!");
+
+            balance -= bet;
+            updateUI();
+            
+            // Draw logic (Simplified)
+            alert("Waiting for draw...");
+        }
+
+        initGrid();
     </script>
 </body>
 </html>
