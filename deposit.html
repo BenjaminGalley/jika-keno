@@ -14,7 +14,7 @@
             background: #111827; border: 1px solid var(--cyan); border-radius: 12px; 
             padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 15px rgba(0,242,255,0.2); 
         }
-        h2 { color: var(--cyan); text-align: center; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { color: var(--cyan); text-align: center; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; }
         label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 13px; }
         select, input { 
             width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #1e293b; 
@@ -27,10 +27,15 @@
         .btn { 
             background: var(--cyan); border: none; color: black; width: 100%; 
             padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; 
-            font-size: 16px; margin-top: 20px; transition: 0.3s;
+            font-size: 16px; margin-top: 15px; transition: 0.3s;
+        }
+        .btn-sync {
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            margin-top: 10px; padding: 10px; font-size: 14px;
         }
         .btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
         .back-link { margin-top: 25px; color: #64748b; text-decoration: none; font-size: 14px; }
+        #statusLabel { margin-top: 10px; font-size: 12px; color: var(--gold); text-align: center; display: block; }
     </style>
 </head>
 <body>
@@ -56,12 +61,19 @@
         <label>Amount / መጠን (ETB)</label>
         <input type="number" id="amount" placeholder="Minimum 100 ETB">
 
-        <button class="btn" id="depositBtn" onclick="submitDepositRequest()">SUBMIT DEPOSIT / አረጋግጥ</button>
+        <button class="btn" id="depositBtn" onclick="submitDepositRequest()">SUBMIT REQUEST</button>
+        
+        <hr style="margin-top: 20px; border: 0; border-top: 1px solid #334155;">
+        
+        <label style="text-align: center;">Already Paid? / ከፍለዋል?</label>
+        <button class="btn btn-sync" id="syncBtn" onclick="checkApproval()">CHECK APPROVAL STATUS</button>
+        <span id="statusLabel">Click to update balance after admin approves</span>
     </div>
 
-    <a href="index.html" class="back-link">← Cancel and Go Back</a>
+    <a href="index.html" class="back-link">← Go Back to Lobby</a>
 
     <script>
+        // Use your specific Apps Script URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function submitDepositRequest() {
@@ -77,27 +89,63 @@
             }
 
             if (!name || !amount) {
-                alert("እባክዎን ሁሉንም መረጃ ይሙሉ (Please fill all info)");
-                return;
-            }
-
-            if (parseFloat(amount) < 100) {
-                alert("ዝቅተኛው ማስገቢያ 100 ብር ነው (Min 100 ETB)");
+                alert("Please fill all info");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "SENDING REQUEST...";
+            btn.innerText = "SENDING...";
 
+            // Action "deposit" tells the sheet to add a new row with "PENDING"
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(name)}&amount=${amount}&method=${method}`;
 
             try {
+                // Using 'no-cors' allows the request to reach the sheet even if browser blocks the response
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("ጥያቄዎ ተልኳል! (Deposit Request Sent!)");
-                window.location.href = "index.html";
+                alert("Request Sent! Wait for admin to change status to 'Approve' on the sheet.");
+                btn.innerText = "REQUEST SENT";
             } catch (error) {
-                alert("ጥያቄዎ ተልኳል!");
-                window.location.href = "index.html";
+                console.log(error);
+                alert("Request Processed!");
+            }
+        }
+
+        async function checkApproval() {
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            const syncBtn = document.getElementById('syncBtn');
+            const statusLabel = document.getElementById('statusLabel');
+
+            if (!user || !user.phone) return;
+
+            syncBtn.disabled = true;
+            syncBtn.innerText = "CHECKING SHEET...";
+
+            try {
+                // Action "checkStatus" tells the script to look for "Approve" rows for this phone
+                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
+                const data = await response.json();
+
+                if (data.approvedAmount > 0) {
+                    // Update Local Balance
+                    let currentBal = parseFloat(user.balance) || 0;
+                    currentBal += parseFloat(data.approvedAmount);
+                    
+                    user.balance = currentBal.toFixed(2);
+                    localStorage.setItem('simba_active_user', JSON.stringify(user));
+                    
+                    alert(`✅ DEPOSIT APPROVED! ${data.approvedAmount} ETB added to your balance.`);
+                    statusLabel.innerText = "Balance Updated!";
+                    window.location.href = "index.html";
+                } else {
+                    alert("Status is still PENDING or not found. Please wait for Admin.");
+                    syncBtn.disabled = false;
+                    syncBtn.innerText = "CHECK APPROVAL STATUS";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to sheet. Make sure you wrote 'Approve' exactly.");
+                syncBtn.disabled = false;
+                syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
         }
     </script>
