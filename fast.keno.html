@@ -7,7 +7,7 @@
     <style>
         :root { 
             --gold: #FFD700; --cyan: #00f2ff; --green: #2ecc71; 
-            --red: #e74c3c; --bg: #05070a; --panel: #0a0e17;
+            --red: #e74c3c; --bg: #05070a; --panel: #1a1e26;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         body { 
@@ -15,90 +15,89 @@
             overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* Top Header */
         .header { 
             background: var(--panel); height: 45px; display: flex; 
             justify-content: space-between; align-items: center; padding: 0 15px;
-            border-bottom: 2px solid var(--gold); flex-shrink: 0; z-index: 100;
+            border-bottom: 2px solid var(--gold); flex-shrink: 0;
         }
-        .hist-btn { background: #333; color: var(--gold); border: 1px solid var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
 
         .timer-bar { 
             background: #000; color: var(--cyan); text-align: center; 
-            font-size: 26px; font-weight: bold; height: 40px; line-height: 40px;
-            border-bottom: 1px solid #222; flex-shrink: 0;
+            font-size: 24px; font-weight: bold; height: 35px; line-height: 35px;
+            border-bottom: 1px solid #333; flex-shrink: 0;
         }
 
-        /* Layout */
         .game-area { display: flex; flex: 1; min-height: 0; position: relative; }
         
-        /* Draw Sidebar - Appears during draw */
+        /* Draw Sidebar */
         .draw-sidebar {
             width: 45px; background: #111; border-right: 1px solid #333;
             display: none; flex-direction: column; overflow-y: auto; padding: 5px 0;
         }
         .side-ball { 
-            width: 34px; height: 34px; margin: 2px auto; border-radius: 50%; 
+            width: 32px; height: 32px; margin: 2px auto; border-radius: 50%; 
             background: var(--gold); color: black; font-weight: 900; 
             display: flex; align-items: center; justify-content: center; font-size: 14px;
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .grid-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 5px; }
         .grid { 
             display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; 
-            width: 100%; max-width: 380px;
+            width: 100%; max-width: 360px;
         }
         .cell { 
-            background: #1e293b; aspect-ratio: 1; display: flex; 
+            background: #242f3e; aspect-ratio: 1; display: flex; 
             align-items: center; justify-content: center; font-size: 14px; 
-            font-weight: bold; border: 1px solid #334155; border-radius: 4px;
+            font-weight: bold; border: 1px solid #3d4b5f; border-radius: 4px;
         }
-        .cell.selected { background: var(--cyan); color: black; }
-        .cell.hit { background: var(--green) !important; color: white; border-color: white; transform: scale(1.05); }
+        .cell.selected { background: var(--cyan); color: black; border-color: white; }
+        .cell.hit { background: var(--green) !important; color: white; box-shadow: 0 0 10px var(--green); }
 
-        /* Multi-Ticket Display (Horizontal Scrolling) */
+        /* LIVE CALCULATOR AREA (Below Table) */
+        .live-calc-area {
+            background: #000; padding: 8px 15px; border-top: 1px solid #333;
+            display: flex; flex-direction: column; gap: 5px; min-height: 50px;
+        }
+        .calc-nums { display: flex; flex-wrap: wrap; gap: 5px; min-height: 20px; }
+        .calc-ball { width: 22px; height: 22px; background: var(--cyan); color: black; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .win-estimate { color: var(--green); font-weight: bold; font-size: 14px; }
+
+        /* TICKETS DISPLAY */
         .tickets-container {
-            height: 85px; background: #000; border-top: 1px solid #333;
+            height: 80px; background: #0a0e14; border-top: 1px solid #444;
             display: flex; overflow-x: auto; padding: 8px; gap: 10px; flex-shrink: 0;
-            scrollbar-width: none; /* Hide scrollbar Firefox */
         }
-        .tickets-container::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
-        
         .ticket-card {
-            min-width: 150px; background: #1a1a1a; border: 1px solid var(--gold);
-            border-radius: 6px; padding: 6px; position: relative; flex-shrink: 0;
+            min-width: 140px; background: #1c222d; border: 1px solid var(--gold);
+            border-radius: 6px; padding: 6px; flex-shrink: 0;
         }
-        .ticket-header { font-size: 10px; color: var(--gold); display: flex; justify-content: space-between; border-bottom: 1px solid #333; margin-bottom: 4px; }
+        .ticket-header { font-size: 9px; color: var(--gold); display: flex; justify-content: space-between; border-bottom: 1px solid #333; margin-bottom: 4px; }
         .ticket-nums { display: flex; flex-wrap: wrap; gap: 3px; }
-        .tn { width: 20px; height: 20px; font-size: 10px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .tn { width: 18px; height: 18px; font-size: 9px; background: #333; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
         .tn.hit { background: var(--green); color: white; }
 
-        /* Controls */
-        .bottom-ui { background: var(--panel); padding: 10px 15px 25px 15px; flex-shrink: 0; border-top: 2px solid #333; }
+        /* BOTTOM UI - Moved up */
+        .bottom-ui { 
+            background: var(--panel); padding: 10px 15px 30px 15px; /* Added more padding-bottom for mobile safety */
+            flex-shrink: 0; border-top: 2px solid var(--gold);
+        }
         .ctrl-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .bet-box { display: flex; align-items: center; background: #000; border: 2px solid var(--gold); border-radius: 25px; }
-        .b-btn { background: none; border: none; color: var(--gold); padding: 5px 15px; font-size: 24px; font-weight: bold; }
-        #betVal { width: 35px; text-align: center; background: none; border: none; color: white; font-weight: bold; font-size: 16px; }
+        .bet-box { display: flex; align-items: center; background: #000; border: 2px solid var(--gold); border-radius: 20px; }
+        .b-btn { background: none; border: none; color: var(--gold); padding: 5px 12px; font-size: 22px; font-weight: bold; }
+        #betVal { width: 40px; text-align: center; background: none; border: none; color: white; font-weight: bold; font-size: 16px; }
         .play-btn { 
             flex: 1; height: 45px; background: linear-gradient(180deg, var(--gold), #b8860b); 
-            border: none; border-radius: 25px; font-weight: 900; font-size: 18px; color: #000;
+            border: none; border-radius: 20px; font-weight: 900; font-size: 18px; color: #000;
         }
-        .play-btn:disabled { opacity: 0.5; }
+        .play-btn:disabled { opacity: 0.4; filter: grayscale(1); }
 
-        /* Overlays */
         #draw-ball { 
-            position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); 
-            width: 110px; height: 110px; background: white; border-radius: 50%; 
-            color: black; font-size: 55px; font-weight: 900; display: none; 
-            align-items: center; justify-content: center; border: 6px solid var(--gold); z-index: 500;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            position: fixed; top: 35%; left: 50%; transform: translate(-50%, -50%); 
+            width: 100px; height: 100px; background: white; border-radius: 50%; 
+            color: black; font-size: 45px; font-weight: 900; display: none; 
+            align-items: center; justify-content: center; border: 5px solid var(--cyan); z-index: 500;
         }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .history-list { width: 100%; max-width: 300px; background: #111; border: 1px solid var(--gold); border-radius: 8px; padding: 15px; }
-        .hist-item { border-bottom: 1px solid #333; padding: 8px 0; font-size: 12px; }
-
-        @keyframes popIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
     </style>
 </head>
 <body onclick="startAudio()">
@@ -107,9 +106,9 @@
     <audio id="sndPop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
     <div class="header">
-        <button class="hist-btn" onclick="toggleHistory()">HISTORY</button>
-        <div style="color:var(--gold); font-weight:900; font-size: 18px;">FAST KENO</div>
-        <div id="muteBtn" onclick="toggleMute()" style="cursor:pointer; font-size:20px;">🔊</div>
+        <div style="color:var(--gold); font-weight:bold;">SIMBA BET</div>
+        <div style="font-size: 14px;">BAL: <span id="liveBal" style="color:var(--green)">1716.50</span></div>
+        <div id="muteBtn" onclick="toggleMute()" style="cursor:pointer;">🔊</div>
     </div>
 
     <div class="timer-bar" id="timer">00:60</div>
@@ -121,15 +120,16 @@
         </div>
     </div>
 
+    <div class="live-calc-area">
+        <div class="calc-nums" id="calcNums">Pick numbers...</div>
+        <div class="win-estimate" id="potentialWin">Max Payout: 0.00 ETB</div>
+    </div>
+
     <div id="draw-ball">0</div>
 
     <div class="tickets-container" id="ticketDisplay"></div>
 
     <div class="bottom-ui">
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px;">
-            <span id="pCount">PICKED: 0/10</span>
-            <span style="color:var(--gold); font-weight:bold;">BAL: <span id="liveBal">1716.50</span> ETB</span>
-        </div>
         <div class="ctrl-row">
             <div class="bet-box">
                 <button class="b-btn" onclick="adjBet(-2)">-</button>
@@ -140,32 +140,23 @@
         </div>
     </div>
 
-    <div id="winOverlay" class="modal-overlay">
-        <h1 style="color:var(--gold); font-size:45px; text-shadow: 0 0 10px gold;">BIG WIN!</h1>
-        <p id="winText" style="font-size:28px; font-weight:bold;"></p>
-        <button class="play-btn" style="margin-top:20px; width:150px;" onclick="closeModal('winOverlay')">CLOSE</button>
-    </div>
-
-    <div id="histOverlay" class="modal-overlay">
-        <div class="history-list">
-            <h2 style="color:var(--gold); margin-bottom:10px; text-align:center;">LAST 5 DRAWS</h2>
-            <div id="histContent"></div>
-            <button class="play-btn" style="margin-top:15px; width:100%; height:40px;" onclick="closeModal('histOverlay')">CLOSE</button>
-        </div>
+    <div id="winOverlay" class="modal">
+        <h1 style="color:var(--gold); font-size:40px;">BIG WIN!</h1>
+        <p id="winText" style="font-size:24px; font-weight:bold;"></p>
+        <button class="play-btn" style="width:120px; margin-top:20px;" onclick="closeWin()">OK</button>
     </div>
 
     <script>
         let balance = 1716.50;
         let selected = [];
         let tickets = [];
-        let history = [];
         let currentBet = 2;
         let timeLeft = 60;
         let tableLocked = false;
         let isMuted = false;
         let audioStarted = false;
 
-        const PAYOUTS = { 2:50, 3:100, 4:160, 5:300, 6:800, 7:2000, 8:10000, 9:25000, 10:100000 };
+        const PAYOUTS = { 1:0, 2:10, 3:25, 4:50, 5:100, 6:300, 7:1000, 8:5000, 9:15000, 10:50000 };
 
         function init() {
             const g = document.getElementById('mainGrid');
@@ -175,8 +166,7 @@
                 c.onclick = () => selectNum(i);
                 g.appendChild(c);
             }
-            document.getElementById('liveBal').innerText = balance.toFixed(2);
-            startGlobalTimer();
+            updateUI();
         }
 
         function selectNum(n) {
@@ -193,26 +183,42 @@
         }
 
         function updateUI() {
-            document.getElementById('pCount').innerText = `PICKED: ${selected.length}/10`;
+            // Update Live Calculator Balls
+            const calcBox = document.getElementById('calcNums');
+            if(selected.length > 0) {
+                calcBox.innerHTML = selected.map(n => `<div class="calc-ball">${n}</div>`).join('');
+            } else {
+                calcBox.innerHTML = "Pick numbers...";
+            }
+
+            // Calculate Potential Win based on how many numbers picked
+            let multiplier = PAYOUTS[selected.length] || 0;
+            let possible = currentBet * multiplier;
+            document.getElementById('potentialWin').innerText = `Max Payout: ${possible.toFixed(2)} ETB`;
+
+            // Bet Button State
             document.getElementById('betBtn').disabled = (selected.length === 0 || tableLocked);
+            document.getElementById('liveBal').innerText = balance.toFixed(2);
         }
 
         function adjBet(v) {
             currentBet = Math.max(2, currentBet + v);
             document.getElementById('betVal').value = currentBet;
+            updateUI();
         }
 
         function placeBet() {
             if(balance < currentBet) return alert("Low Balance");
             balance -= currentBet;
+            
+            // Add ticket
             tickets.push({ nums: [...selected], bet: currentBet });
             renderTickets();
             
-            // Auto-clear selection
+            // CLEAR TABLE AUTOMATICALLY
             selected.forEach(n => document.getElementById('n'+n).classList.remove('selected'));
             selected = [];
             
-            document.getElementById('liveBal').innerText = balance.toFixed(2);
             updateUI();
         }
 
@@ -220,7 +226,7 @@
             const container = document.getElementById('ticketDisplay');
             container.innerHTML = tickets.map((t, i) => `
                 <div class="ticket-card">
-                    <div class="ticket-header"><span>TICKET #${i+1}</span> <span>${t.bet} ETB</span></div>
+                    <div class="ticket-header"><span>TK #${i+1}</span> <span>${t.bet} ETB</span></div>
                     <div class="ticket-nums">
                         ${t.nums.map(n => `<div class="tn" id="tn-${i}-${n}">${n}</div>`).join('')}
                     </div>
@@ -234,10 +240,7 @@
                 if(timeLeft > 0) {
                     timeLeft--;
                     document.getElementById('timer').innerText = "00:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-                    if(timeLeft <= 3) {
-                        tableLocked = true;
-                        document.getElementById('betBtn').disabled = true;
-                    }
+                    if(timeLeft <= 3) tableLocked = true;
                 } else {
                     runDraw();
                     timeLeft = 60;
@@ -246,9 +249,10 @@
         }
 
         async function runDraw() {
+            tableLocked = true;
             let drawn = [];
             const side = document.getElementById('drawSide');
-            const ball = document.getElementById('draw-ball');
+            const ballPopup = document.getElementById('draw-ball');
             side.style.display = 'flex';
             side.innerHTML = "";
 
@@ -256,12 +260,13 @@
                 let n; do { n = Math.floor(Math.random()*80)+1; } while(drawn.includes(n));
                 drawn.push(n);
 
+                // Side board & popup
                 side.innerHTML += `<div class="side-ball">${n}</div>`;
                 side.scrollTop = side.scrollHeight;
-                ball.innerText = n; ball.style.display = 'flex';
+                ballPopup.innerText = n; ballPopup.style.display = 'flex';
                 
+                // Highlight Grid & Tickets
                 document.getElementById('n'+n).classList.add('hit');
-                
                 tickets.forEach((t, tIdx) => {
                     if(t.nums.includes(n)) {
                         const tnEl = document.getElementById(`tn-${tIdx}-${n}`);
@@ -271,33 +276,27 @@
 
                 if(!isMuted) document.getElementById('sndPop').play();
                 await new Promise(r => setTimeout(r, 800));
-                ball.style.display = 'none';
+                ballPopup.style.display = 'none';
             }
 
-            // Record History
-            history.unshift(drawn);
-            if(history.length > 5) history.pop();
-
-            // Payout Logic
-            let win = 0;
+            // Results
+            let winTotal = 0;
             tickets.forEach(t => {
-                let h = t.nums.filter(n => drawn.includes(n)).length;
-                if(h >= 2) win += (PAYOUTS[h] / 2) * t.bet; 
+                let matches = t.nums.filter(n => drawn.includes(n)).length;
+                if(matches >= 2) winTotal += t.bet * (PAYOUTS[matches] / 10); 
             });
 
-            if(win > 0) {
-                balance += win;
-                document.getElementById('winText').innerText = win.toFixed(2) + " ETB";
+            if(winTotal > 0) {
+                balance += winTotal;
+                document.getElementById('winText').innerText = winTotal.toFixed(2) + " ETB";
                 document.getElementById('winOverlay').style.display = 'flex';
-                document.getElementById('liveBal').innerText = balance.toFixed(2);
             }
 
-            await new Promise(r => setTimeout(r, 5000));
-            resetGame();
+            setTimeout(resetGame, 5000);
         }
 
         function resetGame() {
-            closeModal('winOverlay');
+            closeWin();
             document.getElementById('drawSide').style.display = 'none';
             document.querySelectorAll('.cell').forEach(c => c.className = 'cell');
             tickets = [];
@@ -306,24 +305,13 @@
             updateUI();
         }
 
-        function toggleHistory() {
-            const overlay = document.getElementById('histOverlay');
-            const content = document.getElementById('histContent');
-            content.innerHTML = history.length ? history.map((draw, i) => `
-                <div class="hist-item">
-                    <span style="color:var(--gold)">Draw ${i+1}:</span> 
-                    <span style="font-size:10px">${draw.join(', ')}</span>
-                </div>
-            `).join('') : "<p style='text-align:center'>No history yet.</p>";
-            overlay.style.display = 'flex';
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeWin() { document.getElementById('winOverlay').style.display = 'none'; }
 
         function startAudio() {
             if(!audioStarted) {
-                document.getElementById('bgMusic').volume = 0.3;
-                document.getElementById('bgMusic').play();
+                const bg = document.getElementById('bgMusic');
+                bg.volume = 0.2;
+                bg.play();
                 audioStarted = true;
             }
         }
@@ -336,6 +324,7 @@
         }
 
         init();
+        startGlobalTimer();
     </script>
 </body>
 </html>
