@@ -15,14 +15,13 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
         body {
-            background: #0a0a0a url('assets/simba_bg.jpg') no-repeat center center fixed;
+            background: #0a0a0a url('assets/assets/simba_bg.jpg') no-repeat center center fixed;
             background-size: cover;
             color: white; font-family: 'Goldman', sans-serif;
             text-align: center; display: flex; flex-direction: column;
             height: 100vh; overflow: hidden;
         }
 
-        /* Top Bar */
         .game-header {
             width: 100%; display: flex; justify-content: space-between; align-items: center;
             padding: 12px 20px; background: var(--glass); border-bottom: 2px solid var(--gold);
@@ -35,7 +34,6 @@
 
         .balance-display { font-size: 20px; color: var(--gold); font-weight: bold; }
 
-        /* Scratch Card Area */
         .main-game {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
@@ -47,32 +45,37 @@
         }
 
         .grid {
-            display: grid; grid-template-columns: repeat(3, 95px); gap: 12px;
+            display: grid; grid-template-columns: repeat(3, 100px); gap: 12px;
         }
 
         .card {
-            width: 95px; height: 95px; background-color: #222; border-radius: 12px;
+            width: 100px; height: 100px; background-color: #1a1a1a; border-radius: 12px;
             position: relative; cursor: pointer; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid #444; box-shadow: inset 0 0 10px #000;
+            border: 2px solid #444; box-shadow: inset 0 0 15px #000;
         }
 
-        .card img { width: 75%; height: 75%; object-fit: contain; }
+        .card img { 
+            width: 85%; height: 85%; object-fit: contain; 
+            transform: scale(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: drop-shadow(0 0 5px rgba(255,215,0,0.5));
+            display: block;
+        }
 
-        /* The cover (gold scratch layer) */
+        .card.scratched img { transform: scale(1); }
+
         .card-cover {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, #b8860b, #ffd700, #8c5d00);
+            background: linear-gradient(135deg, #b8860b, #ffd700, #b8860b);
             display: flex; align-items: center; justify-content: center;
-            z-index: 2; font-size: 40px; color: rgba(0,0,0,0.3);
-            transition: transform 0.4s ease-out, opacity 0.3s;
+            z-index: 2; font-size: 45px; color: rgba(0,0,0,0.4);
+            transition: transform 0.5s ease-in, opacity 0.4s;
         }
 
         .card.scratched .card-cover {
-            transform: scale(1.5) rotate(15deg); opacity: 0; pointer-events: none;
+            transform: translateY(-100%) rotate(10deg); opacity: 0; pointer-events: none;
         }
 
-        /* Controls */
         .controls-tray {
             background: var(--glass); padding: 25px 20px 45px 20px;
             border-top: 3px solid var(--gold); border-radius: 40px 40px 0 0;
@@ -107,214 +110,19 @@
 
         .win-msg {
             font-size: 24px; color: var(--gold); font-weight: bold;
-            height: 40px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,215,0,0.5);
+            height: 40px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,215,0,0.8);
         }
 
+        .dust {
+            position: absolute; width: 100%; height: 100%;
+            pointer-events: none; background: radial-gradient(circle, #ffd700 0%, transparent 70%);
+            opacity: 0; z-index: 3;
+        }
+        .card.scratched .dust { animation: puff 0.6s ease-out forwards; }
+        @keyframes puff {
+            0% { opacity: 0.8; transform: scale(0.5); }
+            100% { opacity: 0; transform: scale(1.5); }
+        }
     </style>
 </head>
 <body onclick="initAudio()">
-
-    <div class="game-header">
-        <button class="back-btn" onclick="goHome()">LOBBY</button>
-        <div class="balance-display"><span id="balance">0.00</span> ETB</div>
-    </div>
-
-    <div class="main-game">
-        <div class="win-msg" id="winMessage">LION SCRATCH</div>
-        <div class="scratch-container">
-            <div class="grid" id="grid">
-                </div>
-        </div>
-        <button class="scratch-all-btn" id="scratchAllBtn" style="margin-top: 15px; display: none;" onclick="scratchAll()">Scratch All</button>
-    </div>
-
-    <div class="controls-tray">
-        <div class="bet-ctrl">
-            <button class="adj-btn" onclick="adjustBet(-2)">-</button>
-            <div class="bet-display">BET: <span id="currentBet">2</span></div>
-            <button class="adj-btn" onclick="adjustBet(2)">+</button>
-        </div>
-        <div class="btn-group">
-            <button class="buy-btn" onclick="buyCard()" id="playBtn">BUY NEW CARD</button>
-        </div>
-    </div>
-
-    <audio id="bgm" loop src="https://cdn.pixabay.com/audio/2022/03/10/audio_c0c8b350f4.mp3"></audio>
-    <audio id="sndScratch" src="https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3"></audio>
-    <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
-
-    <script>
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: "1716.50" };
-        let balance = parseFloat(user.balance);
-        let bet = 2; 
-        let isPlaying = false;
-        let audioStarted = false;
-        
-        const SYMBOLS = [
-            'assets/gold_7.jpg', 
-            'assets/cherry.jpg', 
-            'assets/lemon.jpg', 
-            'assets/orange.jpg', 
-            'assets/grapes.jpg', 
-            'assets/melon.jpg'
-        ];
-
-        function init() {
-            updateUI();
-            resetGridDisplay();
-        }
-
-        function updateUI() {
-            document.getElementById('balance').innerText = balance.toFixed(2);
-            document.getElementById('currentBet').innerText = bet;
-        }
-
-        function saveBalance() {
-            user.balance = balance.toFixed(2);
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
-        }
-
-        function goHome() {
-            saveBalance();
-            window.location.href = 'index.html';
-        }
-
-        function adjustBet(amount) {
-            if (isPlaying) return;
-            if (bet + amount >= 2 && bet + amount <= 1000) {
-                bet += amount;
-                updateUI();
-            }
-        }
-
-        function resetGridDisplay() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = "";
-            for (let i = 0; i < 9; i++) {
-                let card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<div class="card-cover">🦁</div>`;
-                grid.appendChild(card);
-            }
-            document.getElementById('scratchAllBtn').style.display = 'none';
-        }
-
-        function buyCard() {
-            if (isPlaying) return;
-            if (balance < bet) {
-                alert("Insufficient Balance!");
-                return;
-            }
-
-            balance -= bet;
-            saveBalance();
-            updateUI();
-
-            isPlaying = true;
-            document.getElementById('playBtn').disabled = true;
-            document.getElementById('winMessage').innerText = "SCRATCH TO REVEAL!";
-            document.getElementById('scratchAllBtn').style.display = 'block';
-            
-            generateGame();
-        }
-
-        function generateGame() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = "";
-            
-            let currentSet = [];
-            // 35% win rate
-            let isWinner = Math.random() > 0.65; 
-            
-            if(isWinner) {
-                let winSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                currentSet = [winSym, winSym, winSym]; 
-                while(currentSet.length < 9) {
-                    currentSet.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-                }
-            } else {
-                for(let i=0; i<9; i++) {
-                    currentSet.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
-                }
-            }
-            
-            currentSet.sort(() => Math.random() - 0.5);
-
-            for (let i = 0; i < 9; i++) {
-                let card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<img src="${currentSet[i]}"><div class="card-cover">🦁</div>`;
-                
-                card.onclick = function() {
-                    if (!isPlaying || this.classList.contains('scratched')) return;
-                    this.classList.add('scratched');
-                    document.getElementById('sndScratch').currentTime = 0;
-                    document.getElementById('sndScratch').play();
-                    checkWinCondition();
-                };
-                grid.appendChild(card);
-            }
-        }
-
-        function scratchAll() {
-            if(!isPlaying) return;
-            const covers = document.querySelectorAll('.card:not(.scratched)');
-            covers.forEach((c, index) => {
-                setTimeout(() => {
-                    if(isPlaying) {
-                        c.classList.add('scratched');
-                        document.getElementById('sndScratch').currentTime = 0;
-                        document.getElementById('sndScratch').play();
-                        checkWinCondition();
-                    }
-                }, index * 100);
-            });
-            document.getElementById('scratchAllBtn').style.display = 'none';
-        }
-
-        function checkWinCondition() {
-            const scratched = document.querySelectorAll('.card.scratched');
-            if (scratched.length === 9) {
-                isPlaying = false;
-                document.getElementById('scratchAllBtn').style.display = 'none';
-                
-                const results = Array.from(document.querySelectorAll('.card img')).map(img => img.src);
-                const counts = {};
-                results.forEach(src => { counts[src] = (counts[src] || 0) + 1; });
-
-                let totalWin = 0;
-                for (let src in counts) {
-                    if (counts[src] >= 3) {
-                        let multiplier = src.includes('gold_7') ? 25 : 5;
-                        totalWin += bet * (multiplier + (counts[src] - 3) * 5);
-                    }
-                }
-
-                if (totalWin > 0) {
-                    balance += totalWin;
-                    saveBalance();
-                    document.getElementById('winMessage').innerText = `WINNER! +${totalWin.toFixed(2)} ETB`;
-                    document.getElementById('sndWin').play();
-                } else {
-                    document.getElementById('winMessage').innerText = "NO LUCK! TRY AGAIN";
-                }
-
-                setTimeout(() => {
-                    document.getElementById('playBtn').disabled = false;
-                    updateUI();
-                }, 500);
-            }
-        }
-
-        function initAudio() {
-            if(!audioStarted) {
-                const bgm = document.getElementById('bgm');
-                bgm.volume = 0.15; bgm.play();
-                audioStarted = true;
-            }
-        }
-
-        window.onload = init;
-    </script>
-</body>
-</html>
