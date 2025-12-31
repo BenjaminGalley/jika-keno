@@ -106,8 +106,8 @@
     <audio id="sndPop" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
     <div class="header">
-        <div style="color:var(--gold); font-weight:bold; font-size: 18px;">SIMBA BET</div>
-        <div style="font-size: 16px;">BAL: <span id="liveBal" style="color:var(--green)">1716.50</span></div>
+        <div style="color:var(--gold); font-weight:bold; font-size: 18px;" onclick="window.location.href='index.html'">SIMBA BET</div>
+        <div style="font-size: 16px;">BAL: <span id="liveBal" style="color:var(--green)">0.00</span></div>
         <div id="muteBtn" onclick="toggleMute()" style="cursor:pointer; font-size: 20px;">🔊</div>
     </div>
 
@@ -154,7 +154,11 @@
     </div>
 
     <script>
-        let balance = 1716.50;
+        // --- DATA BRIDGE ---
+        let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = activeUser ? parseFloat(activeUser.balance) : 0;
+        // -------------------
+
         let selected = [];
         let tickets = [];
         let currentBet = 2;
@@ -185,18 +189,14 @@
             updateUI();
         }
 
-        // Timer Loop logic
         setInterval(() => {
             if(timerActive && timeLeft > 0) {
                 timeLeft--;
                 document.getElementById('timer').innerText = "00:" + (timeLeft < 10 ? "0"+timeLeft : timeLeft);
-                
-                // Lock table 3 seconds before draw
                 if(timeLeft <= 3) {
                     tableLocked = true;
                     document.getElementById('betBtn').disabled = true;
                 }
-                
                 if(timeLeft === 0) {
                     timerActive = false;
                     runDraw();
@@ -226,6 +226,12 @@
             document.getElementById('potentialWin').innerText = `Max Payout: ${(currentBet * multiplier).toFixed(2)} ETB`;
             document.getElementById('betBtn').disabled = (selected.length === 0 || tableLocked);
             document.getElementById('liveBal').innerText = balance.toFixed(2);
+            
+            // Save to master account
+            if(activeUser) {
+                activeUser.balance = balance.toFixed(2);
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+            }
         }
 
         function adjBet(v) {
@@ -258,7 +264,6 @@
         }
 
         async function runDraw() {
-            // Hide UI during draw
             document.getElementById('timer').style.visibility = 'hidden';
             document.getElementById('controls').style.opacity = '0.3';
             document.getElementById('calcArea').style.opacity = '0.3';
@@ -285,12 +290,11 @@
                     }
                 });
 
-                if(!isMuted) document.getElementById('sndPop').play();
+                if(!isMuted && audioStarted) document.getElementById('sndPop').play();
                 await new Promise(r => setTimeout(r, 800));
                 ballPopup.style.display = 'none';
             }
 
-            // Draw Finished - Wait 5 Seconds internal clock
             let winTotal = 0;
             tickets.forEach(t => {
                 let matches = t.nums.filter(n => drawn.includes(n)).length;
@@ -305,7 +309,6 @@
                 document.getElementById('loseOverlay').style.display = 'flex';
             }
 
-            // Wait 5 seconds before clearing and restarting timer
             await new Promise(r => setTimeout(r, 5000));
             resetAndRestart();
         }
@@ -321,6 +324,7 @@
             
             tickets = [];
             document.getElementById('ticketDisplay').innerHTML = "";
+            updateUI(); // Final balance save
             startNewRound();
         }
 
