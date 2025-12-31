@@ -87,22 +87,22 @@
     <div class="section-label">NEW & HOT</div>
 
     <div class="games-container">
-        <div class="game-card" onclick="playGame('fast_keno.html')">
+        <div class="game-card" onclick="playGame('keno.html')">
             <div class="img-wrap fast-keno-box">FAST K6</div>
             <p>Fast Keno</p>
         </div>
 
-        <div class="game-card" onclick="playGame('multi-hot-5.html')">
+        <div class="game-card" onclick="playGame('multi-hot.html')">
             <div class="img-wrap multihot-box">HOT 5</div>
             <p>Multi Hot 5</p>
         </div>
 
-        <div class="game-card" onclick="playGame('lion.scratch.html')">
+        <div class="game-card" onclick="playGame('scratch.html')">
             <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
             <p>Lion Scratch</p>
         </div>
 
-        <div class="game-card" onclick="playGame('mega-spin.html')">
+        <div class="game-card" onclick="playGame('slots.html')">
             <div class="img-wrap mega-spin-box">🎰</div>
             <p>Simba's Gold</p>
         </div>
@@ -148,12 +148,10 @@
                 menuName.innerText = activeUser.name;
                 headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
                 
-                // Show SIMBA ID from local data
                 userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
 
                 syncStatus.innerText = "Syncing...";
                 try {
-                    // CHANGED action=getUser to action=checkStatus to match our new script
                     const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${activeUser.phone}`);
                     const data = await response.json();
                     
