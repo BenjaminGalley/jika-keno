@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lion Scratch | Simba Bet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #FFD700;
@@ -15,114 +15,324 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
         body {
-            background: #0a0a0a url('assets/assets/simba_bg.jpg') no-repeat center center fixed;
+            background: #0a0a0a;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://img.freepik.com/premium-photo/golden-lion-logo-black-background_853558-3561.jpg');
             background-size: cover;
-            color: white; font-family: 'Goldman', sans-serif;
-            text-align: center; display: flex; flex-direction: column;
-            height: 100vh; overflow: hidden;
+            background-position: center;
+            color: white; 
+            font-family: 'Goldman', sans-serif;
+            text-align: center; 
+            display: flex; 
+            flex-direction: column;
+            height: 100vh; 
+            overflow: hidden;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
         }
 
         .game-header {
             width: 100%; display: flex; justify-content: space-between; align-items: center;
             padding: 12px 20px; background: var(--glass); border-bottom: 2px solid var(--gold);
+            z-index: 10;
         }
 
         .back-btn {
             background: none; border: 1px solid var(--gold); color: var(--gold);
             padding: 6px 15px; font-weight: bold; border-radius: 8px; cursor: pointer;
+            text-decoration: none; font-size: 14px;
         }
 
         .balance-display { font-size: 20px; color: var(--gold); font-weight: bold; }
 
         .main-game {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 10px;
         }
 
         .scratch-container {
-            background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px;
-            border: 4px solid #8c5d00; box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            position: relative;
+            background: rgba(0,0,0,0.85); padding: 15px; border-radius: 20px;
+            border: 4px solid #8c5d00; box-shadow: 0 0 30px rgba(0,0,0,0.9);
+            position: relative; transition: 0.3s;
+        }
+
+        .scratch-container.winner-glow {
+            box-shadow: 0 0 60px var(--gold);
+            border-color: var(--gold);
         }
 
         .grid {
-            display: grid; grid-template-columns: repeat(3, 100px); gap: 12px;
+            display: grid; 
+            grid-template-columns: repeat(3, 95px); 
+            gap: 12px;
         }
 
         .card {
-            width: 100px; height: 100px; background-color: #1a1a1a; border-radius: 12px;
+            width: 95px; height: 95px; background-color: #111; border-radius: 12px;
             position: relative; cursor: pointer; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
-            border: 2px solid #444; box-shadow: inset 0 0 15px #000;
+            border: 2px solid #333;
         }
 
-        .card img { 
-            width: 85%; height: 85%; object-fit: contain; 
+        .prize-value {
+            font-size: 16px; font-weight: bold; color: var(--gold);
             transform: scale(0); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            filter: drop-shadow(0 0 5px rgba(255,215,0,0.5));
-            display: block;
+            text-align: center;
         }
-
-        .card.scratched img { transform: scale(1); }
+        .card.scratched .prize-value { transform: scale(1); }
+        .card.winning-match { background: rgba(255, 215, 0, 0.2); border-color: var(--gold); animation: pulse 1s infinite; }
+        .card.free-match { background: rgba(0, 242, 255, 0.2); border-color: #00f2ff; animation: pulse 1s infinite; }
 
         .card-cover {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(135deg, #b8860b, #ffd700, #b8860b);
             display: flex; align-items: center; justify-content: center;
-            z-index: 2; font-size: 45px; color: rgba(0,0,0,0.4);
-            transition: transform 0.5s ease-in, opacity 0.4s;
+            z-index: 2; font-size: 35px; color: rgba(0,0,0,0.3);
+            transition: transform 0.5s, opacity 0.3s;
         }
 
         .card.scratched .card-cover {
-            transform: translateY(-100%) rotate(10deg); opacity: 0; pointer-events: none;
+            transform: scale(1.5) rotate(15deg); opacity: 0; pointer-events: none;
         }
 
         .controls-tray {
-            background: var(--glass); padding: 25px 20px 45px 20px;
-            border-top: 3px solid var(--gold); border-radius: 40px 40px 0 0;
-            text-align: center;
+            background: var(--glass); padding: 20px 20px 40px;
+            border-top: 3px solid var(--gold); border-radius: 35px 35px 0 0;
+            z-index: 10;
         }
 
-        .bet-ctrl { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px; }
+        .win-msg {
+            font-size: 22px; color: var(--gold); font-weight: bold;
+            height: 35px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .bet-ctrl { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 15px; }
         
         .adj-btn {
             width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold);
-            background: transparent; color: var(--gold); font-size: 24px; cursor: pointer;
+            background: transparent; color: var(--gold); font-size: 26px; font-weight: bold;
         }
-
-        .bet-display { font-size: 22px; font-weight: bold; width: 150px; }
-
-        .btn-group { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 
         .buy-btn {
             background: var(--fancy-gold); border: none; color: #1a1500;
             font-weight: 900; font-size: 24px; padding: 18px;
-            border-radius: 40px; cursor: pointer; width: 90%; max-width: 400px;
-            box-shadow: 0 6px 0 #5c4000; transition: 0.1s;
+            border-radius: 45px; width: 100%; max-width: 350px;
+            box-shadow: 0 6px 0 #5c4000;
         }
+
         .buy-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #5c4000; }
-        .buy-btn:disabled { filter: grayscale(1); opacity: 0.5; }
+        .buy-btn:disabled { filter: grayscale(1); opacity: 0.5; transform: none; box-shadow: none; }
 
-        .scratch-all-btn {
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 8px 20px; border-radius: 20px; font-size: 14px; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        .win-msg {
-            font-size: 24px; color: var(--gold); font-weight: bold;
-            height: 40px; margin-bottom: 10px; text-shadow: 0 0 10px rgba(255,215,0,0.8);
-        }
-
-        .dust {
-            position: absolute; width: 100%; height: 100%;
-            pointer-events: none; background: radial-gradient(circle, #ffd700 0%, transparent 70%);
-            opacity: 0; z-index: 3;
-        }
-        .card.scratched .dust { animation: puff 0.6s ease-out forwards; }
-        @keyframes puff {
-            0% { opacity: 0.8; transform: scale(0.5); }
-            100% { opacity: 0; transform: scale(1.5); }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
-<body onclick="initAudio()">
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="game-header">
+        <a href="index.html" class="back-btn">LOBBY</a>
+        <div class="balance-display"><span id="balDisplay">0.00</span> ETB</div>
+        <button onclick="toggleMute()" id="muteBtn" style="background:none; border:none; font-size:20px;">🔊</button>
+    </div>
+
+    <div class="main-game">
+        <div class="win-msg" id="status">LION SCRATCH</div>
+        <div class="scratch-container" id="scratchBox">
+            <div class="grid" id="gameGrid"></div>
+        </div>
+        <button onclick="scratchAll()" id="scratchAllBtn" style="margin-top:20px; background:none; border:1px solid var(--gold); color:var(--gold); padding:8px 20px; border-radius:20px; display:none; font-weight:bold;">SCRATCH ALL</button>
+    </div>
+
+    <div class="controls-tray">
+        <div class="bet-ctrl">
+            <button class="adj-btn" onclick="adjBet(-2)">-</button>
+            <div style="font-size:22px; font-weight:bold;">BET: <span id="betDisplay">2</span></div>
+            <button class="adj-btn" onclick="adjBet(2)">+</button>
+        </div>
+        <button class="buy-btn" id="buyBtn" onclick="buyTicket()">BUY TICKET</button>
+    </div>
+
+    <audio id="sndScratch" src="https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3"></audio>
+    <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+        let balance = 0;
+        let currentBet = 2;
+        let isGameActive = false;
+        let cardsScratched = 0;
+        let prizes = [];
+        let isMuted = false;
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || {balance: "100.00"};
+
+        function init() {
+            balance = parseFloat(user.balance);
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
+            document.getElementById('betDisplay').innerText = currentBet;
+            createGrid();
+        }
+
+        function createGrid() {
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = `card-${i}`;
+                card.innerHTML = `
+                    <div class="card-cover">🦁</div>
+                    <div class="prize-value">?</div>
+                `;
+                card.onclick = () => scratchCard(card, i);
+                grid.appendChild(card);
+            }
+        }
+
+        function adjBet(val) {
+            if (isGameActive) return;
+            if (currentBet + val >= 2 && currentBet + val <= 1000) {
+                currentBet += val;
+                document.getElementById('betDisplay').innerText = currentBet;
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').innerText = isMuted ? "🔇" : "🔊";
+        }
+
+        function buyTicket() {
+            if (balance < currentBet) return alert("Low Balance!");
+            balance -= currentBet;
+            updateUI();
+            
+            isGameActive = true;
+            cardsScratched = 0;
+            document.getElementById('scratchBox').classList.remove('winner-glow');
+            document.getElementById('buyBtn').disabled = true;
+            document.getElementById('scratchAllBtn').style.display = 'inline-block';
+            document.getElementById('status').innerText = "SCRATCH TO WIN!";
+            
+            generatePrizes();
+            createGrid();
+        }
+
+        function generatePrizes() {
+            const pool = [currentBet, currentBet*2, currentBet*5, currentBet*10, "FREE", 0, 0, 0];
+            const winningVal = pool[Math.floor(Math.random() * pool.length)];
+            prizes = new Array(9).fill(0);
+            let indices = [0,1,2,3,4,5,6,7,8].sort(() => 0.5 - Math.random());
+
+            // 40% chance to generate a matching set
+            if (Math.random() > 0.6 && winningVal !== 0) {
+                prizes[indices[0]] = winningVal;
+                prizes[indices[1]] = winningVal;
+                prizes[indices[2]] = winningVal;
+                // Fill rest randomly from pool (excluding original winner to prevent confusion)
+                for(let i=3; i<9; i++) {
+                    let r = pool[Math.floor(Math.random()*pool.length)];
+                    prizes[indices[i]] = (r === winningVal) ? 0 : r;
+                }
+            } else {
+                // Random no-win setup
+                for(let i=0; i<9; i++) prizes[i] = pool[Math.floor(Math.random()*pool.length)];
+            }
+        }
+
+        function scratchCard(card, index) {
+            if (!isGameActive || card.classList.contains('scratched')) return;
+            if(!isMuted) document.getElementById('sndScratch').play();
+            card.classList.add('scratched');
+            
+            const p = prizes[index];
+            if (p === "FREE") {
+                card.querySelector('.prize-value').innerHTML = "<span style='color:#00f2ff'>FREE<br>TICKET</span>";
+            } else {
+                card.querySelector('.prize-value').innerText = p > 0 ? p + " ETB" : "❌";
+            }
+            
+            cardsScratched++;
+            if (cardsScratched === 9) checkWin();
+        }
+
+        function scratchAll() {
+            if (!isGameActive) return;
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, i) => {
+                setTimeout(() => scratchCard(card, i), i * 100);
+            });
+        }
+
+        function checkWin() {
+            isGameActive = false;
+            document.getElementById('scratchAllBtn').style.display = 'none';
+            const counts = {};
+            let winAmount = 0;
+            let isFreeTicket = false;
+            
+            prizes.forEach(p => { if (p !== 0) counts[p] = (counts[p] || 0) + 1; });
+            
+            for (let val in counts) { 
+                if (counts[val] >= 3) {
+                    if (val === "FREE") isFreeTicket = true;
+                    else winAmount = parseFloat(val);
+                }
+            }
+
+            setTimeout(() => {
+                if (winAmount > 0) {
+                    balance += winAmount;
+                    handleWinEffects(winAmount, false);
+                } else if (isFreeTicket) {
+                    balance += currentBet; // Give money back for free play
+                    handleWinEffects("FREE TICKET", true);
+                } else {
+                    document.getElementById('status').innerText = "TRY AGAIN";
+                }
+                updateUI();
+                document.getElementById('buyBtn').disabled = false;
+            }, 500);
+        }
+
+        function handleWinEffects(displayVal, isFree) {
+            if(!isMuted) document.getElementById('sndWin').play();
+            document.getElementById('status').innerText = isFree ? "FREE TICKET!" : "WINNER: " + displayVal + " ETB!";
+            document.getElementById('scratchBox').classList.add('winner-glow');
+            
+            confetti({ 
+                particleCount: 150, 
+                spread: 70, 
+                origin: { y: 0.6 }, 
+                colors: isFree ? ['#00f2ff', '#ffffff'] : ['#FFD700', '#FFA200'] 
+            });
+            
+            const matchVal = isFree ? "FREE" : parseFloat(displayVal);
+            prizes.forEach((p, i) => {
+                if(p === matchVal) {
+                    document.getElementById(`card-${i}`).classList.add(isFree ? 'free-match' : 'winning-match');
+                }
+            });
+        }
+
+        function updateUI() {
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
