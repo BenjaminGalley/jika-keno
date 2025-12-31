@@ -22,7 +22,7 @@
             justify-content: space-between; align-items: center; padding: 0 15px;
             border-bottom: 2px solid var(--gold); flex-shrink: 0; z-index: 10;
         }
-        .game-title { color: var(--gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; }
+        .game-title { color: var(--gold); font-weight: 900; font-size: 18px; letter-spacing: 1px; }
         
         .header-right { display: flex; align-items: center; gap: 15px; }
         
@@ -37,6 +37,7 @@
         .game-container {
             flex: 1; display: flex; align-items: center; justify-content: center;
             position: relative; padding: 10px;
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
         }
 
         .slot-frame {
@@ -52,7 +53,7 @@
             background-size: 100% 100%;
         }
 
-        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; }
+        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.05); }
 
         .reel-strip { position: absolute; width: 100%; top: 0; transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
 
@@ -95,9 +96,17 @@
             display: none; flex-direction: column; align-items: center; 
             justify-content: center; z-index: 100;
         }
+
+        .exit-btn {
+            position: absolute; top: 10px; left: 10px; background: #ff4444;
+            color: white; border: none; padding: 5px 10px; border-radius: 5px;
+            font-size: 12px; cursor: pointer; z-index: 20;
+        }
     </style>
 </head>
-<body>
+<body onload="init()">
+
+    <button class="exit-btn" onclick="location.href='index.html'">EXIT</button>
 
     <div class="header">
         <div class="game-title">MULTI HOT 5</div>
@@ -137,6 +146,7 @@
     </div>
 
     <script>
+        // PNG Assets from your assets/assets/ folder
         const SYMBOLS = [
             'bell.png', 'collector.png', 'crown.png', 'double.star.png', 
             'purple.gift.png', 'red.gift.png', 'seven.triple.png', 'star.png'
@@ -144,8 +154,8 @@
         const PATH = 'assets/assets/';
         const SYMBOL_HEIGHT = 73.3;
         
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 1000 };
-        let balance = parseFloat(user.balance);
+        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 0 };
+        let balance = parseFloat(user.balance || 0);
         let bet = 2;
         let spinning = false;
         let isMuted = false;
@@ -154,12 +164,13 @@
             updateUI();
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                // Fill strip with 80 symbols for a long downward spin
+                strip.innerHTML = ''; // Clear existing
+                // Fill strip with symbols
                 for(let j=0; j<80; j++) {
                     const imgName = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                    strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}"></div>`;
+                    strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}" onerror="this.style.display='none'"></div>`;
                 }
-                // Set initial position to the bottom of the strip
+                // Initial position
                 strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
             }
         }
@@ -182,7 +193,10 @@
         }
 
         function runSpin() {
-            if(balance < bet || spinning) return;
+            if(balance < bet || spinning) {
+                if(balance < bet) alert("Insufficient Balance!");
+                return;
+            }
             
             spinning = true;
             balance -= bet;
@@ -192,13 +206,13 @@
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
                 
-                // 1. Reset to top instantly
+                // Reset to top instantly
                 strip.style.transition = 'none';
                 strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
                 
-                // 2. Animate downward to a random offset near the top of the strip
+                // Animate downward
                 setTimeout(() => {
-                    const stopOffset = Math.floor(Math.random() * 5); // Stops at one of the first 5 symbols
+                    const stopOffset = Math.floor(Math.random() * 5); 
                     strip.style.transition = 'top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
                     strip.style.top = `-${stopOffset * SYMBOL_HEIGHT}px`;
                 }, 50 + (i * 120));
@@ -208,8 +222,9 @@
                 spinning = false;
                 document.getElementById('spinBtn').disabled = false;
                 
+                // Random win logic (approx 15% chance)
                 if(Math.random() > 0.85) {
-                    let win = bet * 12;
+                    let win = bet * 10;
                     balance += win;
                     updateUI();
                     document.getElementById('winVal').innerText = win.toFixed(2);
@@ -218,8 +233,6 @@
                 }
             }, 2800);
         }
-
-        init();
     </script>
 </body>
 </html>
