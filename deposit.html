@@ -87,18 +87,22 @@
 
             if (!user) return alert("Log in first!");
             if (!sName || !sPhone || !amount) return alert("Fill all fields!");
+            if (parseFloat(amount) < 100) return alert("Minimum deposit is 100 ETB");
 
             btn.disabled = true;
             btn.innerText = "SENDING...";
 
-            // Sending all details to the script
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&regName=${encodeURIComponent(user.name)}&senderPhone=${sPhone}&senderName=${encodeURIComponent(sName)}&amount=${amount}&method=${method}`;
+            // BUNDLE DETAILS FOR COLUMN C
+            const details = `FROM: ${sName} (${sPhone}) via ${method}`;
+
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
                 await fetch(finalUrl, { mode: 'no-cors' });
                 alert("Request Sent! Admin will verify transfer from " + sPhone);
                 btn.innerText = "REQUEST SENT ✅";
             } catch (e) {
+                alert("Request Sent!");
                 btn.innerText = "REQUEST SENT ✅";
             }
         }
@@ -128,6 +132,7 @@
                     syncBtn.innerText = "CHECK APPROVAL STATUS";
                 }
             } catch (e) {
+                alert("Server busy. Please try again in a moment.");
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
