@@ -5,111 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdraw | Simba Bet</title>
     <style>
-        :root { --gold: #fcc201; --dark: #0b0d17; --red: #ff4444; }
+        :root { --gold: #fcc201; --dark: #05070a; --red: #ef4444; --cyan: #00f2ff; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; text-align: center; }
-        .container { background: #1a1d29; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .container { background: #111827; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; border: 1px solid var(--cyan); box-shadow: 0 0 20px rgba(0,242,255,0.1); }
         .balance-card { background: #000; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px dashed var(--gold); }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 8px; border: 1px solid #444; background: #0b0d17; color: white; box-sizing: border-box; font-size: 18px; outline: none; }
-        input:focus { border-color: var(--gold); }
-        .btn-withdraw { width: 100%; padding: 15px; background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-withdraw:disabled { background: #555; cursor: not-allowed; }
-        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 14px; }
-        .info-text { font-size: 12px; color: #aaa; margin-top: 10px; line-height: 1.4; }
+        label { display: block; text-align: left; font-size: 13px; color: #94a3b8; margin-top: 10px; }
+        select, input { width: 100%; padding: 12px; margin: 5px 0 10px; border-radius: 8px; border: 1px solid #1e293b; background: #05070a; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--cyan); }
+        .btn-withdraw { width: 100%; padding: 15px; background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-withdraw:disabled { background: #334155; cursor: not-allowed; }
+        .back-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 14px; }
+        .info-text { font-size: 11px; color: #64748b; margin-top: 10px; line-height: 1.4; text-align: left; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2 style="color:var(--gold); margin-bottom: 5px;">💸 Withdraw Funds</h2>
-        <p style="font-size: 12px; color: #888;">CASH OUT YOUR WINNINGS</p>
         
         <div class="balance-card">
-            <small style="color: #888;">AVAILABLE BALANCE</small>
+            <small style="color: #888;">YOUR BALANCE</small>
             <div id="displayBal" style="font-size: 26px; font-weight: bold; color: var(--gold); margin-top: 5px;">0.00 ETB</div>
         </div>
 
-        <p style="text-align: left; font-size: 14px; margin-bottom: 5px;">Enter Amount:</p>
-        <input type="number" id="witAmount" placeholder="Min: 50 ETB">
+        <label>Withdrawal Method</label>
+        <select id="witMethod">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE Birr">CBE Birr</option>
+        </select>
+
+        <label>Recipient Full Name (የሚቀበለው ስም)</label>
+        <input type="text" id="recName" placeholder="Name on account">
+
+        <label>Recipient Phone (የሚቀበለው ስልክ ቁጥር)</label>
+        <input type="tel" id="recPhone" placeholder="09...">
+
+        <label>Amount to Withdraw (መጠን)</label>
+        <input type="number" id="witAmount" placeholder="Minimum 100 ETB">
         
         <p class="info-text">
-            Payments are processed to your registered phone number via <b>Telebirr</b> or <b>CBE</b>. 
-            Processing time: 1-12 hours.
+            * Minimum withdrawal is 100 ETB.<br>
+            * Funds are locked immediately. Rejections will refund your balance.
         </p>
 
         <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL</button>
-        
         <div id="witStatus" style="margin-top:15px; font-size: 14px;"></div>
 
         <a href="index.html" class="back-link">⬅ Back to Lobby</a>
     </div>
 
     <script>
-        // ✅ YOUR MASTER URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
-
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         function init() {
-            if (!activeUser) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!activeUser) { window.location.href = 'login.html'; return; }
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
         }
 
         async function handleWithdraw() {
-            const amountInput = document.getElementById('witAmount');
-            const amount = parseFloat(amountInput.value);
+            const amount = parseFloat(document.getElementById('witAmount').value);
+            const method = document.getElementById('witMethod').value;
+            const rName = document.getElementById('recName').value.trim();
+            const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
             const status = document.getElementById('witStatus');
 
-            if (!amount || amount < 50) {
-                alert("Minimum withdrawal is 50 ETB");
-                return;
-            }
+            // 1. Validations
+            if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
+            if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
+            if (!rName || !rPhone) { alert("Please fill recipient details!"); return; }
 
-            if (amount > parseFloat(activeUser.balance)) {
-                alert("Insufficient balance!");
-                return;
-            }
-
-            if (!confirm(`Confirm withdrawal of ${amount} ETB?`)) return;
+            if (!confirm(`Withdraw ${amount} ETB to ${rName}?`)) return;
 
             btn.disabled = true;
-            btn.innerText = "Sending Request...";
-            status.style.color = "white";
-            status.innerText = "Contacting Server...";
+            btn.innerText = "Processing...";
 
-            // Action matches the 'withdraw' case in your Master Script
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&amount=${amount}`;
+            // 2. Format details for Column C in Google Sheets
+            const details = `WITHDRAW: ${method} | TO: ${rName} (${rPhone})`;
+            
+            // 3. Prepare the URL
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
-                // Fetch WITHOUT no-cors to get the response
-                const response = await fetch(finalUrl);
-                const data = await response.json();
+                // Send request to Google Script
+                await fetch(finalUrl, { mode: 'no-cors' });
 
-                if (data.status === "success") {
-                    // 1. Update local balance immediately
-                    let newBal = parseFloat(activeUser.balance) - amount;
-                    activeUser.balance = newBal.toFixed(2);
-                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    
-                    // 2. Update UI
-                    document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
-                    status.style.color = "#fbbf24";
-                    status.innerHTML = "✅ <b>Request Sent!</b><br>Amount deducted from balance.";
-                    btn.innerText = "SUCCESS";
-                    amountInput.value = "";
-                    
-                    alert("Withdrawal request sent successfully!");
-                } else {
-                    throw new Error(data.message || "Failed");
-                }
+                // 4. DEDUCT LOCALLY IMMEDIATELY
+                let newBal = parseFloat(activeUser.balance) - amount;
+                activeUser.balance = newBal.toFixed(2);
+                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+
+                // 5. Update UI
+                document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
+                status.style.color = "#fbbf24";
+                status.innerHTML = "✅ <b>Success!</b><br>Request sent. Funds deducted.";
                 
+                alert("Withdrawal request submitted. Balance updated!");
+                window.location.href = "index.html";
+
             } catch (error) {
-                console.error(error);
-                status.style.color = "#ff4444";
-                status.innerText = "Error: Could not connect to server.";
+                alert("Error connecting to server. Please try again.");
                 btn.disabled = false;
                 btn.innerText = "REQUEST WITHDRAWAL";
             }
