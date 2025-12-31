@@ -9,34 +9,36 @@
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
         .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; z-index: 100; }
         
+        /* Game Tile Styles */
         .mega-spin-box {
             background: linear-gradient(45deg, #fcc201, #92400e) !important;
             display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-size: 24px;
+            height: 110px; border-radius: 12px; font-size: 40px;
+            border: 2px solid #fcc201;
         }
 
         .fast-keno-box {
             background: linear-gradient(135deg, #004488, #001122) !important;
-            border: 1px solid #00CCFF;
+            border: 2px solid #00f2ff;
             display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-weight: bold; color: #00CCFF;
-            text-shadow: 0 0 8px #00CCFF;
+            height: 110px; border-radius: 12px; font-weight: bold;
+            position: relative; overflow: hidden;
         }
 
         .multihot-box {
             background: linear-gradient(135deg, #053305, #000) !important;
-            border: 1px solid #FFD700;
+            border: 2px solid #FFD700;
             display: flex; align-items: center; justify-content: center;
-            height: 55px; border-radius: 5px; font-weight: bold; color: #FFD700;
-            text-shadow: 0 0 5px #ff4500;
+            height: 110px; border-radius: 12px; font-weight: bold;
+            position: relative; overflow: hidden;
         }
 
-        .game-tile-img {
-            width: 100%;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 5px;
-            display: block;
+        .tile-img-bg {
+            position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
+        }
+
+        .tile-text {
+            z-index: 2; text-align: center; color: white;
         }
 
         .syncing { opacity: 0.7; font-style: italic; }
@@ -88,22 +90,34 @@
 
     <div class="games-container">
         <div class="game-card" onclick="playGame('fast.keno.html')">
-            <div class="img-wrap fast-keno-box">FAST K6</div>
-            <p>Fast Keno</p>
+            <div class="img-wrap fast-keno-box">
+                <img src="assets/assets/gold7.jpg" class="tile-img-bg">
+                <div class="tile-text">
+                    <div style="font-size: 22px; font-weight: 900; color: #00f2ff;">FAST</div>
+                    <div style="font-size: 14px; letter-spacing: 2px;">KENO</div>
+                </div>
+            </div>
+            <p>Fast Keno 80</p>
         </div>
 
-        <div class="game-card" onclick="playGame('hot-fruit.html')">
-            <div class="img-wrap multihot-box">HOT 5</div>
+        <div class="game-card" onclick="playGame('multi-hot-5.html')">
+            <div class="img-wrap multihot-box">
+                <img src="assets/assets/grid.jpg" class="tile-img-bg">
+                <div class="tile-text">
+                    <div style="font-size: 20px; font-weight: 900; color: #ffd700;">MULTI</div>
+                    <div style="font-size: 16px; color: #ff4500;">HOT 5</div>
+                </div>
+            </div>
             <p>Multi Hot 5</p>
         </div>
 
         <div class="game-card" onclick="playGame('lion.scratch.html')">
-            <div class="img-wrap mega-spin-box" style="background: #92400e !important;">🦁</div>
+            <div class="img-wrap mega-spin-box">🦁</div>
             <p>Lion Scratch</p>
         </div>
 
         <div class="game-card" onclick="playGame('fruit.html')">
-            <div class="img-wrap mega-spin-box">🎰</div>
+            <div class="img-wrap mega-spin-box" style="background: linear-gradient(45deg, #444, #000) !important; border-color: #ffd700;">🎰</div>
             <p>Simba's Gold</p>
         </div>
     </div>
