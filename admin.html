@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Bet | Admin Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; }
+        body { background: var(--bg); color: white; font-family: 'Goldman', sans-serif; padding: 20px; }
+        .header { border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .req-card { 
+            background: #111827; border: 1px solid #1e293b; padding: 15px; 
+            margin-bottom: 15px; border-radius: 12px; border-left: 5px solid var(--cyan);
+        }
+        .info { margin-bottom: 15px; line-height: 1.6; }
+        .info b { color: var(--gold); font-size: 12px; text-transform: uppercase; }
+        .btn-group { display: flex; gap: 10px; }
+        button { 
+            flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; 
+            font-family: 'Goldman'; font-weight: bold; font-size: 14px; text-transform: uppercase;
+        }
+        .app-btn { background: var(--cyan); color: #000; }
+        .den-btn { background: #ef4444; color: white; }
+        #status-msg { text-align: center; color: var(--gold); margin-top: 20px; }
+        .logout-btn { background: transparent; border: 1px solid #444; color: #888; margin-bottom: 10px; padding: 5px 10px; font-size: 10px; }
+    </style>
+</head>
+<body onload="startAdmin()">
+
+    <div class="header">
+        <button class="logout-btn" onclick="logout()">LOGOUT</button>
+        <h2 style="color: var(--cyan); margin: 0;">PENDING DEPOSITS</h2>
+    </div>
+
+    <div id="list">Checking security access...</div>
+    <div id="status-msg"></div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        let adminKey = localStorage.getItem('simba_admin_key');
+
+        function logout() {
+            localStorage.removeItem('simba_admin_key');
+            location.reload();
+        }
+
+        async function startAdmin() {
+            if (!adminKey) {
+                adminKey = prompt("Enter Admin Password:");
+                if (adminKey) {
+                    localStorage.setItem('simba_admin_key', adminKey);
+                }
+            }
+            loadData();
+        }
+
+        async function loadData() {
+            const listDiv = document.getElementById('list');
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getPending&key=${adminKey}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("Unauthorized Access!");
+                    logout();
+                    return;
+                }
+
+                if (data.length === 0) {
+                    listDiv.innerHTML = "<p style='text-align:center; color:#666;'>No pending requests found.</p>";
+                    return;
+                }
+
+                listDiv.innerHTML = data.map(req => `
+                    <div class="req-card">
+                        <div class="info">
+                            <b>Player ID:</b><br>${req.phone}<br>
+                            <b>Sender Info:</b><br>${req.details}<br>
+                            <b>Amount:</b><br><span style="font-size:20px; color:var(--gold)">${req.amount} ETB</span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="app-btn" onclick="updateStatus(${req.row}, 'Approve')">APPROVE</button>
+                            <button class="den-btn" onclick="updateStatus(${req.row}, 'Deny')">DENY</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                listDiv.innerHTML = "Connection Error. Make sure you deployed the script.";
+            }
+        }
+
+        async function updateStatus(row, status) {
+            if (!confirm(`Are you sure you want to ${status}?`)) return;
+            
+            document.getElementById('status-msg').innerText = "Updating sheet...";
+            
+            try {
+                await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${status}&key=${adminKey}`, {mode: 'no-cors'});
+                alert("Success: Status changed to " + status);
+                document.getElementById('status-msg').innerText = "";
+                loadData(); // Refresh list
+            } catch (e) {
+                loadData();
+            }
+        }
+    </script>
+</body>
+</html>
