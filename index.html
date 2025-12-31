@@ -17,6 +17,15 @@
             border: 2px solid #fcc201;
         }
 
+        /* NEW: Jungle Big Win Tile Style */
+        .jungle-win-box {
+            background: linear-gradient(135deg, #0a4d0a, #000) !important;
+            border: 2px solid #2ecc71;
+            display: flex; align-items: center; justify-content: center;
+            height: 110px; border-radius: 12px; font-weight: bold;
+            position: relative; overflow: hidden;
+        }
+
         .fast-keno-box {
             background: linear-gradient(135deg, #004488, #001122) !important;
             border: 2px solid #00f2ff;
@@ -89,6 +98,17 @@
     <div class="section-label">NEW & HOT</div>
 
     <div class="games-container">
+        <div class="game-card" onclick="playGame('jungle.html')">
+            <div class="img-wrap jungle-win-box">
+                <img src="assets/assets/jungle.background.jpg" class="tile-img-bg">
+                <div class="tile-text">
+                    <div style="font-size: 18px; font-weight: 900; color: #2ecc71;">JUNGLE</div>
+                    <div style="font-size: 12px; letter-spacing: 1px; color: #ffd700;">BIG WIN</div>
+                </div>
+            </div>
+            <p>Jungle Big Win</p>
+        </div>
+
         <div class="game-card" onclick="playGame('fast.keno.html')">
             <div class="img-wrap fast-keno-box">
                 <img src="assets/assets/gold7.jpg" class="tile-img-bg">
