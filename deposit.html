@@ -44,33 +44,32 @@
         <h2>Deposit / ገንዘብ ያስገቡ</h2>
         
         <div class="instruction">
-            <strong>Payment Accounts / መክፈያ ቁጥሮች:</strong><br>
+            <strong>Payment Accounts:</strong><br>
             📱 Telebirr: <strong>0943595090</strong><br>
             🏦 CBE: <strong>0911045825</strong>
         </div>
 
-        <label>Payment Method / መክፈያ ዘዴ</label>
+        <label>Payment Method</label>
         <select id="method">
             <option value="Telebirr">Telebirr</option>
             <option value="CBE Birr">CBE Birr</option>
         </select>
 
-        <label>Sender Full Name / የሚልከው ስም</label>
-        <input type="text" id="senderName" placeholder="Name on your Telebirr/CBE">
+        <label>Sender Full Name (የሚልከው ስም)</label>
+        <input type="text" id="senderName" placeholder="Name on bank account">
 
-        <label>Sender Phone Number / የሚልከው ስልክ ቁጥር</label>
+        <label>Sender Phone Number (የሚልከው ስልክ ቁጥር)</label>
         <input type="tel" id="senderPhone" placeholder="09...">
 
-        <label>Amount / መጠን (ETB)</label>
-        <input type="number" id="amount" placeholder="Minimum 100 ETB">
+        <label>Amount (መጠን)</label>
+        <input type="number" id="amount" placeholder="Min 100 ETB">
 
         <button class="btn" id="depositBtn" onclick="submitDepositRequest()">SUBMIT REQUEST</button>
         
         <hr style="margin-top: 20px; border: 0; border-top: 1px solid #334155;">
         
-        <label style="text-align: center;">Already Paid? / ከፍለዋል?</label>
         <button class="btn btn-sync" id="syncBtn" onclick="checkApproval()">CHECK APPROVAL STATUS</button>
-        <span id="statusLabel">Click to update balance after admin approves</span>
+        <span id="statusLabel">Balance updates after Admin approves</span>
     </div>
 
     <a href="index.html" class="back-link">← Go Back to Lobby</a>
@@ -79,49 +78,36 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function submitDepositRequest() {
-            // Internal data (Registration info)
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
-            
-            // Form data (The sender's account info)
             const method = document.getElementById('method').value;
             const sName = document.getElementById('senderName').value.trim();
             const sPhone = document.getElementById('senderPhone').value.trim();
             const amount = document.getElementById('amount').value.trim();
             const btn = document.getElementById('depositBtn');
 
-            if (!user || !user.phone) {
-                alert("Error: Please log in again.");
-                return;
-            }
-
-            if (!sName || !sPhone || !amount || amount < 100) {
-                alert("Please fill all fields. Minimum 100 ETB.");
-                return;
-            }
+            if (!user) return alert("Log in first!");
+            if (!sName || !sPhone || !amount) return alert("Fill all fields!");
 
             btn.disabled = true;
             btn.innerText = "SENDING...";
 
-            // Send both Internal Player Phone and the Sender's specific info
-            const finalUrl = `${SCRIPT_URL}?action=deposit&playerID=${user.phone}&senderPhone=${sPhone}&senderName=${encodeURIComponent(sName)}&amount=${amount}&method=${method}`;
+            // Sending all details to the script
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&regName=${encodeURIComponent(user.name)}&senderPhone=${sPhone}&senderName=${encodeURIComponent(sName)}&amount=${amount}&method=${method}`;
 
             try {
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("Request Sent! Admin will verify the transfer from " + sPhone);
+                alert("Request Sent! Admin will verify transfer from " + sPhone);
                 btn.innerText = "REQUEST SENT ✅";
-            } catch (error) {
-                alert("Request Processed!");
+            } catch (e) {
                 btn.innerText = "REQUEST SENT ✅";
             }
         }
 
         async function checkApproval() {
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            if (!user) return;
+            
             const syncBtn = document.getElementById('syncBtn');
-            const statusLabel = document.getElementById('statusLabel');
-
-            if (!user || !user.phone) return;
-
             syncBtn.disabled = true;
             syncBtn.innerText = "CHECKING...";
 
@@ -129,7 +115,7 @@
                 const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
                 const data = await response.json();
 
-                if (data.approvedAmount && data.approvedAmount > 0) {
+                if (data.approvedAmount > 0) {
                     let currentBal = parseFloat(user.balance) || 0;
                     currentBal += parseFloat(data.approvedAmount);
                     user.balance = currentBal.toFixed(2);
@@ -137,11 +123,11 @@
                     alert(`✅ APPROVED! ${data.approvedAmount} ETB added.`);
                     window.location.href = "index.html";
                 } else {
-                    alert("Status: PENDING.");
+                    alert("Status: STILL PENDING or DENIED.");
                     syncBtn.disabled = false;
                     syncBtn.innerText = "CHECK APPROVAL STATUS";
                 }
-            } catch (error) {
+            } catch (e) {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
