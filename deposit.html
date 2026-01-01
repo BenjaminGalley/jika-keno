@@ -75,7 +75,6 @@
     <a href="index.html" class="back-link">← Go Back to Lobby</a>
 
     <script>
-        // UPDATED TO YOUR WORKING APLV SCRIPT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
 
         async function submitDepositRequest() {
@@ -94,6 +93,7 @@
             btn.innerText = "SENDING...";
 
             const details = `DEP: ${method} FROM ${sName} (${sPhone})`;
+            // Updated to match the script's column structure (A:Date, B:Phone, C:Name, D:Action, E:Amount, G:Status, H:Details)
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
@@ -116,28 +116,26 @@
             syncBtn.innerText = "CHECKING...";
 
             try {
-                const userPhone = user.phone.toString().trim();
-                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
+                // CHANGED: Using 'getBalance' because that's what we built into your script to sum approved rows
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
                 const data = await response.json();
 
-                if (data && data.approvedAmount > 0) {
-                    // Calculate new balance
-                    let currentBal = parseFloat(user.balance) || 0;
-                    currentBal += parseFloat(data.approvedAmount);
-                    
-                    // Update local user data
-                    user.balance = currentBal.toFixed(2);
-                    localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    
-                    alert(`✅ SUCCESS! ${data.approvedAmount} ETB added to your balance.`);
-                    window.location.href = "index.html";
-                } else {
-                    alert("Status: Admin has not approved this request yet.");
-                    syncBtn.disabled = false;
-                    syncBtn.innerText = "CHECK APPROVAL STATUS";
+                if (data && data.balance !== undefined) {
+                    const newTotal = parseFloat(data.balance);
+                    const oldTotal = parseFloat(user.balance) || 0;
+
+                    if (newTotal > oldTotal) {
+                        alert(`✅ SUCCESS! Your balance is now ${newTotal.toFixed(2)} ETB.`);
+                        user.balance = newTotal.toFixed(2);
+                        localStorage.setItem('simba_active_user', JSON.stringify(user));
+                        window.location.href = "index.html";
+                    } else {
+                        alert("Status: Admin has not approved a new request yet.");
+                    }
                 }
             } catch (e) {
-                alert("Could not reach server. Make sure you deployed your Google Script as 'Anyone'.");
+                alert("Error connecting to server.");
+            } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
