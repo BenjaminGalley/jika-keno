@@ -16,7 +16,6 @@
             height: 110px; border-radius: 12px; font-size: 40px;
             border: 2px solid #fcc201;
         }
-
         .jungle-win-box {
             background: linear-gradient(135deg, #0a4d0a, #000) !important;
             border: 2px solid #2ecc71;
@@ -24,7 +23,6 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
-
         .fast-keno-box {
             background: linear-gradient(135deg, #004488, #001122) !important;
             border: 2px solid #00f2ff;
@@ -32,7 +30,6 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
-
         .multihot-box {
             background: linear-gradient(135deg, #053305, #000) !important;
             border: 2px solid #FFD700;
@@ -40,17 +37,12 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
-
         .tile-img-bg {
             position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
         }
-
         .tile-text {
             z-index: 2; text-align: center; color: white;
         }
-
-        .syncing { opacity: 0.7; font-style: italic; }
-        
         .side-menu {
             position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
             background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
@@ -146,7 +138,8 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // THIS IS THE FIXED URL.
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
@@ -179,13 +172,11 @@
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
                 headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
-                
                 userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
 
                 // Start Auto-Sync
                 syncStatus.innerText = "Syncing...";
                 try {
-                    // Force phone to string to avoid script errors
                     const userPhone = activeUser.phone.toString();
                     const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
                     const data = await response.json();
@@ -193,7 +184,6 @@
                     if (data && data.approvedAmount > 0) {
                         let currentBal = parseFloat(activeUser.balance || 0);
                         currentBal += parseFloat(data.approvedAmount);
-                        
                         activeUser.balance = currentBal.toFixed(2);
                         headerBal.innerText = activeUser.balance;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
