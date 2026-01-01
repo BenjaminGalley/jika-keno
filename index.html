@@ -6,9 +6,8 @@
     <title>Simba Bet | Official</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        :root { --primary: #fcc201; --bg: #0a0a0a; --card: #1a1a1a; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        
+        :root { --primary: #fcc201; --bg: #0a0a0a; --card: #151515; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; }
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
         
         .top-nav {
@@ -25,160 +24,103 @@
         .header-bal-text { color: var(--primary); font-weight: bold; font-size: 16px; }
 
         .deposit-btn-top {
-            background: #2ecc71; color: white; border: none; padding: 6px 14px;
-            border-radius: 6px; font-weight: bold; font-size: 13px; margin-left: 12px;
-            cursor: pointer; text-transform: uppercase; box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+            background: #2ecc71; color: white; border: none; padding: 6px 12px;
+            border-radius: 6px; font-weight: bold; font-size: 12px; margin-left: 10px;
+            cursor: pointer;
         }
-
-        .side-menu {
-            position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
-            background: #111; transition: 0.3s; z-index: 2000; border-right: 1px solid var(--primary);
-        }
-
-        .menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; z-index: 1500;
-        }
-
-        .games-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        
-        .game-card { 
-            background: var(--card); border-radius: 12px; padding: 10px; 
-            text-align: center; border: 1px solid #333; cursor: pointer; 
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .game-card:active { transform: scale(0.95); border-color: var(--primary); }
 
         .footer-stats {
             display: flex; justify-content: space-around; padding: 12px;
             background: #000; border-top: 1px solid var(--primary);
-            position: fixed; bottom: 0; width: 100%; font-size: 12px; z-index: 1000;
+            position: fixed; bottom: 0; width: 100%; font-size: 12px;
         }
 
-        .syncing-indicator {
-            width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%; 
-            display: inline-block; margin-left: 5px; animation: pulse 1s infinite;
+        .sync-dot {
+            width: 8px; height: 8px; background: var(--primary);
+            border-radius: 50%; display: inline-block; margin-left: 5px;
+            box-shadow: 0 0 5px var(--primary);
         }
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
-    <div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
-
-    <div id="sideMenu" class="side-menu">
-        <div style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;">
-            <span id="menuUserName" style="color:var(--primary); font-weight: bold;">Player</span>
-            <button onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px;">×</button>
-        </div>
-        <nav style="display: flex; flex-direction: column; padding: 10px;">
-            <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💰 Deposit Funds</a>
-            <a href="withdraw.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💸 Withdraw Funds</a>
-            <a href="#" onclick="logout()" style="color: #ff4444; padding: 15px; text-decoration: none;">🚪 Logout</a>
-        </nav>
-    </div>
-
     <header class="top-nav">
         <div style="display:flex; align-items:center;">
-            <button id="menuToggleBtn" onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:24px; margin-right:10px; cursor:pointer;">☰</button>
-            <div style="font-weight:bold; color:var(--primary); letter-spacing:1px; font-size: 18px;">SIMBA BET</div>
+            <button id="menuToggleBtn" style="background:none; border:none; color:white; font-size:24px; margin-right:10px;">☰</button>
+            <div style="font-weight:bold; color:var(--primary);">SIMBA BET</div>
         </div>
 
         <div id="topBalanceArea" class="top-balance-area">
             <div style="text-align: right;">
-                <div style="font-size: 9px; color: #888; font-weight: bold; line-height: 1;">MY BALANCE</div>
-                <span id="headerBalance" class="header-bal-text">0.00</span> <small style="font-size:10px;">ETB</small>
+                <div style="font-size: 9px; color: #888;">BALANCE</div>
+                <span id="headerBalance" class="header-bal-text">0.00</span> <small>ETB</small>
             </div>
-            <button class="deposit-btn-top" onclick="location.href='deposit.html'">DEPOSIT</button>
+            <button class="deposit-btn-top" onclick="location.href='deposit.html'">+</button>
         </div>
 
         <div id="auth-section">
-            <button onclick="location.href='login.html'" style="background:none; color:white; border:none; margin-right:10px; font-weight:bold;">Login</button>
-            <button onclick="location.href='register.html'" style="background:var(--primary); color:black; border:none; padding:6px 12px; border-radius:4px; font-weight:bold;">Join</button>
+            <button onclick="location.href='login.html'" style="background:none; color:white; border:none;">Login</button>
         </div>
     </header>
 
-    <main style="margin-top: 70px;">
-        <div style="padding: 10px;">
-            <img src="assets/assets/simba_bg.jpg" style="width:100%; border-radius:15px; border: 1px solid var(--primary); display: block;">
+    <main style="margin-top: 70px; padding: 15px; text-align: center;">
+        <div style="background: var(--card); border-radius: 15px; padding: 20px; border: 1px solid #333;">
+            <h2 style="color: var(--primary); margin: 0;">Welcome to Simba Bet</h2>
+            <p id="welcomeName" style="color: #aaa;">Please log in to start playing.</p>
         </div>
-
-        <div style="padding: 15px; color:var(--primary); font-weight: bold; letter-spacing: 1px; font-size: 14px;">HOT GAMES 🔥</div>
-
-        <div class="games-container">
-            <div class="game-card" onclick="location.href='jungle.html'">
-                <div style="height:100px; background: linear-gradient(135deg, #1a4d1a 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">🦁</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold; color: #eee;">Jungle Win</p>
-            </div>
-            <div class="game-card" onclick="location.href='fast.keno.html'">
-                <div style="height:100px; background: linear-gradient(135deg, #1a1a4d 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">🔢</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold; color: #eee;">Fast Keno</p>
-            </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
+            <div style="background:var(--card); padding:20px; border-radius:10px; border:1px solid #222;" onclick="location.href='jungle.html'">🦁 Jungle</div>
+            <div style="background:var(--card); padding:20px; border-radius:10px; border:1px solid #222;" onclick="location.href='fast.keno.html'">🔢 Keno</div>
         </div>
     </main>
 
     <footer class="footer-stats">
-        <div>ID: <span id="displayID" style="color:var(--primary); font-weight: bold;">----</span></div>
-        <div>SERVER: <span id="syncStatus" style="color:var(--primary); font-weight: bold;">Live</span> <span id="liveIndicator" class="syncing-indicator"></span></div>
+        <div>PLAYER: <span id="displayID" style="color:var(--primary);">GUEST</span></div>
+        <div>STATUS: <span id="syncStatus">Connected</span> <span class="sync-dot"></span></div>
     </footer>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
-        let isSyncing = false;
-
-        function toggleMenu() { 
-            const menu = document.getElementById('sideMenu');
-            const overlay = document.getElementById('menuOverlay');
-            if (menu.style.left === '0px') {
-                menu.style.left = '-260px';
-                overlay.style.display = 'none';
-            } else {
-                menu.style.left = '0px';
-                overlay.style.display = 'block';
-            }
-        }
-
-        async function refreshBalance() {
+        
+        async function fetchLiveBalance() {
             let user = JSON.parse(localStorage.getItem('simba_active_user'));
-            if (!user || isSyncing) return;
-            isSyncing = true;
-            document.getElementById('liveIndicator').style.display = "inline-block";
+            if (!user) return;
 
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
                 const data = await res.json();
+                
                 if (data && data.balance !== undefined) {
                     const newBal = parseFloat(data.balance).toFixed(2);
                     document.getElementById('headerBalance').innerText = newBal;
+                    
+                    // Update Local Storage
                     user.balance = newBal;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                 }
-            } catch (e) { console.log("Sync Error"); }
-            finally { 
-                isSyncing = false; 
-                setTimeout(() => { document.getElementById('liveIndicator').style.display = "none"; }, 1500);
+            } catch (e) {
+                console.log("Balance sync failed");
             }
         }
 
-        function init() {
+        function initApp() {
             let user = JSON.parse(localStorage.getItem('simba_active_user'));
             if (user) {
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('topBalanceArea').style.display = 'flex';
-                document.getElementById('menuToggleBtn').style.display = 'block';
-                document.getElementById('menuUserName').innerText = user.name;
+                document.getElementById('welcomeName').innerText = "Hello, " + user.name;
                 document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
                 document.getElementById('headerBalance').innerText = parseFloat(user.balance || 0).toFixed(2);
                 
-                refreshBalance();
-                setInterval(refreshBalance, 10000); // Sync every 10 seconds
+                fetchLiveBalance();
+                setInterval(fetchLiveBalance, 8000); // Auto-update every 8 seconds
             } else {
-                document.getElementById('auth-section').style.display = 'flex';
+                document.getElementById('auth-section').style.display = 'block';
             }
         }
 
-        function logout() { localStorage.removeItem('simba_active_user'); location.reload(); }
-        window.onload = init;
+        window.onload = initApp;
     </script>
 </body>
 </html>
