@@ -16,6 +16,7 @@
             height: 110px; border-radius: 12px; font-size: 40px;
             border: 2px solid #fcc201;
         }
+
         .jungle-win-box {
             background: linear-gradient(135deg, #0a4d0a, #000) !important;
             border: 2px solid #2ecc71;
@@ -23,6 +24,7 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
+
         .fast-keno-box {
             background: linear-gradient(135deg, #004488, #001122) !important;
             border: 2px solid #00f2ff;
@@ -30,6 +32,7 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
+
         .multihot-box {
             background: linear-gradient(135deg, #053305, #000) !important;
             border: 2px solid #FFD700;
@@ -37,12 +40,26 @@
             height: 110px; border-radius: 12px; font-weight: bold;
             position: relative; overflow: hidden;
         }
+
         .tile-img-bg {
             position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
         }
+
         .tile-text {
             z-index: 2; text-align: center; color: white;
         }
+
+        .syncing-indicator {
+            width: 8px; height: 8px; background-color: #fcc201; border-radius: 50%; display: inline-block;
+            margin-left: 5px; animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        
         .side-menu {
             position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
             background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
@@ -134,13 +151,14 @@
 
     <footer class="footer-stats">
         <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:#fcc201">0000</span></div>
-        <div class="stat-item">STATUS: <span id="syncStatus" style="color:#fcc201">Online</span></div>
+        <div class="stat-item">STATUS: <span id="syncStatus" style="color:#fcc201">Online</span> <span id="liveIndicator" class="syncing-indicator" style="display:none"></span></div>
     </footer>
 
     <script>
-        // THIS IS THE FIXED URL.
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
 
+        let isSyncing = false; // Prevent double checking
+        
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
@@ -165,17 +183,25 @@
             const menuName = document.getElementById('menuUserName');
             const headerBal = document.getElementById('headerBalance');
             const syncStatus = document.getElementById('syncStatus');
+            const liveIndicator = document.getElementById('liveIndicator');
 
             if (activeUser) {
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
+                
+                // Show cached balance instantly
                 headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
                 userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
 
-                // Start Auto-Sync
-                syncStatus.innerText = "Syncing...";
+                // STOP if already running to avoid network jams
+                if (isSyncing) return;
+                
+                // Start Background Sync
+                isSyncing = true;
+                liveIndicator.style.display = "inline-block"; // Show pulsing dot
+                
                 try {
                     const userPhone = activeUser.phone.toString();
                     const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
@@ -183,16 +209,23 @@
                     
                     if (data && data.approvedAmount > 0) {
                         let currentBal = parseFloat(activeUser.balance || 0);
-                        currentBal += parseFloat(data.approvedAmount);
+                        let addedAmount = parseFloat(data.approvedAmount);
+                        currentBal += addedAmount;
+                        
                         activeUser.balance = currentBal.toFixed(2);
                         headerBal.innerText = activeUser.balance;
                         localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                        syncStatus.innerText = "Synced ✅";
+                        
+                        // NOTIFY USER
+                        alert(`Successfully Received ${addedAmount} ETB!`);
+                        syncStatus.innerText = "Funds Received ✅";
                     } else {
                         syncStatus.innerText = "Online";
                     }
                 } catch (e) {
-                    syncStatus.innerText = "Online (Local)";
+                    syncStatus.innerText = "Weak Connection";
+                } finally {
+                    isSyncing = false;
                 }
             } else {
                 authSection.style.display = 'flex';
@@ -206,7 +239,12 @@
             location.reload();
         }
 
+        // 1. Check immediately on load
         window.addEventListener('DOMContentLoaded', checkAuthStatus);
+
+        // 2. TURBO MODE: Check every 5 seconds automatically
+        setInterval(checkAuthStatus, 5000); 
+
     </script>
 </body>
 </html>
