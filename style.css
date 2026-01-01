@@ -1,51 +1,111 @@
-* { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-body, html { margin: 0; padding: 0; background: #000; font-family: sans-serif; color: white; width: 100%; height: 100%; overflow-x: hidden; }
+<style>
+    /* YOUR ORIGINAL GITHUB CSS - DO NOT TOUCH */
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+    body, html { margin: 0; padding: 0; background: #000; font-family: sans-serif; color: white; width: 100%; height: 100%; overflow-x: hidden; }
 
-/* Fixed Header */
-.top-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; position: sticky; top: 0; z-index: 1000; height: 55px; }
-.left-section { display: flex; align-items: center; gap: 5px; }
-.brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; }
-.x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; margin-right: 2px; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; position: sticky; top: 0; z-index: 1000; height: 55px; }
+    .left-section { display: flex; align-items: center; gap: 5px; }
+    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; }
+    .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; margin-right: 2px; }
 
-/* Balance Display */
-.top-balance-area { text-align: center; flex-grow: 1; }
-.balance-label { display: block; font-size: 0.5rem; color: #888; }
-.balance-value { color: #f1c40f; font-weight: bold; font-size: 1rem; }
+    .top-balance-area { text-align: center; flex-grow: 1; }
+    .balance-label { display: block; font-size: 0.5rem; color: #888; }
+    .balance-value { color: #f1c40f; font-weight: bold; font-size: 1rem; }
 
-.auth-btns button { padding: 6px 10px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-.login-btn { background: #333; color: #fff; margin-right: 4px; }
-.register-btn { background: #fff; color: #000; }
+    .auth-btns button { padding: 6px 10px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
+    .login-btn { background: #333; color: #fff; margin-right: 4px; }
+    .register-btn { background: #fff; color: #000; }
 
-/* SIZE FIX: Force Banner to 180px height to prevent overflow */
-.hero-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
-.hero-img { width: 100%; height: 100%; object-fit: fill; display: block; }
+    .hero-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
+    .hero-img { width: 100%; height: 100%; object-fit: fill; display: block; }
 
-.section-label { padding: 10px 15px; color: gold; font-weight: bold; font-size: 0.8rem; }
+    .section-label { padding: 10px 15px; color: gold; font-weight: bold; font-size: 0.8rem; }
 
-/* Grid Layout Fix */
-.games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px 80px 10px; }
-.game-card { background: #111; border: 1.5px solid #333; border-radius: 10px; text-align: center; padding: 10px 5px; border-bottom: 2.5px solid #f1c40f; }
-.img-wrap { height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; border-radius: 5px; background: #000; overflow: hidden; }
-.img-wrap img { width: 85%; height: 85%; object-fit: contain; }
-.game-card p { margin: 0; font-size: 0.65rem; color: #ddd; font-weight: bold; }
+    .games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px 80px 10px; }
+    .game-card { background: #111; border: 1.5px solid #333; border-radius: 10px; text-align: center; padding: 10px 5px; border-bottom: 2.5px solid #f1c40f; }
+    .img-wrap { height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; border-radius: 5px; background: #000; overflow: hidden; }
+    .img-wrap img { width: 85%; height: 85%; object-fit: contain; }
+    .game-card p { margin: 0; font-size: 0.65rem; color: #ddd; font-weight: bold; }
 
-/* Keno/SBA placeholders */
-.keno-box { background: #004488; color: white; font-weight: bold; }
-.sba-box { background: #880000; color: white; font-weight: bold; }
-.empty-box { background: #222; color: #555; font-weight: bold; }
+    .keno-box { background: #004488; color: white; font-weight: bold; }
+    .sba-box { background: #880000; color: white; font-weight: bold; }
+    .empty-box { background: #222; color: #555; font-weight: bold; }
 
-/* Menu & Modals */
-.side-menu { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #111; z-index: 2000; transition: 0.3s; border-right: 1px solid gold; padding: 20px; }
-.side-menu.open { left: 0; }
-.menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
+    .side-menu { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #111; z-index: 2000; transition: 0.3s; border-right: 1px solid gold; padding: 20px; }
+    .side-menu.open { left: 0; }
+    .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
 
-.modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-.modal-content { background: #1a1a1a; margin: 20% auto; padding: 20px; border: 1px solid gold; width: 85%; border-radius: 10px; }
-.modal-content input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-.submit-btn { background: #f1c40f; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
-.back-btn { background: none; border: none; color: #777; width: 100%; margin-top: 10px; cursor: pointer; }
+    .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
+    .modal-content { background: #1a1a1a; margin: 20% auto; padding: 20px; border: 1px solid gold; width: 85%; border-radius: 10px; }
+    .modal-content input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
+    .submit-btn { background: #f1c40f; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+    .back-btn { background: none; border: none; color: #777; width: 100%; margin-top: 10px; cursor: pointer; }
 
-/* Footer */
-.footer-stats { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-between; padding: 12px 15px; background: #000; border-top: 1px solid #333; font-size: 0.7rem; color: #888; }
-#toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: gold; padding: 10px 20px; border-radius: 20px; z-index: 5000; font-size: 0.8rem; border: 1px solid gold; transition: 0.3s; }
-.toast-hidden { opacity: 0; visibility: hidden; }
+    .footer-stats { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-between; padding: 12px 15px; background: #000; border-top: 1px solid #333; font-size: 0.7rem; color: #888; }
+    #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: gold; padding: 10px 20px; border-radius: 20px; z-index: 5000; font-size: 0.8rem; border: 1px solid gold; transition: 0.3s; }
+    .toast-hidden { opacity: 0; visibility: hidden; }
+</style>
+
+<script>
+    // UPDATED WITH YOUR NEW DEPLOYMENT URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec'; 
+
+    async function updateDisplay() {
+        const user = JSON.parse(localStorage.getItem('simba_active_user'));
+        if (!user) {
+            if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'flex';
+            if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'none';
+            return;
+        }
+
+        try {
+            // Updated to getBalance + redirect follow to fix the 0.00 issue
+            const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            const data = await response.json();
+            
+            if (data && data.balance !== undefined) {
+                user.balance = parseFloat(data.balance).toFixed(2);
+                localStorage.setItem('simba_active_user', JSON.stringify(user));
+                
+                const balHeader = document.getElementById('headerBalance');
+                if(balHeader) balHeader.innerText = user.balance;
+                
+                if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
+                if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
+                if(document.getElementById('menuToggleBtn')) document.getElementById('menuToggleBtn').style.display = 'block';
+                
+                if(document.getElementById('displayID')) {
+                    document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
+                }
+            }
+        } catch (e) { 
+            console.log("Balance Syncing..."); 
+        }
+    }
+
+    function checkGameBalance(cost) {
+        const user = JSON.parse(localStorage.getItem('simba_active_user'));
+        if (!user || parseFloat(user.balance) < cost) {
+            alert("Insufficient Balance! / በቂ ቀሪ ሂሳብ የሎትም!");
+            return false;
+        }
+        return true;
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('sideMenu');
+        if (menu) menu.classList.toggle('open');
+    }
+
+    function logout() { 
+        localStorage.removeItem('simba_active_user'); 
+        window.location.href = 'login.html'; 
+    }
+
+    // Auto-sync balance every 15 seconds
+    setInterval(updateDisplay, 15000);
+    window.onload = updateDisplay;
+</script>
