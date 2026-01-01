@@ -93,17 +93,21 @@
             btn.innerText = "SENDING...";
 
             // BUNDLE DETAILS FOR COLUMN C
-            const details = `FROM: ${sName} (${sPhone}) via ${method}`;
+            const details = `DEP: ${method} FROM ${sName} (${sPhone})`;
 
+            // Note: phone=${user.phone} is the logged-in account, sPhone is the payment source
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
+                // Use no-cors for the deposit update
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("Request Sent! Admin will verify transfer from " + sPhone);
+                alert("Deposit Request Sent! Please wait for Admin to verify.");
                 btn.innerText = "REQUEST SENT ✅";
+                // Optionally redirect after success
+                setTimeout(() => { window.location.href = "index.html"; }, 2000);
             } catch (e) {
-                alert("Request Sent!");
-                btn.innerText = "REQUEST SENT ✅";
+                alert("Request Submitted!");
+                window.location.href = "index.html";
             }
         }
 
@@ -116,23 +120,27 @@
             syncBtn.innerText = "CHECKING...";
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
+                // Fetch status (Must use default mode to get JSON back)
+                const userPhone = user.phone.toString();
+                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
                 const data = await response.json();
 
-                if (data.approvedAmount > 0) {
+                if (data && data.approvedAmount > 0) {
                     let currentBal = parseFloat(user.balance) || 0;
                     currentBal += parseFloat(data.approvedAmount);
+                    
                     user.balance = currentBal.toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    alert(`✅ APPROVED! ${data.approvedAmount} ETB added.`);
+                    
+                    alert(`✅ SUCCESS! ${data.approvedAmount} ETB added to your balance.`);
                     window.location.href = "index.html";
                 } else {
-                    alert("Status: STILL PENDING or DENIED.");
+                    alert("Status: Admin has not approved this request yet.");
                     syncBtn.disabled = false;
                     syncBtn.innerText = "CHECK APPROVAL STATUS";
                 }
             } catch (e) {
-                alert("Server busy. Please try again in a moment.");
+                alert("Could not reach server. Try again in a minute.");
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
             }
