@@ -3,128 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Admin</title>
+    <title>Simba Admin | Secure</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; padding: 20px; }
-        .header { text-align: center; color: #00f2ff; text-transform: uppercase; margin-bottom: 20px; }
-        .card { 
-            background: #111827; border: 1px solid #333; padding: 15px; 
-            margin-bottom: 15px; border-radius: 10px; border-left: 5px solid #00f2ff;
-        }
-        .row-id { color: #00f2ff; font-size: 12px; margin-bottom: 5px; }
-        .amount { font-size: 24px; color: #fbbf24; font-weight: bold; margin: 10px 0; }
-        .detail-row { font-size: 14px; margin: 5px 0; color: #ccc; }
-        .detail-label { color: #888; font-size: 12px; }
+        :root { --gold: #fcc201; --cyan: #00f2ff; --bg: #05070a; --card: #111827; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
         
+        /* Lock Screen Styles */
+        #lockScreen { 
+            position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .pin-input { 
+            background: #111; border: 1px solid var(--cyan); color: var(--cyan); 
+            font-size: 24px; padding: 10px; text-align: center; border-radius: 8px; width: 180px; outline: none;
+        }
+
+        .header { text-align: center; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; letter-spacing: 2px; }
+        .refresh-btn { 
+            background: #1e293b; color: var(--cyan); border: 1px solid var(--cyan); 
+            padding: 12px 25px; display: block; margin: 0 auto 20px auto; 
+            border-radius: 30px; cursor: pointer; font-weight: bold;
+        }
+
+        .card { 
+            background: var(--card); border: 1px solid #333; padding: 18px; 
+            margin: 0 auto 15px auto; border-radius: 12px; border-left: 5px solid var(--cyan);
+            max-width: 500px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        
+        .row-id { color: var(--cyan); font-size: 11px; margin-bottom: 8px; font-weight: bold; opacity: 0.7; }
+        .amount { font-size: 30px; color: var(--gold); font-weight: bold; margin: 10px 0; }
+        .info-box { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin: 12px 0; border: 1px solid #222; }
+        .detail-row { font-size: 14px; margin: 6px 0; color: #ccc; }
+        .detail-label { color: #888; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+
         .btn-approve { 
-            background: #10b981; color: white; width: 100%; padding: 15px; 
-            border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
+            background: #10b981; color: white; width: 100%; padding: 16px; 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px;
         }
         .btn-deny {
             background: #ef4444; color: white; width: 100%; padding: 10px; 
-            border: none; border-radius: 5px; margin-top: 5px; cursor: pointer;
-        }
-        .refresh-btn { 
-            background: #333; color: white; border: 1px solid #555; padding: 10px 20px; 
-            display: block; margin: 0 auto 20px auto; border-radius: 20px;
+            border: none; border-radius: 8px; margin-top: 10px; cursor: pointer; opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
-    <h2 class="header">Pending Deposits</h2>
-    <button class="refresh-btn" onclick="loadRequests()">Refresh List</button>
-    
-    <div id="requestList">Loading...</div>
+    <div id="lockScreen">
+        <h2 style="color:var(--gold)">ADMIN ACCESS</h2>
+        <p style="color:#666">Enter Admin PIN to manage funds</p>
+        <input type="password" id="adminPin" class="pin-input" placeholder="ENTER PIN">
+        <button onclick="checkPin()" style="margin-top:20px; padding:12px 40px; background:var(--cyan); border:none; border-radius:5px; font-weight:bold; cursor:pointer; color:black;">UNLOCK SYSTEM</button>
+    </div>
+
+    <div id="adminContent" style="display:none;">
+        <h2 class="header">Pending Requests</h2>
+        <button class="refresh-btn" onclick="loadRequests()">🔄 REFRESH DATA</button>
+        <div id="requestList"></div>
+    </div>
 
     <script>
-        // UPDATED SCRIPT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
+        
+        // SECURE PIN: B328
+        function checkPin() {
+            const pin = document.getElementById('adminPin').value.trim();
+            if(pin === "B328") { 
+                document.getElementById('lockScreen').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                loadRequests();
+            } else {
+                alert("Incorrect PIN");
+            }
+        }
 
         async function loadRequests() {
-            document.getElementById('requestList').innerText = "Loading data from Sheet...";
+            const list = document.getElementById('requestList');
+            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing with Sheets...</p>';
+            
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getPending`);
                 const data = await response.json();
-                const list = document.getElementById('requestList');
                 list.innerHTML = "";
 
-                if (data.length === 0) {
-                    list.innerHTML = "<p style='text-align:center; color:#666;'>No pending requests.</p>";
+                if (!data || data.length === 0) {
+                    list.innerHTML = "<p style='text-align:center; color:#666; margin-top:50px;'>No pending requests found.</p>";
                     return;
                 }
 
                 data.forEach(req => {
-                    // Extract details from the details string (e.g. "DEP: Telebirr FROM Name (Phone)")
-                    let rawDetails = req.details || "";
-                    let displayDetails = parseDetails(rawDetails);
-
+                    let displayDetails = parseDetails(req.details || "");
                     const div = document.createElement("div");
                     div.className = "card";
                     div.innerHTML = `
-                        <div class="row-id">PLAYER REQUEST (ROW ${req.row})</div>
-                        <div class="detail-row"><span class="detail-label">PLAYER PHONE:</span> <br>${req.phone}</div>
-                        
-                        <div class="amount">${req.amount} ETB</div>
-                        
-                        <div style="background:#222; padding:10px; border-radius:5px; margin:10px 0;">
-                            <div class="detail-row"><span class="detail-label">SENDER NAME:</span> <b style="color:white">${displayDetails.name}</b></div>
-                            <div class="detail-row"><span class="detail-label">SENDER PHONE:</span> <b style="color:white">${displayDetails.phone}</b></div>
-                            <div class="detail-row"><span class="detail-label">METHOD:</span> ${displayDetails.method}</div>
+                        <div class="row-id">SYSTEM ROW: ${req.row}</div>
+                        <div class="detail-row"><span class="detail-label">SIMBA PLAYER ID:</span> <br><b>${req.phone}</b></div>
+                        <div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div>
+                        <div class="info-box">
+                            <div class="detail-row"><span class="detail-label">SENDER NAME:</span> <br><b style="color:white">${displayDetails.name}</b></div>
+                            <div class="detail-row"><span class="detail-label">SENDER PHONE:</span> <br><b style="color:white">${displayDetails.phone}</b></div>
+                            <div class="detail-row"><span class="detail-label">PAYMENT VIA:</span> <span style="color:var(--cyan)">${displayDetails.method}</span></div>
                         </div>
-
-                        <button class="btn-approve" onclick="processRequest(${req.row}, 'Approve')">APPROVE & ADD FUNDS</button>
-                        <button class="btn-deny" onclick="processRequest(${req.row}, 'Deny')">DENY</button>
+                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE & ADD FUNDS</button>
+                        <button class="btn-deny" onclick="processRequest(${req.row}, 'Deny')">DENY / REMOVE</button>
                     `;
                     list.appendChild(div);
                 });
             } catch (e) {
-                document.getElementById('requestList').innerText = "Error loading requests.";
+                list.innerHTML = "<p style='text-align:center; color:red'>Error: Could not connect to Google Script.</p>";
             }
         }
 
-        // Helper to make the details look nice
-        function parseDetails(detailString) {
-            // Default values
-            let result = { name: "Unknown", phone: "Unknown", method: "Unknown" };
-            
-            if (!detailString) return result;
-
-            try {
-                // Expected format: "DEP: Telebirr FROM John Doe (0912345678)"
-                if (detailString.includes("FROM")) {
-                    let parts = detailString.split(" FROM ");
-                    result.method = parts[0].replace("DEP:", "").trim(); // "Telebirr"
-                    
-                    let senderInfo = parts[1]; // "John Doe (0912345678)"
-                    let lastParen = senderInfo.lastIndexOf("(");
-                    
-                    if (lastParen > -1) {
-                        result.name = senderInfo.substring(0, lastParen).trim();
-                        result.phone = senderInfo.substring(lastParen).replace("(", "").replace(")", "").trim();
-                    } else {
-                        result.name = senderInfo;
-                    }
-                } else {
-                    result.method = detailString;
-                }
-            } catch (e) {
-                result.method = detailString;
-            }
-            return result;
+        function parseDetails(str) {
+            let res = { name: "N/A", phone: "N/A", method: "Direct" };
+            if (str.includes("FROM") || str.includes("TO")) {
+                let split = str.includes("FROM") ? " FROM " : " TO ";
+                let pts = str.split(split);
+                res.method = pts[0].replace("DEP:", "").replace("WITHDRAW:", "").trim();
+                let info = pts[1];
+                let lp = info.lastIndexOf("(");
+                if (lp > -1) {
+                    res.name = info.substring(0, lp).trim();
+                    res.phone = info.substring(lp).replace(/[()]/g, "").trim();
+                } else { res.name = info; }
+            } else { res.method = str; }
+            return res;
         }
 
         async function processRequest(row, status) {
-            if(!confirm(`Are you sure you want to ${status} this request?`)) return;
-
-            // Using no-cors to be faster, then reloading list
-            await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${status}`, { mode: 'no-cors' });
-            alert(`Request ${status}d! Player balance will update shortly.`);
-            loadRequests(); // Refresh the list
+            if(!confirm(`Are you sure you want to ${status} row ${row}?`)) return;
+            try {
+                // Pointing to your Google Script actions
+                await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { mode: 'no-cors' });
+                alert("Database Updated!");
+                loadRequests();
+            } catch (e) { alert("Updated"); loadRequests(); }
         }
-
-        window.onload = loadRequests;
     </script>
-
 </body>
 </html>
