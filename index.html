@@ -3,187 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Bet | Official</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-        :root { --primary: #fcc201; --bg: #0a0a0a; --card: #1a1a1a; --green: #2ecc71; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        
-        #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
-        
-        .top-nav {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 15px; background: #000; border-bottom: 1px solid #333;
-            position: fixed; top: 0; width: 100%; z-index: 1000; box-sizing: border-box;
-        }
-
-        .top-balance-area {
-            display: flex; align-items: center; background: rgba(255,255,255,0.05);
-            padding: 5px 12px; border-radius: 30px; border: 1px solid #333;
-        }
-
-        .header-bal-text { color: var(--primary); font-weight: bold; font-size: 16px; }
-
-        .deposit-btn-top {
-            background: var(--green); color: white; border: none; padding: 6px 14px;
-            border-radius: 6px; font-weight: bold; font-size: 13px; margin-left: 12px;
-            cursor: pointer; text-transform: uppercase;
-        }
-
-        .side-menu {
-            position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
-            background: #111; transition: 0.3s; z-index: 2000; border-right: 1px solid var(--primary);
-        }
-        .menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; z-index: 1500;
-        }
-
-        .games-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        
-        .game-card { 
-            background: var(--card); border-radius: 12px; padding: 10px; 
-            text-align: center; border: 1px solid #333; cursor: pointer; 
-            transition: transform 0.2s;
-        }
-        .game-card:active { transform: scale(0.95); border-color: var(--primary); }
-
-        .footer-stats {
-            display: flex; justify-content: space-around; padding: 12px;
-            background: #000; border-top: 1px solid var(--primary);
-            position: fixed; bottom: 0; width: 100%; font-size: 12px; z-index: 1000;
-        }
-
-        .sync-dot {
-            width: 8px; height: 8px; background-color: var(--primary); border-radius: 50%; 
-            display: inline-block; margin-left: 5px; animation: pulse 1s infinite;
-        }
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-    </style>
+    <title>Simba Bet | Home</title>
+    <link rel="stylesheet" href="style.html"> 
 </head>
 <body>
 
-    <div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
-
-    <div id="sideMenu" class="side-menu">
-        <div style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;">
-            <span id="menuUserName" style="color:var(--primary); font-weight: bold;">Player</span>
-            <button onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px;">×</button>
-        </div>
-        <nav style="display: flex; flex-direction: column; padding: 10px;">
-            <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💰 Deposit Funds</a>
-            <a href="withdraw.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💸 Withdraw Funds</a>
-            <a href="#" onclick="logout()" style="color: #ff4444; padding: 15px; text-decoration: none;">🚪 Logout</a>
+    <div class="steady-top">
+        <nav class="top-nav">
+            <div class="left-section">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+                <div class="brand"><span class="x-logo">X</span> SIMBA BET</div>
+            </div>
+            <div class="top-balance-area" id="topBalanceArea">
+                <span class="balance-label">BALANCE</span>
+                <span class="balance-value"><span id="headerBalance">0.00</span> ETB</span>
+            </div>
+            <div class="auth-btns" id="auth-section">
+                <button class="register-btn" onclick="window.location.href='deposit.html'">DEPOSIT</button>
+            </div>
         </nav>
+
+        <div class="hero-container">
+            <img src="https://i.ibb.co/v44m8Y9/lion-banner.jpg" class="hero-img" alt="Simba Banner">
+        </div>
     </div>
 
-    <header class="top-nav">
-        <div style="display:flex; align-items:center;">
-            <button id="menuToggleBtn" onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:24px; margin-right:10px; cursor:pointer;">☰</button>
-            <div style="font-weight:bold; color:var(--primary); letter-spacing:1px;">SIMBA BET</div>
-        </div>
-
-        <div id="topBalanceArea" class="top-balance-area">
-            <div style="text-align: right;">
-                <div style="font-size: 9px; color: #888; font-weight: bold;">BALANCE</div>
-                <span id="headerBalance" class="header-bal-text">0.00</span> <small>ETB</small>
+    <div class="scrollable-content">
+        
+        <div class="section-label">CATEGORIES ⚡</div>
+        <div class="sideways-wrap">
+            <div class="game-card" style="min-width: 100px; padding: 10px;">
+                <p>ALL GAMES</p>
             </div>
-            <button class="deposit-btn-top" onclick="location.href='deposit.html'">DEPOSIT</button>
+            <div class="game-card" style="min-width: 100px; padding: 10px;">
+                <p>SLOTS</p>
+            </div>
+            <div class="game-card" style="min-width: 100px; padding: 10px;">
+                <p>CRASH</p>
+            </div>
+            <div class="game-card" style="min-width: 100px; padding: 10px;">
+                <p>LIVE</p>
+            </div>
         </div>
 
-        <div id="auth-section">
-            <button onclick="location.href='login.html'" style="background:none; color:white; border:none; margin-right:10px; font-weight:bold;">Login</button>
-            <button onclick="location.href='register.html'" style="background:var(--primary); color:black; border:none; padding:6px 12px; border-radius:4px; font-weight:bold;">Join</button>
-        </div>
-    </header>
-
-    <main style="margin-top: 70px;">
-        <div style="padding: 10px;">
-            <img src="assets/assets/simba_bg.jpg" style="width:100%; border-radius:15px; border: 1px solid var(--primary);">
-        </div>
-
-        <div style="padding: 15px; color:var(--primary); font-weight: bold; letter-spacing: 1px;">HOT GAMES 🔥</div>
-
+        <div class="section-label">HOT GAMES 🔥</div>
+        
         <div class="games-container">
-            <div class="game-card" onclick="location.href='jungle.html'">
-                <div style="height:100px; background: linear-gradient(135deg, #1a4d1a 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🦁</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold;">Lion Scratch</p>
+            <div class="game-card" onclick="window.location.href='lionscratch.html'">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/616/616412.png"></div>
+                <p>Lion Scratch</p>
             </div>
-            
-            <div class="game-card" onclick="location.href='multi5.html'">
-                <div style="height:100px; background: linear-gradient(135deg, #4d1a1a 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center; color: #ff4d4d;">✖5</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold;">Hot Multi 5</p>
+            <div class="game-card" onclick="window.location.href='multi5.html'">
+                <div class="img-wrap"><p style="font-size: 2rem; color: #ef4444;">❌5</p></div>
+                <p>Hot Multi 5</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><p style="font-size: 1.5rem; color: #00f2ff;">1 2<br>3 4</p></div>
+                <p>Fast Keno</p>
             </div>
 
-            <div class="game-card" onclick="location.href='fast.keno.html'">
-                <div style="height:100px; background: linear-gradient(135deg, #1a1a4d 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🔢</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold;">Fast Keno</p>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png"></div>
+                <p>Mega Wheel</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2619/2619245.png"></div>
+                <p>Golden Goal</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/5351/5351486.png"></div>
+                <p>Aviator X</p>
+            </div>
+
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/8061/8061611.png"></div>
+                <p>Simba Slot</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png"></div>
+                <p>Fruit Blast</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/248/248941.png"></div>
+                <p>Poker Pro</p>
+            </div>
+
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png"></div>
+                <p>Dice Roll</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/4342/4342733.png"></div>
+                <p>777 Classic</p>
+            </div>
+            <div class="game-card">
+                <div class="img-wrap"><p style="font-size: 1.2rem; color: gold;">COMING<br>SOON</p></div>
+                <p>Mystery Box</p>
             </div>
         </div>
-    </main>
+    </div>
 
-    <footer class="footer-stats">
-        <div>ID: <span id="displayID" style="color:var(--primary);">----</span></div>
-        <div>STATUS: <span style="color:var(--primary);">Live</span> <span class="sync-dot"></span></div>
-    </footer>
+    <div class="side-menu" id="sideMenu">
+        <h2 style="color:gold;">MENU</h2>
+        <div class="menu-links">
+            <a href="index.html">🏠 Home</a>
+            <a href="deposit.html">💳 Deposit</a>
+            <a href="withdraw.html">💸 Withdraw</a>
+            <a href="#" onclick="logout()">🚪 Logout</a>
+        </div>
+    </div>
 
-    <script>
-        // Updated with your NEW Script URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+    <div class="footer-stats">
+        <div>ID: <span id="displayID" style="color:gold;">SB-Loading</span></div>
+        <div>STATUS: <span style="color:#00c853;">Live ●</span></div>
+    </div>
 
-        function toggleMenu() { 
-            const menu = document.getElementById('sideMenu');
-            const overlay = document.getElementById('menuOverlay');
-            if (menu.style.left === '0px') {
-                menu.style.left = '-260px';
-                overlay.style.display = 'none';
-            } else {
-                menu.style.left = '0px';
-                overlay.style.display = 'block';
-            }
-        }
-
-        async function refreshBalance() {
-            let user = JSON.parse(localStorage.getItem('simba_active_user'));
-            if (!user) return;
-            try {
-                // Using getBalance and redirect follow
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
-                const data = await res.json();
-                if (data && data.balance !== undefined) {
-                    const newBal = parseFloat(data.balance).toFixed(2);
-                    document.getElementById('headerBalance').innerText = newBal;
-                    user.balance = newBal;
-                    localStorage.setItem('simba_active_user', JSON.stringify(user));
-                }
-            } catch (e) { console.log("Balance sync issue", e); }
-        }
-
-        function init() {
-            let user = JSON.parse(localStorage.getItem('simba_active_user'));
-            if (user) {
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('topBalanceArea').style.display = 'flex';
-                document.getElementById('menuToggleBtn').style.display = 'block';
-                
-                document.getElementById('menuUserName').innerText = user.name;
-                document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
-                document.getElementById('headerBalance').innerText = parseFloat(user.balance || 0).toFixed(2);
-                
-                refreshBalance();
-                setInterval(refreshBalance, 10000); // Syncs every 10 seconds
-            } else {
-                document.getElementById('auth-section').style.display = 'flex';
-                document.getElementById('topBalanceArea').style.display = 'none';
-                document.getElementById('menuToggleBtn').style.display = 'none';
-            }
-        }
-
-        function logout() { localStorage.removeItem('simba_active_user'); location.reload(); }
-        window.onload = init;
-    </script>
 </body>
 </html>
