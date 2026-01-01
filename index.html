@@ -4,7 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Simba Bet | Home</title>
-    <link rel="stylesheet" href="style.html"> 
+    <style>
+        /* 1. GLOBAL & RESET */
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; background: #000; font-family: sans-serif; color: white; width: 100%; height: 100%; overflow: hidden; }
+
+        /* 2. STEADY TOP SECTION */
+        .steady-top { position: fixed; top: 0; width: 100%; background: #000; z-index: 1000; }
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; height: 55px; }
+        .left-section { display: flex; align-items: center; gap: 8px; }
+        .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; }
+        .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; }
+        .top-balance-area { text-align: center; flex-grow: 1; }
+        .balance-label { display: block; font-size: 0.5rem; color: #888; }
+        .balance-value { color: #f1c40f; font-weight: bold; font-size: 1rem; }
+        .register-btn { background: #00c853; color: #fff; padding: 6px 12px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
+        .hero-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* 3. SCROLLABLE CONTENT */
+        .scrollable-content { margin-top: 235px; height: calc(100vh - 235px); overflow-y: auto; padding-bottom: 80px; -webkit-overflow-scrolling: touch; }
+        .section-label { padding: 15px 15px 5px 15px; color: gold; font-weight: bold; font-size: 0.9rem; }
+        .sideways-wrap { display: flex; overflow-x: auto; padding: 5px 10px; gap: 10px; }
+        .cat-item { background: #1a1a1a; padding: 8px 15px; border-radius: 15px; border: 1px solid #333; font-size: 0.7rem; white-space: nowrap; }
+
+        /* 4. SHINY GAME GRID */
+        .games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
+        .game-card { background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border: 1px solid #333; border-radius: 10px; text-align: center; padding: 10px 5px; position: relative; overflow: hidden; border-bottom: 2.5px solid #f1c40f; }
+        .game-card::after { content: ''; position: absolute; top: -50%; left: -100%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(251, 196, 15, 0.1), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+        @keyframes shine { 100% { left: 100%; } }
+        .img-wrap { height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; border-radius: 5px; background: #000; }
+        .img-wrap img { width: 85%; height: 85%; object-fit: contain; }
+        .game-card p { margin: 0; font-size: 0.65rem; color: #ddd; font-weight: bold; }
+
+        /* SIDE MENU */
+        .side-menu { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #111; z-index: 2000; transition: 0.3s; border-right: 1px solid gold; padding: 20px; }
+        .side-menu.open { left: 0; }
+        .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; }
+
+        /* FOOTER */
+        .footer-stats { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-between; padding: 12px 15px; background: #000; border-top: 1px solid #333; font-size: 0.7rem; color: #888; z-index: 1000; }
+    </style>
 </head>
 <body>
 
@@ -14,92 +55,47 @@
                 <button class="menu-btn" onclick="toggleMenu()">☰</button>
                 <div class="brand"><span class="x-logo">X</span> SIMBA BET</div>
             </div>
-            <div class="top-balance-area" id="topBalanceArea">
+            <div class="top-balance-area">
                 <span class="balance-label">BALANCE</span>
                 <span class="balance-value"><span id="headerBalance">0.00</span> ETB</span>
             </div>
-            <div class="auth-btns" id="auth-section">
+            <div class="auth-btns">
                 <button class="register-btn" onclick="window.location.href='deposit.html'">DEPOSIT</button>
             </div>
         </nav>
-
         <div class="hero-container">
-            <img src="https://i.ibb.co/v44m8Y9/lion-banner.jpg" class="hero-img" alt="Simba Banner">
+            <img src="https://i.ibb.co/v44m8Y9/lion-banner.jpg" class="hero-img">
         </div>
     </div>
 
     <div class="scrollable-content">
-        
         <div class="section-label">CATEGORIES ⚡</div>
         <div class="sideways-wrap">
-            <div class="game-card" style="min-width: 100px; padding: 10px;">
-                <p>ALL GAMES</p>
-            </div>
-            <div class="game-card" style="min-width: 100px; padding: 10px;">
-                <p>SLOTS</p>
-            </div>
-            <div class="game-card" style="min-width: 100px; padding: 10px;">
-                <p>CRASH</p>
-            </div>
-            <div class="game-card" style="min-width: 100px; padding: 10px;">
-                <p>LIVE</p>
-            </div>
+            <div class="cat-item" style="color:gold; border-color:gold;">ALL GAMES</div>
+            <div class="cat-item">SLOTS</div>
+            <div class="cat-item">CRASH</div>
+            <div class="cat-item">LIVE</div>
         </div>
 
         <div class="section-label">HOT GAMES 🔥</div>
-        
         <div class="games-container">
             <div class="game-card" onclick="window.location.href='lionscratch.html'">
                 <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/616/616412.png"></div>
                 <p>Lion Scratch</p>
             </div>
             <div class="game-card" onclick="window.location.href='multi5.html'">
-                <div class="img-wrap"><p style="font-size: 2rem; color: #ef4444;">❌5</p></div>
+                <div class="img-wrap"><p style="font-size:2rem; color:#ef4444; margin:0;">×5</p></div>
                 <p>Hot Multi 5</p>
             </div>
             <div class="game-card">
-                <div class="img-wrap"><p style="font-size: 1.5rem; color: #00f2ff;">1 2<br>3 4</p></div>
+                <div class="img-wrap"><p style="font-size:1.2rem; color:#00f2ff; line-height:1;">1 2<br>3 4</p></div>
                 <p>Fast Keno</p>
             </div>
-
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png"></div>
-                <p>Mega Wheel</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2619/2619245.png"></div>
-                <p>Golden Goal</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/5351/5351486.png"></div>
-                <p>Aviator X</p>
-            </div>
-
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/8061/8061611.png"></div>
-                <p>Simba Slot</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png"></div>
-                <p>Fruit Blast</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/248/248941.png"></div>
-                <p>Poker Pro</p>
-            </div>
-
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png"></div>
-                <p>Dice Roll</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/4342/4342733.png"></div>
-                <p>777 Classic</p>
-            </div>
-            <div class="game-card">
-                <div class="img-wrap"><p style="font-size: 1.2rem; color: gold;">COMING<br>SOON</p></div>
-                <p>Mystery Box</p>
-            </div>
+            <script>
+                for(let i=0; i<9; i++) {
+                    document.write('<div class="game-card"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png"></div><p>Game Slot</p></div>');
+                }
+            </script>
         </div>
     </div>
 
@@ -118,5 +114,29 @@
         <div>STATUS: <span style="color:#00c853;">Live ●</span></div>
     </div>
 
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec'; 
+
+        async function updateDisplay() {
+            const user = JSON.parse(localStorage.getItem('simba_active_user'));
+            if (!user) return;
+            try {
+                const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, { method: 'GET', redirect: 'follow' });
+                const data = await response.json();
+                // BALANCE FIX: Support approvedAmount from your sheet
+                let currentBal = data.balance || data.approvedAmount || 0;
+                user.balance = parseFloat(currentBal).toFixed(2);
+                localStorage.setItem('simba_active_user', JSON.stringify(user));
+                document.getElementById('headerBalance').innerText = user.balance;
+                document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
+            } catch (e) { console.log("Sync..."); }
+        }
+
+        function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
+        function logout() { localStorage.removeItem('simba_active_user'); window.location.href = 'login.html'; }
+
+        setInterval(updateDisplay, 15000);
+        window.onload = updateDisplay;
+    </script>
 </body>
 </html>
