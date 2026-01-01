@@ -1,148 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Admin Management</title>
-    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; --red: #ef4444; }
-        body { background: var(--bg); color: white; font-family: 'Goldman', sans-serif; padding: 20px; }
-        .header { border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        
-        .req-card { 
-            background: #111827; border: 1px solid #1e293b; padding: 15px; 
-            margin-bottom: 15px; border-radius: 12px; position: relative;
-        }
-        .type-deposit { border-left: 5px solid var(--cyan); }
-        .type-withdraw { border-left: 5px solid var(--red); }
+function doGet(e) {
+  var action = e.parameter.action;
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Sheet1");
+  var data = sheet.getDataRange().getValues();
 
-        .info { margin-bottom: 15px; line-height: 1.6; }
-        .info b { color: var(--gold); font-size: 11px; text-transform: uppercase; }
-        .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
-        .badge-deposit { background: var(--cyan); color: #000; }
-        .badge-withdraw { background: var(--red); color: #fff; }
+  // --- 1. ADMIN ACTION: Load Pending Requests into Admin.html ---
+  if (action == "getPending") {
+    var pending = [];
+    for (var i = 1; i < data.length; i++) {
+      var status = data[i][6] ? data[i][6].toString().trim() : "";
+      // Admin page looks for PENDING (Deposits) or W-PENDING (Withdrawals)
+      if (status === "PENDING" || status === "W-PENDING") {
+        pending.push({
+          row: i + 1,
+          phone: data[i][1],
+          amount: data[i][4],
+          details: data[i][7] || "",
+          type: data[i][3]
+        });
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(pending))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
-        .btn-group { display: flex; gap: 10px; }
-        button { 
-            flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; 
-            font-family: 'Goldman'; font-weight: bold; font-size: 14px; text-transform: uppercase;
-        }
-        .app-btn { background: #10b981; color: #fff; }
-        .den-btn { background: #ef4444; color: white; }
-        #status-msg { text-align: center; color: var(--gold); margin-top: 20px; font-size: 12px; }
-        .logout-btn { background: transparent; border: 1px solid #444; color: #888; margin-bottom: 10px; padding: 5px 10px; font-size: 10px; border-radius: 4px; }
-        
-        #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #passIn { padding: 15px; border: 1px solid var(--gold); background: #111827; color: white; font-family: 'Goldman'; text-align: center; border-radius: 8px; margin-bottom: 10px; }
-    </style>
-</head>
-<body onload="checkSecurity()">
+  // --- 2. ADMIN ACTION: Approve/Deny from Admin.html buttons ---
+  if (action == "updateStatus") {
+    var row = parseInt(e.parameter.row);
+    var status = e.parameter.status; // "Approve" or "Deny"
+    sheet.getRange(row, 7).setValue(status); 
+    return ContentService.createTextOutput("Success");
+  }
 
-    <div id="loginOverlay" style="display: none;">
-        <h2 style="color: var(--cyan);">ADMIN SECURE ACCESS</h2>
-        <input type="password" id="passIn" placeholder="ENTER B328 KEY">
-        <button onclick="login()" style="background: var(--gold); width: 200px; color: black;">UNLOCK</button>
-    </div>
+  // --- 3. PLAYER ACTION: Deposit ---
+  if (action == "deposit") {
+    sheet.appendRow([new Date(), e.parameter.phone, e.parameter.name, "DEPOSIT", e.parameter.amount, "", "PENDING", e.parameter.details]);
+    return ContentService.createTextOutput("Success");
+  }
 
-    <div id="adminContent" style="display: none;">
-        <div class="header">
-            <button class="logout-btn" onclick="logout()">LOGOUT</button>
-            <h2 style="color: var(--cyan); margin: 0;">PENDING REQUESTS</h2>
-        </div>
+  // --- 4. PLAYER ACTION: Check Status (Sync Balance) ---
+  if (action == "checkStatus") {
+    var phone = e.parameter.phone;
+    var total = 0;
+    for (var i = 1; i < data.length; i++) {
+      var rowPhone = data[i][1] ? data[i][1].toString().trim() : "";
+      var rowStatus = data[i][6] ? data[i][6].toString().trim() : "";
+      if (rowPhone === phone.toString().trim() && rowStatus === "Approve") {
+        total += parseFloat(data[i][4] || 0);
+        sheet.getRange(i + 1, 7).setValue("SYNCED"); // Prevent double-pay
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({approvedAmount: total}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 
-        <div id="list">Fetching database...</div>
-        <div id="status-msg"></div>
-    </div>
-
-    <script>
-        // UPDATE THIS URL IF YOU DEPLOY A NEW VERSION
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
-        let adminKey = localStorage.getItem('simba_admin_key');
-
-        function checkSecurity() {
-            if (!adminKey) {
-                document.getElementById('loginOverlay').style.display = 'flex';
-            } else {
-                document.getElementById('adminContent').style.display = 'block';
-                loadData();
-            }
-        }
-
-        function login() {
-            const val = document.getElementById('passIn').value;
-            if (val === "B328") {
-                localStorage.setItem('simba_admin_key', val);
-                location.reload();
-            } else {
-                alert("ACCESS DENIED");
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('simba_admin_key');
-            location.reload();
-        }
-
-        async function loadData() {
-            const listDiv = document.getElementById('list');
-            try {
-                // We use default fetch here because we NEED the data back (JSON)
-                const response = await fetch(`${SCRIPT_URL}?action=getPending&key=${adminKey}`);
-                const data = await response.json();
-
-                if (data.error) { logout(); return; }
-
-                if (data.length === 0) {
-                    listDiv.innerHTML = "<p style='text-align:center; color:#666;'>No pending requests found.</p>";
-                    return;
-                }
-
-                listDiv.innerHTML = data.map(req => {
-                    const isWithdrawal = parseFloat(req.amount) < 0;
-                    return `
-                        <div class="req-card ${isWithdrawal ? 'type-withdraw' : 'type-deposit'}">
-                            <span class="badge ${isWithdrawal ? 'badge-withdraw' : 'badge-deposit'}">
-                                ${isWithdrawal ? 'WITHDRAWAL' : 'DEPOSIT'}
-                            </span>
-                            <div class="info">
-                                <b>User Phone:</b><br>${req.phone}<br>
-                                <b>Details:</b><br>${req.details}<br>
-                                <b>Amount:</b><br><span style="font-size:24px; color:var(--gold)">${Math.abs(req.amount)} ETB</span>
-                            </div>
-                            <div class="btn-group">
-                                <button class="app-btn" onclick="updateStatus(${req.row}, 'Approve')">APPROVE</button>
-                                <button class="den-btn" onclick="updateStatus(${req.row}, 'Deny')">DENY</button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (e) {
-                listDiv.innerHTML = "Sync Error. Verify Google Script Deployment is set to 'Anyone'.";
-            }
-        }
-
-        async function updateStatus(row, status) {
-            if (!confirm(`Confirm ${status} for row ${row}?`)) return;
-            const msg = document.getElementById('status-msg');
-            msg.innerText = "Processing... Please wait.";
-            
-            // We use mode: 'no-cors' here to bypass browser security blocks for background updates
-            try {
-                const finalUrl = `${SCRIPT_URL}?action=updateStatus&row=${row}&status=${status}&key=${adminKey}`;
-                await fetch(finalUrl, { mode: 'no-cors' });
-                
-                // Since no-cors doesn't give a response, we wait 2 seconds then refresh
-                setTimeout(() => {
-                    alert("Action Sent! refreshing list...");
-                    msg.innerText = "";
-                    loadData();
-                }, 2000);
-            } catch (e) {
-                alert("Request error. Try again.");
-                loadData();
-            }
-        }
-    </script>
-</body>
-</html>
+  // --- 5. REGISTRATION ---
+  if (action == "register") {
+    sheet.appendRow([new Date(), e.parameter.phone, e.parameter.name, e.parameter.pass, 0, "", "USER"]);
+    return ContentService.createTextOutput("Success");
+  }
+}
