@@ -128,8 +128,8 @@
     </footer>
 
     <script>
-        // Using your confirmed URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
+        // UPDATED WITH YOUR NEW URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
@@ -161,7 +161,6 @@
         function init() {
             let user = JSON.parse(localStorage.getItem('simba_active_user'));
             if (user) {
-                // LOGGED IN: Hide login/register, show balance & menu
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('topBalanceArea').style.display = 'flex';
                 document.getElementById('menuToggleBtn').style.display = 'block';
@@ -173,7 +172,6 @@
                 refreshBalance();
                 setInterval(refreshBalance, 10000);
             } else {
-                // LOGGED OUT: Show login/register, hide everything else
                 document.getElementById('auth-section').style.display = 'flex';
                 document.getElementById('topBalanceArea').style.display = 'none';
                 document.getElementById('menuToggleBtn').style.display = 'none';
