@@ -1,6 +1,6 @@
 <script>
     // UPDATED WITH YOUR NEW DEPLOYMENT URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec'; 
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec'; 
 
     async function updateDisplay() {
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
@@ -11,7 +11,7 @@
         }
 
         try {
-            // Added redirect: 'follow' to ensure it gets the balance from Google Sheets
+            // Using action=getBalance to match the new Google Script
             const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, {
                 method: 'GET',
                 redirect: 'follow'
@@ -29,7 +29,7 @@
                 if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
                 if(document.getElementById('menuToggleBtn')) document.getElementById('menuToggleBtn').style.display = 'block';
                 
-                // Also update the display ID based on the phone
+                // Update the display ID based on the phone
                 if(document.getElementById('displayID')) {
                     document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
                 }
@@ -56,7 +56,7 @@
         if (!user || !recPhone || isNaN(amt)) return alert("Please fill all information!");
         if (amt > parseFloat(user.balance)) return alert("Insufficient Balance!");
 
-        // Update UI locally immediately
+        // Update UI locally immediately to prevent double-spending
         const newLocalBal = parseFloat(user.balance) - amt;
         user.balance = newLocalBal;
         localStorage.setItem('simba_active_user', JSON.stringify(user));
@@ -65,14 +65,17 @@
             document.getElementById('headerBalance').innerText = newLocalBal.toFixed(2);
         }
 
-        // Send to sheet - ensures amount is negative for balance subtraction
+        // Send to sheet - For your current Script, we send it as a 'deposit' action 
+        // with a negative number so it subtracts from the balance.
         const withdrawAmt = -Math.abs(amt);
-        fetch(`${scriptURL}?action=withdraw&phone=${user.phone}&amount=${withdrawAmt}&details=WITHDRAW TO ${recPhone}`, { 
+        const details = encodeURIComponent(`WITHDRAW TO ${recPhone}`);
+        
+        fetch(`${scriptURL}?action=deposit&phone=${user.phone}&amount=${withdrawAmt}&details=${details}`, { 
             method: 'GET', 
             mode: 'no-cors' 
         });
 
-        alert("Withdrawal request sent!");
+        alert("Withdrawal request sent! Admin will process it shortly.");
         window.location.href = 'index.html';
     }
 
