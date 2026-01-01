@@ -55,13 +55,25 @@
     </div>
 
     <script>
-        // UPDATED TO MATCH YOUR WORKING ADMIN SYSTEM
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
-        function init() {
+        async function init() {
             if (!activeUser) { window.location.href = 'login.html'; return; }
+            
+            // Show current local balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
+
+            // Fetch latest approved balance from server to be sure
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
+                const data = await res.json();
+                if (data && data.balance !== undefined) {
+                    activeUser.balance = data.balance;
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    document.getElementById('displayBal').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
+                }
+            } catch (e) { console.log("Balance sync skipped"); }
         }
 
         async function handleWithdraw() {
@@ -72,7 +84,6 @@
             const btn = document.getElementById('witBtn');
             const status = document.getElementById('witStatus');
 
-            // 1. Validations
             if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
             if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
             if (!rName || !rPhone) { alert("Please fill recipient details!"); return; }
@@ -82,33 +93,30 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
-            // 2. Format details for Admin to see clearly
+            // Use the amount as a negative number so the 'Sum' math in getBalance works automatically
+            const withdrawAmount = -Math.abs(amount);
             const details = `WITHDRAW: ${method} TO ${rName} (${rPhone})`;
             
-            // 3. Prepare URL (Action: withdraw)
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
+            // Action matches the 'withdraw' handler in your script
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawAmount}&details=${encodeURIComponent(details)}`;
 
             try {
-                // Send to Google Script
                 await fetch(finalUrl, { mode: 'no-cors' });
 
-                // 4. DEDUCT LOCALLY IMMEDIATELY
-                let currentBal = parseFloat(activeUser.balance);
-                let newBal = currentBal - amount;
+                // Deduct locally so the user can't double-spend while waiting
+                let newBal = parseFloat(activeUser.balance) - amount;
                 activeUser.balance = newBal.toFixed(2);
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
 
-                // 5. Update UI
                 document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
                 status.style.color = "#fbbf24";
-                status.innerHTML = "✅ <b>Request Sent!</b><br>Balance updated. Admin will process shortly.";
+                status.innerHTML = "✅ <b>Request Sent!</b><br>Admin will process shortly.";
                 
-                alert("Withdrawal request submitted successfully!");
-                setTimeout(() => { window.location.href = "index.html"; }, 2000);
+                alert("Withdrawal request submitted!");
+                setTimeout(() => { window.location.href = "index.html"; }, 1500);
 
             } catch (error) {
-                // If network is slow, still confirm and redirect
-                alert("Request Sent!");
+                alert("Request Submitted!");
                 window.location.href = "index.html";
             }
         }
