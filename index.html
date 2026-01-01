@@ -6,9 +6,8 @@
     <title>Simba Bet | Official</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* UI Restore: All original styling put back */
         :root { --primary: #fcc201; --bg: #0a0a0a; --card: #1a1a1a; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; padding-bottom: 80px; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
         
@@ -36,14 +35,19 @@
             background: #111; transition: 0.3s; z-index: 2000; border-right: 1px solid var(--primary);
         }
 
+        .menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; z-index: 1500;
+        }
+
         .games-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
         
         .game-card { 
             background: var(--card); border-radius: 12px; padding: 10px; 
             text-align: center; border: 1px solid #333; cursor: pointer; 
-            transition: transform 0.2s;
+            transition: transform 0.2s, border-color 0.2s;
         }
-        .game-card:active { transform: scale(0.95); }
+        .game-card:active { transform: scale(0.95); border-color: var(--primary); }
 
         .footer-stats {
             display: flex; justify-content: space-around; padding: 12px;
@@ -60,8 +64,10 @@
 </head>
 <body>
 
+    <div id="menuOverlay" class="menu-overlay" onclick="toggleMenu()"></div>
+
     <div id="sideMenu" class="side-menu">
-        <div style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center;">
+        <div style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222;">
             <span id="menuUserName" style="color:var(--primary); font-weight: bold;">Player</span>
             <button onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px;">×</button>
         </div>
@@ -74,46 +80,46 @@
 
     <header class="top-nav">
         <div style="display:flex; align-items:center;">
-            <button id="menuToggleBtn" onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:24px; margin-right:10px;">☰</button>
-            <div style="font-weight:bold; color:var(--primary); letter-spacing:1px;">SIMBA BET</div>
+            <button id="menuToggleBtn" onclick="toggleMenu()" style="background:none; border:none; color:white; font-size:24px; margin-right:10px; cursor:pointer;">☰</button>
+            <div style="font-weight:bold; color:var(--primary); letter-spacing:1px; font-size: 18px;">SIMBA BET</div>
         </div>
 
         <div id="topBalanceArea" class="top-balance-area">
             <div style="text-align: right;">
-                <div style="font-size: 9px; color: #888; font-weight: bold;">MY BALANCE</div>
+                <div style="font-size: 9px; color: #888; font-weight: bold; line-height: 1;">MY BALANCE</div>
                 <span id="headerBalance" class="header-bal-text">0.00</span> <small style="font-size:10px;">ETB</small>
             </div>
             <button class="deposit-btn-top" onclick="location.href='deposit.html'">DEPOSIT</button>
         </div>
 
         <div id="auth-section">
-            <button onclick="location.href='login.html'" style="background:none; color:white; border:none; margin-right:10px;">Login</button>
-            <button onclick="location.href='register.html'" style="background:var(--primary); color:black; border:none; padding:5px 10px; border-radius:4px; font-weight:bold;">Join</button>
+            <button onclick="location.href='login.html'" style="background:none; color:white; border:none; margin-right:10px; font-weight:bold;">Login</button>
+            <button onclick="location.href='register.html'" style="background:var(--primary); color:black; border:none; padding:6px 12px; border-radius:4px; font-weight:bold;">Join</button>
         </div>
     </header>
 
     <main style="margin-top: 70px;">
         <div style="padding: 10px;">
-            <img src="assets/assets/simba_bg.jpg" style="width:100%; border-radius:15px; border: 1px solid var(--primary);">
+            <img src="assets/assets/simba_bg.jpg" style="width:100%; border-radius:15px; border: 1px solid var(--primary); display: block;">
         </div>
 
-        <div style="padding: 15px; color:var(--primary); font-weight: bold; letter-spacing: 1px;">HOT GAMES 🔥</div>
+        <div style="padding: 15px; color:var(--primary); font-weight: bold; letter-spacing: 1px; font-size: 14px;">HOT GAMES 🔥</div>
 
         <div class="games-container">
             <div class="game-card" onclick="location.href='jungle.html'">
-                <div style="height:100px; background: linear-gradient(to bottom, #1a4d1a, #000); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🦁</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold;">Jungle Win</p>
+                <div style="height:100px; background: linear-gradient(135deg, #1a4d1a 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">🦁</div>
+                <p style="font-size: 14px; margin-top: 8px; font-weight:bold; color: #eee;">Jungle Win</p>
             </div>
             <div class="game-card" onclick="location.href='fast.keno.html'">
-                <div style="height:100px; background: linear-gradient(to bottom, #1a1a4d, #000); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🔢</div>
-                <p style="font-size: 14px; margin-top: 8px; font-weight:bold;">Fast Keno</p>
+                <div style="height:100px; background: linear-gradient(135deg, #1a1a4d 0%, #000 100%); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">🔢</div>
+                <p style="font-size: 14px; margin-top: 8px; font-weight:bold; color: #eee;">Fast Keno</p>
             </div>
         </div>
     </main>
 
     <footer class="footer-stats">
-        <div>ID: <span id="displayID" style="color:var(--primary);">----</span></div>
-        <div>SERVER: <span id="syncStatus" style="color:var(--primary);">Live</span> <span id="liveIndicator" class="syncing-indicator"></span></div>
+        <div>ID: <span id="displayID" style="color:var(--primary); font-weight: bold;">----</span></div>
+        <div>SERVER: <span id="syncStatus" style="color:var(--primary); font-weight: bold;">Live</span> <span id="liveIndicator" class="syncing-indicator"></span></div>
     </footer>
 
     <script>
@@ -122,7 +128,14 @@
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
-            menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
+            const overlay = document.getElementById('menuOverlay');
+            if (menu.style.left === '0px') {
+                menu.style.left = '-260px';
+                overlay.style.display = 'none';
+            } else {
+                menu.style.left = '0px';
+                overlay.style.display = 'block';
+            }
         }
 
         async function refreshBalance() {
@@ -158,7 +171,7 @@
                 document.getElementById('headerBalance').innerText = parseFloat(user.balance || 0).toFixed(2);
                 
                 refreshBalance();
-                setInterval(refreshBalance, 10000);
+                setInterval(refreshBalance, 10000); // Sync every 10 seconds
             } else {
                 document.getElementById('auth-section').style.display = 'flex';
             }
