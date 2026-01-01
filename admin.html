@@ -14,7 +14,6 @@
             background: #111827; border: 1px solid #1e293b; padding: 15px; 
             margin-bottom: 15px; border-radius: 12px; position: relative;
         }
-        /* Visual Indicators for Type */
         .type-deposit { border-left: 5px solid var(--cyan); }
         .type-withdraw { border-left: 5px solid var(--red); }
 
@@ -31,10 +30,9 @@
         }
         .app-btn { background: #10b981; color: #fff; }
         .den-btn { background: #ef4444; color: white; }
-        #status-msg { text-align: center; color: var(--gold); margin-top: 20px; }
+        #status-msg { text-align: center; color: var(--gold); margin-top: 20px; font-size: 12px; }
         .logout-btn { background: transparent; border: 1px solid #444; color: #888; margin-bottom: 10px; padding: 5px 10px; font-size: 10px; border-radius: 4px; }
         
-        /* Security Overlay */
         #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #passIn { padding: 15px; border: 1px solid var(--gold); background: #111827; color: white; font-family: 'Goldman'; text-align: center; border-radius: 8px; margin-bottom: 10px; }
     </style>
@@ -58,6 +56,7 @@
     </div>
 
     <script>
+        // UPDATE THIS URL IF YOU DEPLOY A NEW VERSION
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
         let adminKey = localStorage.getItem('simba_admin_key');
 
@@ -88,6 +87,7 @@
         async function loadData() {
             const listDiv = document.getElementById('list');
             try {
+                // We use default fetch here because we NEED the data back (JSON)
                 const response = await fetch(`${SCRIPT_URL}?action=getPending&key=${adminKey}`);
                 const data = await response.json();
 
@@ -118,20 +118,28 @@
                     `;
                 }).join('');
             } catch (e) {
-                listDiv.innerHTML = "Sync Error. Check Google Script Deployment.";
+                listDiv.innerHTML = "Sync Error. Verify Google Script Deployment is set to 'Anyone'.";
             }
         }
 
         async function updateStatus(row, status) {
             if (!confirm(`Confirm ${status} for row ${row}?`)) return;
-            document.getElementById('status-msg').innerText = "Processing...";
+            const msg = document.getElementById('status-msg');
+            msg.innerText = "Processing... Please wait.";
             
+            // We use mode: 'no-cors' here to bypass browser security blocks for background updates
             try {
-                await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=${status}&key=${adminKey}`, {mode: 'no-cors'});
-                alert("Action Successful");
-                document.getElementById('status-msg').innerText = "";
-                loadData();
+                const finalUrl = `${SCRIPT_URL}?action=updateStatus&row=${row}&status=${status}&key=${adminKey}`;
+                await fetch(finalUrl, { mode: 'no-cors' });
+                
+                // Since no-cors doesn't give a response, we wait 2 seconds then refresh
+                setTimeout(() => {
+                    alert("Action Sent! refreshing list...");
+                    msg.innerText = "";
+                    loadData();
+                }, 2000);
             } catch (e) {
+                alert("Request error. Try again.");
                 loadData();
             }
         }
