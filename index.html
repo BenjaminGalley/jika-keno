@@ -7,75 +7,17 @@
     <link rel="stylesheet" href="style.css">
     <style>
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
+        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; z-index: 100; }
         
-        .footer-stats { 
-            display: flex; justify-content: space-around; padding: 10px; 
-            background: #000; border-top: 1px solid #fcc201; 
-            position: fixed; bottom: 0; width: 100%; 
-            box-sizing: border-box; font-size: 12px; z-index: 100; 
-        }
-        
-        /* New Deposit Button Style */
         .deposit-btn-top {
-            background: #2ecc71;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 12px;
-            margin-left: 10px;
-            cursor: pointer;
-            text-transform: uppercase;
+            background: #2ecc71; color: white; border: none; padding: 6px 14px;
+            border-radius: 6px; font-weight: bold; font-size: 13px; margin-left: 12px;
+            cursor: pointer; text-transform: uppercase; box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
         }
 
         .top-balance-area {
-            display: flex;
-            align-items: center;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 20px;
-            border: 1px solid #333;
-        }
-
-        /* Game Tile Styles */
-        .mega-spin-box {
-            background: linear-gradient(45deg, #fcc201, #92400e) !important;
-            display: flex; align-items: center; justify-content: center;
-            height: 110px; border-radius: 12px; font-size: 40px;
-            border: 2px solid #fcc201;
-        }
-
-        .jungle-win-box {
-            background: linear-gradient(135deg, #0a4d0a, #000) !important;
-            border: 2px solid #2ecc71;
-            display: flex; align-items: center; justify-content: center;
-            height: 110px; border-radius: 12px; font-weight: bold;
-            position: relative; overflow: hidden;
-        }
-
-        .fast-keno-box {
-            background: linear-gradient(135deg, #004488, #001122) !important;
-            border: 2px solid #00f2ff;
-            display: flex; align-items: center; justify-content: center;
-            height: 110px; border-radius: 12px; font-weight: bold;
-            position: relative; overflow: hidden;
-        }
-
-        .multihot-box {
-            background: linear-gradient(135deg, #053305, #000) !important;
-            border: 2px solid #FFD700;
-            display: flex; align-items: center; justify-content: center;
-            height: 110px; border-radius: 12px; font-weight: bold;
-            position: relative; overflow: hidden;
-        }
-
-        .tile-img-bg {
-            position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
-        }
-
-        .tile-text {
-            z-index: 2; text-align: center; color: white;
+            display: flex; align-items: center; background: rgba(255,255,255,0.05);
+            padding: 5px 12px; border-radius: 30px; border: 1px solid #333;
         }
 
         .syncing-indicator {
@@ -83,30 +25,26 @@
             margin-left: 5px; animation: pulse 1s infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            50% { opacity: 1; }
-            100% { opacity: 0.4; }
-        }
+        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
         
         .side-menu {
             position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
             background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
         }
+        
+        .game-card { background: #1a1a1a; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #333; }
     </style>
 </head>
 <body>
     <div id="sideMenu" class="side-menu">
         <div class="menu-header" style="padding: 20px; background: #000; display: flex; justify-content: space-between; align-items: center;">
             <span id="menuUserName" style="color:#fcc201; font-weight: bold;">Guest Player</span>
-            <button class="close-btn" onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px; cursor: pointer;">×</button>
+            <button onclick="toggleMenu()" style="background: none; border: none; color: white; font-size: 30px;">×</button>
         </div>
-        <nav class="menu-links" style="display: flex; flex-direction: column; padding: 10px;">
+        <nav style="display: flex; flex-direction: column; padding: 10px;">
             <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💰 Deposit Funds</a>
             <a href="withdraw.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">💸 Withdraw Funds</a>
-            <a href="deposit.html" style="color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #222;">📜 History</a>
-            <hr style="border: 0.5px solid #333; margin: 10px 0;">
-            <a href="#" class="logout-link" onclick="logout()" style="color: #ff4444; padding: 15px; text-decoration: none;">🚪 Logout</a>
+            <a href="#" onclick="logout()" style="color: #ff4444; padding: 15px; text-decoration: none;">🚪 Logout</a>
         </nav>
     </div>
 
@@ -117,14 +55,14 @@
         </div>
         
         <div class="top-balance-area" id="topBalanceArea">
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                <span class="balance-label" style="font-size: 10px; color: #888;">BALANCE</span>
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 9px; color: #888; font-weight: bold;">MY BALANCE</span>
                 <div>
-                    <span class="balance-value" id="headerBalance" style="color: #fcc201; font-weight: bold;">0.00</span> 
-                    <small style="font-size: 10px;">ETB</small>
+                    <span id="headerBalance" style="color: #fcc201; font-weight: bold; font-size: 16px;">0.00</span> 
+                    <small style="font-size: 10px; color: #fff;">ETB</small>
                 </div>
             </div>
-            <button class="deposit-btn-top" onclick="location.href='deposit.html'">Deposit</button>
+            <button class="deposit-btn-top" onclick="location.href='deposit.html'">DEPOSIT</button>
         </div>
 
         <div class="auth-btns" id="auth-section">
@@ -133,65 +71,30 @@
         </div>
     </header>
 
-    <div class="hero-container">
-        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet" class="hero-img">
+    <div style="padding: 10px; margin-top: 60px;">
+        <img src="assets/assets/simba_bg.jpg" style="width:100%; border-radius:15px; border: 1px solid #fcc201;">
     </div>
 
-    <div class="section-label">NEW & HOT</div>
+    <div style="padding: 15px; color:#fcc201; font-weight: bold; letter-spacing: 1px;">HOT GAMES 🔥</div>
 
-    <div class="games-container">
-        <div class="game-card" onclick="playGame('jungle.html')">
-            <div class="img-wrap jungle-win-box">
-                <img src="assets/assets/jungle.background.jpg" class="tile-img-bg">
-                <div class="tile-text">
-                    <div style="font-size: 18px; font-weight: 900; color: #2ecc71;">JUNGLE</div>
-                    <div style="font-size: 12px; letter-spacing: 1px; color: #ffd700;">BIG WIN</div>
-                </div>
-            </div>
-            <p>Jungle Big Win</p>
+    <div class="games-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 10px; padding-bottom: 80px;">
+        <div class="game-card" onclick="location.href='jungle.html'">
+            <div style="height:100px; background: linear-gradient(to bottom, #1a4d1a, #000); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🦁</div>
+            <p style="font-size: 14px; margin-top: 8px;">Jungle Win</p>
         </div>
-
-        <div class="game-card" onclick="playGame('fast.keno.html')">
-            <div class="img-wrap fast-keno-box">
-                <img src="assets/assets/gold7.jpg" class="tile-img-bg">
-                <div class="tile-text">
-                    <div style="font-size: 22px; font-weight: 900; color: #00f2ff;">FAST</div>
-                    <div style="font-size: 14px; letter-spacing: 2px;">KENO</div>
-                </div>
-            </div>
-            <p>Fast Keno 80</p>
-        </div>
-
-        <div class="game-card" onclick="playGame('multi-hot-5.html')">
-            <div class="img-wrap multihot-box">
-                <img src="assets/assets/grid.jpg" class="tile-img-bg">
-                <div class="tile-text">
-                    <div style="font-size: 20px; font-weight: 900; color: #ffd700;">MULTI</div>
-                    <div style="font-size: 16px; color: #ff4500;">HOT 5</div>
-                </div>
-            </div>
-            <p>Multi Hot 5</p>
-        </div>
-
-        <div class="game-card" onclick="playGame('lion.scratch.html')">
-            <div class="img-wrap mega-spin-box">🦁</div>
-            <p>Lion Scratch</p>
-        </div>
-
-        <div class="game-card" onclick="playGame('fruit.html')">
-            <div class="img-wrap mega-spin-box" style="background: linear-gradient(45deg, #444, #000) !important; border-color: #ffd700;">🎰</div>
-            <p>Simba's Gold</p>
+        <div class="game-card" onclick="location.href='fast.keno.html'">
+            <div style="height:100px; background: linear-gradient(to bottom, #1a1a4d, #000); border-radius:10px; font-size: 40px; display:flex; align-items:center; justify-content:center;">🔢</div>
+            <p style="font-size: 14px; margin-top: 8px;">Fast Keno</p>
         </div>
     </div>
 
     <footer class="footer-stats">
-        <div class="stat-item">PLAYER ID: <span id="displayUserID" style="color:#fcc201">0000</span></div>
-        <div class="stat-item">STATUS: <span id="syncStatus" style="color:#fcc201">Online</span> <span id="liveIndicator" class="syncing-indicator" style="display:none"></span></div>
+        <div class="stat-item">ID: <span id="displayUserID" style="color:#fcc201">----</span></div>
+        <div class="stat-item">SERVER: <span id="syncStatus" style="color:#fcc201">Connected</span> <span id="liveIndicator" class="syncing-indicator"></span></div>
     </footer>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
-
         let isSyncing = false; 
         
         function toggleMenu() { 
@@ -199,86 +102,54 @@
             menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
         }
 
-        function playGame(page) {
-            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-            if (!activeUser) {
-                alert("Please LOGIN or REGISTER to play!");
-                location.href = 'login.html';
-            } else {
-                location.href = page;
-            }
-        }
-
-        async function refreshBalance() {
+        async function refreshBalanceFromServer() {
             let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             if (!activeUser || isSyncing) return;
 
-            const headerBal = document.getElementById('headerBalance');
-            const syncStatus = document.getElementById('syncStatus');
-            const liveIndicator = document.getElementById('liveIndicator');
-
             isSyncing = true;
-            liveIndicator.style.display = "inline-block";
+            document.getElementById('liveIndicator').style.display = "inline-block";
 
             try {
-                // Request the total summed balance from the sheet for this phone number
+                // IMPORTANT: Action "getBalance" calculates the SUM of all approved rows
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
                 const data = await response.json();
 
                 if (data && typeof data.balance !== 'undefined') {
-                    const newTotal = parseFloat(data.balance).toFixed(2);
+                    const serverBal = parseFloat(data.balance).toFixed(2);
                     
-                    // Only update and alert if the balance has actually increased
-                    if (parseFloat(newTotal) > parseFloat(activeUser.balance || 0)) {
-                        alert(`Funds updated! Total Balance: ${newTotal} ETB`);
+                    if (document.getElementById('headerBalance').innerText !== serverBal) {
+                        document.getElementById('headerBalance').innerText = serverBal;
+                        activeUser.balance = serverBal;
+                        localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     }
-
-                    headerBal.innerText = newTotal;
-                    activeUser.balance = newTotal;
-                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    syncStatus.innerText = "Online";
+                    document.getElementById('syncStatus').innerText = "Live";
                 }
             } catch (e) {
-                syncStatus.innerText = "Sync Error";
+                document.getElementById('syncStatus').innerText = "Retry...";
             } finally {
                 isSyncing = false;
-                setTimeout(() => { liveIndicator.style.display = "none"; }, 1000);
+                setTimeout(() => { document.getElementById('liveIndicator').style.display = "none"; }, 1500);
             }
         }
 
         function init() {
             let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
-            const authSection = document.getElementById('auth-section');
-            const balanceArea = document.getElementById('topBalanceArea');
-            const menuBtn = document.getElementById('menuToggleBtn');
-            const userIDDisplay = document.getElementById('displayUserID');
-            const menuName = document.getElementById('menuUserName');
-            const headerBal = document.getElementById('headerBalance');
-
             if (activeUser) {
-                authSection.style.display = 'none';
-                balanceArea.style.display = 'flex';
-                menuBtn.style.display = 'block';
-                menuName.innerText = activeUser.name;
-                headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
-                userIDDisplay.innerText = "SB-" + activeUser.phone.toString().slice(-4);
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('topBalanceArea').style.display = 'flex';
+                document.getElementById('menuToggleBtn').style.display = 'block';
+                document.getElementById('menuUserName').innerText = activeUser.name;
+                document.getElementById('headerBalance').innerText = parseFloat(activeUser.balance || 0).toFixed(2);
+                document.getElementById('displayUserID').innerText = activeUser.phone.toString().slice(-4);
                 
-                // Fetch fresh balance immediately
-                refreshBalance();
-                // Check every 8 seconds
-                setInterval(refreshBalance, 8000);
+                refreshBalanceFromServer();
+                setInterval(refreshBalanceFromServer, 7000); // Check every 7 seconds
             } else {
-                authSection.style.display = 'flex';
-                balanceArea.style.display = 'none';
-                menuBtn.style.display = 'none';
+                document.getElementById('auth-section').style.display = 'flex';
             }
         }
 
-        function logout() {
-            localStorage.removeItem('simba_active_user');
-            location.reload();
-        }
-
+        function logout() { localStorage.removeItem('simba_active_user'); location.reload(); }
         window.onload = init;
     </script>
 </body>
