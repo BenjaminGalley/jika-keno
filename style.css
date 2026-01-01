@@ -1,89 +1,49 @@
 <style>
-    /* --- 1. GLOBAL RESET & BASE --- */
-    * { 
-        box-sizing: border-box; 
-        outline: none; 
-        -webkit-tap-highlight-color: transparent; 
-    }
+    /* 1. LAYOUT RESET - STABLE CORE */
+    * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
     body, html { 
         margin: 0; padding: 0; background: #000; 
-        font-family: 'Segoe UI', Roboto, sans-serif; 
+        font-family: 'Segoe UI', sans-serif; 
         color: white; width: 100%; height: 100%; overflow: hidden; 
     }
 
-    /* --- 2. STEADY TOP SECTION (Locked) --- */
-    .steady-top { 
-        position: fixed; top: 0; width: 100%; 
-        background: #000; z-index: 1000; 
-        box-shadow: 0 4px 10px rgba(0,0,0,0.8);
-    }
-
+    /* 2. STEADY TOP SECTION */
+    .steady-top { position: fixed; top: 0; width: 100%; background: #000; z-index: 1000; }
     .top-nav { 
         display: flex; justify-content: space-between; align-items: center; 
         padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; 
         height: 55px; 
     }
-    .left-section { display: flex; align-items: center; gap: 8px; }
-    .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
-    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px; }
+    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; }
     .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; }
 
+    /* BALANCE SECTION - NO MORE 0.00 */
     .top-balance-area { text-align: center; flex-grow: 1; }
-    .balance-label { display: block; font-size: 0.55rem; color: #888; font-weight: bold; }
+    .balance-label { display: block; font-size: 0.55rem; color: #888; }
     .balance-value { color: #f1c40f; font-weight: bold; font-size: 1.1rem; }
+    .register-btn { background: #00c853; color: #fff; padding: 7px 14px; border: none; border-radius: 5px; font-weight: bold; font-size: 0.75rem; cursor: pointer; }
 
-    .register-btn { 
-        background: #00c853; color: #fff; padding: 7px 14px; 
-        border: none; border-radius: 5px; font-weight: bold; 
-        font-size: 0.75rem; cursor: pointer; 
-    }
-
-    /* LION BANNER AREA */
-    .hero-container { width: 100%; height: 180px; overflow: hidden; border-bottom: 1px solid #222; }
+    /* THE LION BANNER SPACE */
+    .hero-container { width: 100%; height: 180px; overflow: hidden; background: #000; border-bottom: 1px solid #222; }
     .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* --- 3. SCROLLABLE CONTENT --- */
+    /* 3. SCROLLABLE GAMES AREA */
     .scrollable-content { 
-        margin-top: 235px; /* Combined height of Nav + Hero */
+        margin-top: 235px; /* Height of Nav + Banner */
         height: calc(100vh - 235px); 
-        overflow-y: auto; 
-        padding-bottom: 80px; 
+        overflow-y: auto; padding-bottom: 80px; 
         -webkit-overflow-scrolling: touch;
     }
+    .section-label { padding: 15px 15px 8px 15px; color: gold; font-weight: bold; font-size: 0.95rem; }
 
-    .section-label { 
-        padding: 15px 15px 8px 15px; color: #f1c40f; 
-        font-weight: bold; font-size: 0.95rem; display: flex; 
-        align-items: center; gap: 6px; 
-    }
-
-    /* SIDEWAYS CATEGORIES */
-    .sideways-wrap {
-        display: flex; overflow-x: auto; padding: 5px 15px; 
-        gap: 12px; white-space: nowrap;
-    }
-    .sideways-wrap::-webkit-scrollbar { display: none; }
-    .cat-item { 
-        background: #1a1a1a; padding: 8px 18px; border-radius: 20px; 
-        border: 1px solid #333; font-size: 0.75rem; font-weight: bold; 
-    }
-
-    /* --- 4. SHINY GAME GRID --- */
-    .games-container { 
-        display: grid; grid-template-columns: repeat(3, 1fr); 
-        gap: 12px; padding: 10px 15px; 
-    }
-
+    /* SHINY GRID */
+    .games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 10px 15px; }
     .game-card { 
         background: linear-gradient(145deg, #1e1e1e, #0a0a0a); 
         border: 1px solid #333; border-radius: 12px; 
-        text-align: center; padding: 15px 5px; 
-        position: relative; overflow: hidden;
-        border-bottom: 3px solid #f1c40f;
-        cursor: pointer;
+        text-align: center; padding: 15px 5px; position: relative; 
+        overflow: hidden; border-bottom: 3px solid #f1c40f; cursor: pointer;
     }
-
-    /* SHINE ANIMATION */
     .game-card::after {
         content: ''; position: absolute; top: -50%; left: -100%;
         width: 200%; height: 200%;
@@ -91,27 +51,15 @@
         transform: rotate(45deg); animation: shine 4s infinite;
     }
     @keyframes shine { 100% { left: 100%; } }
-
-    .img-wrap { 
-        height: 65px; display: flex; align-items: center; justify-content: center; 
-        margin-bottom: 10px; border-radius: 10px; background: #000; 
-    }
+    .img-wrap { height: 65px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
     .img-wrap img { width: 85%; height: 85%; object-fit: contain; }
-    .game-card p { margin: 0; font-size: 0.75rem; color: #fff; font-weight: bold; }
+    .game-card p { margin: 0; font-size: 0.7rem; color: #fff; font-weight: bold; }
 
-    /* --- 5. SIDE MENU & FOOTER --- */
-    .side-menu { 
-        position: fixed; left: -265px; top: 0; width: 260px; height: 100%; 
-        background: #111; z-index: 2000; transition: 0.3s; 
-        border-right: 2px solid #f1c40f; padding: 25px; 
-    }
-    .side-menu.open { left: 0; }
-    .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; }
-
+    /* 4. FOOTER & STATUS */
     .footer-stats { 
-        position: fixed; bottom: 0; width: 100%; 
-        display: flex; justify-content: space-between; 
-        padding: 12px 15px; background: #000; border-top: 1px solid #333; 
+        position: fixed; bottom: 0; width: 100%; display: flex; 
+        justify-content: space-between; padding: 12px 15px; 
+        background: #000; border-top: 1px solid #333; 
         font-size: 0.7rem; color: #888; z-index: 1100; 
     }
 </style>
@@ -123,9 +71,9 @@
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
         if (!user) return;
         try {
-            const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, { method: 'GET', redirect: 'follow' });
+            const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`);
             const data = await response.json();
-            // Pulls amount from Sheet (handles balance or approvedAmount)
+            // Looks for 'approvedAmount' in Column E
             let currentBal = data.balance || data.approvedAmount || 0;
             user.balance = parseFloat(currentBal).toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
@@ -133,9 +81,6 @@
             if(document.getElementById('displayID')) document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
         } catch (e) { console.log("Sync..."); }
     }
-
-    function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
-    function logout() { localStorage.removeItem('simba_active_user'); window.location.href = 'login.html'; }
-    setInterval(updateDisplay, 12000);
     window.onload = updateDisplay;
+    setInterval(updateDisplay, 15000);
 </script>
