@@ -1,5 +1,5 @@
 <style>
-    /* --- GLOBAL & BASE --- */
+    /* --- 1. GLOBAL RESET & BASE --- */
     * { 
         box-sizing: border-box; 
         outline: none; 
@@ -7,129 +7,112 @@
     }
     body, html { 
         margin: 0; padding: 0; background: #000; 
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        font-family: 'Segoe UI', Roboto, sans-serif; 
         color: white; width: 100%; height: 100%; overflow: hidden; 
     }
 
-    /* --- STEADY TOP SECTION (Locked at top) --- */
+    /* --- 2. STEADY TOP SECTION (Locked) --- */
     .steady-top { 
         position: fixed; top: 0; width: 100%; 
         background: #000; z-index: 1000; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.8);
     }
+
     .top-nav { 
         display: flex; justify-content: space-between; align-items: center; 
-        padding: 0 12px; background: #111; border-bottom: 2px solid #f1c40f; 
-        height: 60px; 
+        padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; 
+        height: 55px; 
     }
-    .left-section { display: flex; align-items: center; gap: 10px; }
-    .menu-btn { 
-        background: none; border: none; color: white; 
-        font-size: 1.8rem; cursor: pointer; padding: 5px; 
-    }
-    .brand { 
-        color: #f1c40f; font-weight: 900; font-size: 1rem; 
-        letter-spacing: 1px; display: flex; align-items: center; gap: 5px;
-    }
-    .x-logo { 
-        background: #f1c40f; color: #000; padding: 2px 6px; 
-        border-radius: 3px; font-weight: 900; font-size: 0.9rem;
-    }
+    .left-section { display: flex; align-items: center; gap: 8px; }
+    .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px; }
+    .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; }
 
     .top-balance-area { text-align: center; flex-grow: 1; }
     .balance-label { display: block; font-size: 0.55rem; color: #888; font-weight: bold; }
     .balance-value { color: #f1c40f; font-weight: bold; font-size: 1.1rem; }
 
     .register-btn { 
-        background: #00c853; color: #fff; padding: 8px 16px; 
-        border: none; border-radius: 6px; font-weight: bold; 
-        font-size: 0.8rem; cursor: pointer; box-shadow: 0 2px 5px rgba(0,200,83,0.3);
+        background: #00c853; color: #fff; padding: 7px 14px; 
+        border: none; border-radius: 5px; font-weight: bold; 
+        font-size: 0.75rem; cursor: pointer; 
     }
 
-    /* --- HERO BANNER --- */
-    .hero-container { 
-        width: 100%; height: 190px; overflow: hidden; 
-        background: #111; border-bottom: 1px solid #222; 
-    }
+    /* LION BANNER AREA */
+    .hero-container { width: 100%; height: 180px; overflow: hidden; border-bottom: 1px solid #222; }
     .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* --- SCROLLABLE CONTENT --- */
+    /* --- 3. SCROLLABLE CONTENT --- */
     .scrollable-content { 
-        margin-top: 250px; /* Height of Nav (60) + Hero (190) */
-        height: calc(100vh - 250px); 
-        overflow-y: auto; padding-bottom: 100px; 
+        margin-top: 235px; /* Combined height of Nav + Hero */
+        height: calc(100vh - 235px); 
+        overflow-y: auto; 
+        padding-bottom: 80px; 
         -webkit-overflow-scrolling: touch;
     }
 
     .section-label { 
-        padding: 20px 15px 10px 15px; color: #f1c40f; 
-        font-weight: bold; font-size: 1rem; display: flex; 
-        align-items: center; gap: 8px; 
+        padding: 15px 15px 8px 15px; color: #f1c40f; 
+        font-weight: bold; font-size: 0.95rem; display: flex; 
+        align-items: center; gap: 6px; 
     }
 
-    /* --- SIDEWAYS CATEGORIES --- */
-    .sideways-wrap { 
+    /* SIDEWAYS CATEGORIES */
+    .sideways-wrap {
         display: flex; overflow-x: auto; padding: 5px 15px; 
-        gap: 12px; scroll-behavior: smooth;
+        gap: 12px; white-space: nowrap;
     }
     .sideways-wrap::-webkit-scrollbar { display: none; }
     .cat-item { 
-        background: #1a1a1a; padding: 10px 20px; border-radius: 25px; 
+        background: #1a1a1a; padding: 8px 18px; border-radius: 20px; 
         border: 1px solid #333; font-size: 0.75rem; font-weight: bold; 
-        white-space: nowrap; transition: 0.2s;
     }
-    .cat-item.active { border-color: #f1c40f; color: #f1c40f; background: #222; }
 
-    /* --- SHINY GAME GRID --- */
+    /* --- 4. SHINY GAME GRID --- */
     .games-container { 
         display: grid; grid-template-columns: repeat(3, 1fr); 
-        gap: 12px; padding: 15px; 
+        gap: 12px; padding: 10px 15px; 
     }
+
     .game-card { 
-        background: linear-gradient(145deg, #222, #050505); 
+        background: linear-gradient(145deg, #1e1e1e, #0a0a0a); 
         border: 1px solid #333; border-radius: 12px; 
         text-align: center; padding: 15px 5px; 
         position: relative; overflow: hidden;
         border-bottom: 3px solid #f1c40f;
-        cursor: pointer; transition: transform 0.1s;
+        cursor: pointer;
     }
-    .game-card:active { transform: scale(0.95); }
 
     /* SHINE ANIMATION */
     .game-card::after {
-        content: ''; position: absolute; top: -50%; left: -150%;
+        content: ''; position: absolute; top: -50%; left: -100%;
         width: 200%; height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(241, 196, 15, 0.1), transparent);
-        transform: rotate(45deg); animation: shine 3.5s infinite;
+        background: linear-gradient(45deg, transparent, rgba(251, 196, 15, 0.15), transparent);
+        transform: rotate(45deg); animation: shine 4s infinite;
     }
-    @keyframes shine { 0% { left: -150%; } 100% { left: 150%; } }
+    @keyframes shine { 100% { left: 100%; } }
 
     .img-wrap { 
-        height: 60px; display: flex; align-items: center; justify-content: center; 
-        margin-bottom: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); 
+        height: 65px; display: flex; align-items: center; justify-content: center; 
+        margin-bottom: 10px; border-radius: 10px; background: #000; 
     }
-    .img-wrap img { width: 80%; height: 80%; object-fit: contain; }
-    .game-card p { margin: 0; font-size: 0.7rem; color: #eee; font-weight: bold; }
+    .img-wrap img { width: 85%; height: 85%; object-fit: contain; }
+    .game-card p { margin: 0; font-size: 0.75rem; color: #fff; font-weight: bold; }
 
-    /* --- SIDE MENU --- */
+    /* --- 5. SIDE MENU & FOOTER --- */
     .side-menu { 
-        position: fixed; left: -285px; top: 0; width: 280px; height: 100%; 
-        background: #0a0a0a; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        border-right: 2px solid #f1c40f; padding: 30px 20px; 
+        position: fixed; left: -265px; top: 0; width: 260px; height: 100%; 
+        background: #111; z-index: 2000; transition: 0.3s; 
+        border-right: 2px solid #f1c40f; padding: 25px; 
     }
     .side-menu.open { left: 0; }
-    .menu-links a { 
-        display: flex; align-items: center; gap: 15px;
-        color: white; text-decoration: none; padding: 18px 10px; 
-        border-bottom: 1px solid #1a1a1a; font-size: 1rem;
-    }
+    .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; }
 
-    /* --- FOOTER --- */
     .footer-stats { 
         position: fixed; bottom: 0; width: 100%; 
         display: flex; justify-content: space-between; 
-        padding: 15px 20px; background: #000; border-top: 1px solid #222; 
-        font-size: 0.75rem; color: #666; z-index: 1000; 
+        padding: 12px 15px; background: #000; border-top: 1px solid #333; 
+        font-size: 0.7rem; color: #888; z-index: 1100; 
     }
 </style>
 
@@ -142,18 +125,17 @@
         try {
             const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, { method: 'GET', redirect: 'follow' });
             const data = await response.json();
-            // Checking both balance and approvedAmount
+            // Pulls amount from Sheet (handles balance or approvedAmount)
             let currentBal = data.balance || data.approvedAmount || 0;
             user.balance = parseFloat(currentBal).toFixed(2);
             localStorage.setItem('simba_active_user', JSON.stringify(user));
             if(document.getElementById('headerBalance')) document.getElementById('headerBalance').innerText = user.balance;
             if(document.getElementById('displayID')) document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
-        } catch (e) { console.log("Syncing..."); }
+        } catch (e) { console.log("Sync..."); }
     }
 
     function toggleMenu() { document.getElementById('sideMenu').classList.toggle('open'); }
-    function logout() { localStorage.removeItem('simba_active_user'); window.location.href='login.html'; }
-
+    function logout() { localStorage.removeItem('simba_active_user'); window.location.href = 'login.html'; }
     setInterval(updateDisplay, 12000);
     window.onload = updateDisplay;
 </script>
