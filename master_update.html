@@ -9,6 +9,7 @@
         .card { background: #111827; padding: 30px; border-radius: 15px; border: 2px solid #fcc201; width: 90%; max-width: 400px; text-align: center; }
         input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fcc201; font-size: 18px; box-sizing: border-box; }
         button { width: 100%; padding: 18px; background: #fcc201; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        #status { margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -21,33 +22,44 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "PASTE_YOUR_NEW_URL_HERE";
+        // Updated with your NEW URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function addMoney() {
-            const phone = document.getElementById('phone').value;
+            const phone = document.getElementById('phone').value.trim();
             const amount = document.getElementById('amount').value;
             const btn = document.getElementById('btn');
             const status = document.getElementById('status');
 
+            if (!phone || !amount) {
+                alert("Please enter both phone and amount!");
+                return;
+            }
+
             btn.disabled = true;
             btn.innerText = "UPDATING...";
 
+            // We use action=deposit for adding money via the Admin panel as well.
+            // This ensures the Google Script records it in the history sheet.
+            const details = encodeURIComponent("ADMIN TOP-UP");
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${phone}&amount=${amount}&details=${details}`;
+
             try {
-                // This 'method: POST' matches the 'doPost' in your script
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        action: 'setManualBalance',
-                        phone: phone,
-                        amount: amount
-                    })
+                // Using GET with no-cors to match the simplified Google Script logic
+                await fetch(finalUrl, {
+                    method: 'GET',
+                    mode: 'no-cors'
                 });
-                status.innerText = "✅ Done! Check the player's balance.";
+                
+                status.innerText = "✅ Done! Request sent to Sheet.";
                 status.style.color = "#2ecc71";
+                
+                // Clear inputs
+                document.getElementById('amount').value = "";
             } catch (e) {
                 status.innerText = "❌ Error. Check your Script URL.";
                 status.style.color = "#e74c3c";
+                console.error(e);
             } finally {
                 btn.disabled = false;
                 btn.innerText = "UPDATE ACCOUNT";
