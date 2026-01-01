@@ -7,8 +7,37 @@
     <link rel="stylesheet" href="style.css">
     <style>
         #auth-section, #topBalanceArea, #menuToggleBtn { display: none; }
-        .footer-stats { display: flex; justify-content: space-around; padding: 10px; background: #000; border-top: 1px solid #fcc201; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; font-size: 12px; z-index: 100; }
         
+        .footer-stats { 
+            display: flex; justify-content: space-around; padding: 10px; 
+            background: #000; border-top: 1px solid #fcc201; 
+            position: fixed; bottom: 0; width: 100%; 
+            box-sizing: border-box; font-size: 12px; z-index: 100; 
+        }
+        
+        /* New Deposit Button Style */
+        .deposit-btn-top {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-left: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .top-balance-area {
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
         /* Game Tile Styles */
         .mega-spin-box {
             background: linear-gradient(45deg, #fcc201, #92400e) !important;
@@ -88,8 +117,14 @@
         </div>
         
         <div class="top-balance-area" id="topBalanceArea">
-            <span class="balance-label">BALANCE</span>
-            <span class="balance-value" id="headerBalance">0.00</span> <small>ETB</small>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span class="balance-label" style="font-size: 10px; color: #888;">BALANCE</span>
+                <div>
+                    <span class="balance-value" id="headerBalance" style="color: #fcc201; font-weight: bold;">0.00</span> 
+                    <small style="font-size: 10px;">ETB</small>
+                </div>
+            </div>
+            <button class="deposit-btn-top" onclick="location.href='deposit.html'">Deposit</button>
         </div>
 
         <div class="auth-btns" id="auth-section">
@@ -157,7 +192,7 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
 
-        let isSyncing = false; // Prevent double checking
+        let isSyncing = false; 
         
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
@@ -174,7 +209,44 @@
             }
         }
 
-        async function checkAuthStatus() {
+        async function refreshBalance() {
+            let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
+            if (!activeUser || isSyncing) return;
+
+            const headerBal = document.getElementById('headerBalance');
+            const syncStatus = document.getElementById('syncStatus');
+            const liveIndicator = document.getElementById('liveIndicator');
+
+            isSyncing = true;
+            liveIndicator.style.display = "inline-block";
+
+            try {
+                // Request the total summed balance from the sheet for this phone number
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
+                const data = await response.json();
+
+                if (data && typeof data.balance !== 'undefined') {
+                    const newTotal = parseFloat(data.balance).toFixed(2);
+                    
+                    // Only update and alert if the balance has actually increased
+                    if (parseFloat(newTotal) > parseFloat(activeUser.balance || 0)) {
+                        alert(`Funds updated! Total Balance: ${newTotal} ETB`);
+                    }
+
+                    headerBal.innerText = newTotal;
+                    activeUser.balance = newTotal;
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    syncStatus.innerText = "Online";
+                }
+            } catch (e) {
+                syncStatus.innerText = "Sync Error";
+            } finally {
+                isSyncing = false;
+                setTimeout(() => { liveIndicator.style.display = "none"; }, 1000);
+            }
+        }
+
+        function init() {
             let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
             const authSection = document.getElementById('auth-section');
             const balanceArea = document.getElementById('topBalanceArea');
@@ -182,51 +254,19 @@
             const userIDDisplay = document.getElementById('displayUserID');
             const menuName = document.getElementById('menuUserName');
             const headerBal = document.getElementById('headerBalance');
-            const syncStatus = document.getElementById('syncStatus');
-            const liveIndicator = document.getElementById('liveIndicator');
 
             if (activeUser) {
                 authSection.style.display = 'none';
                 balanceArea.style.display = 'flex';
                 menuBtn.style.display = 'block';
                 menuName.innerText = activeUser.name;
-                
-                // Show cached balance instantly
                 headerBal.innerText = parseFloat(activeUser.balance || 0).toFixed(2);
-                userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
-
-                // STOP if already running to avoid network jams
-                if (isSyncing) return;
+                userIDDisplay.innerText = "SB-" + activeUser.phone.toString().slice(-4);
                 
-                // Start Background Sync
-                isSyncing = true;
-                liveIndicator.style.display = "inline-block"; // Show pulsing dot
-                
-                try {
-                    const userPhone = activeUser.phone.toString();
-                    const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
-                    const data = await response.json();
-                    
-                    if (data && data.approvedAmount > 0) {
-                        let currentBal = parseFloat(activeUser.balance || 0);
-                        let addedAmount = parseFloat(data.approvedAmount);
-                        currentBal += addedAmount;
-                        
-                        activeUser.balance = currentBal.toFixed(2);
-                        headerBal.innerText = activeUser.balance;
-                        localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                        
-                        // NOTIFY USER
-                        alert(`Successfully Received ${addedAmount} ETB!`);
-                        syncStatus.innerText = "Funds Received ✅";
-                    } else {
-                        syncStatus.innerText = "Online";
-                    }
-                } catch (e) {
-                    syncStatus.innerText = "Weak Connection";
-                } finally {
-                    isSyncing = false;
-                }
+                // Fetch fresh balance immediately
+                refreshBalance();
+                // Check every 8 seconds
+                setInterval(refreshBalance, 8000);
             } else {
                 authSection.style.display = 'flex';
                 balanceArea.style.display = 'none';
@@ -239,12 +279,7 @@
             location.reload();
         }
 
-        // 1. Check immediately on load
-        window.addEventListener('DOMContentLoaded', checkAuthStatus);
-
-        // 2. TURBO MODE: Check every 5 seconds automatically
-        setInterval(checkAuthStatus, 5000); 
-
+        window.onload = init;
     </script>
 </body>
 </html>
