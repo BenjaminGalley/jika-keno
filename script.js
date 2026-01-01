@@ -11,7 +11,11 @@
         }
 
         try {
-            const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`);
+            // Added redirect: 'follow' to ensure it gets the balance from Google Sheets
+            const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, {
+                method: 'GET',
+                redirect: 'follow'
+            });
             const data = await response.json();
             
             if (data && data.balance !== undefined) {
@@ -24,6 +28,11 @@
                 if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
                 if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
                 if(document.getElementById('menuToggleBtn')) document.getElementById('menuToggleBtn').style.display = 'block';
+                
+                // Also update the display ID based on the phone
+                if(document.getElementById('displayID')) {
+                    document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
+                }
             }
         } catch (e) { 
             console.log("Syncing balance..."); 
