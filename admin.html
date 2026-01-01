@@ -1,62 +1,65 @@
-function doGet(e) {
-  var action = e.parameter.action;
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getSheetByName("Sheet1");
-  var data = sheet.getDataRange().getValues();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Bet Admin</title>
+    <style>
+        body { background: #05070a; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: #111827; border: 1px solid #374151; padding: 15px; margin: 10px auto; max-width: 400px; border-radius: 12px; text-align: left; }
+        .btn-approve { background: #10b981; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        #login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #05070a; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        input { padding: 12px; background: #111827; border: 1px solid #fbbf24; color: white; border-radius: 8px; text-align: center; }
+    </style>
+</head>
+<body onload="checkAuth()">
+    <div id="login">
+        <h2 style="color: #00f2ff;">ADMIN LOGIN</h2>
+        <input type="password" id="key" placeholder="ENTER B328 KEY">
+        <button onclick="unlock()" style="background:#fbbf24; padding: 10px 20px; margin-top:10px; border:none; border-radius:8px;">UNLOCK</button>
+    </div>
 
-  // --- 1. ADMIN ACTION: Load Pending Requests into Admin.html ---
-  if (action == "getPending") {
-    var pending = [];
-    for (var i = 1; i < data.length; i++) {
-      var status = data[i][6] ? data[i][6].toString().trim() : "";
-      // Admin page looks for PENDING (Deposits) or W-PENDING (Withdrawals)
-      if (status === "PENDING" || status === "W-PENDING") {
-        pending.push({
-          row: i + 1,
-          phone: data[i][1],
-          amount: data[i][4],
-          details: data[i][7] || "",
-          type: data[i][3]
-        });
-      }
-    }
-    return ContentService.createTextOutput(JSON.stringify(pending))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+    <div id="content" style="display:none;">
+        <h1>PENDING PAYMENTS</h1>
+        <div id="list">Loading...</div>
+    </div>
 
-  // --- 2. ADMIN ACTION: Approve/Deny from Admin.html buttons ---
-  if (action == "updateStatus") {
-    var row = parseInt(e.parameter.row);
-    var status = e.parameter.status; // "Approve" or "Deny"
-    sheet.getRange(row, 7).setValue(status); 
-    return ContentService.createTextOutput("Success");
-  }
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
 
-  // --- 3. PLAYER ACTION: Deposit ---
-  if (action == "deposit") {
-    sheet.appendRow([new Date(), e.parameter.phone, e.parameter.name, "DEPOSIT", e.parameter.amount, "", "PENDING", e.parameter.details]);
-    return ContentService.createTextOutput("Success");
-  }
+        function unlock() {
+            if(document.getElementById('key').value === "B328") {
+                localStorage.setItem('simba_admin', 'ok');
+                location.reload();
+            } else { alert("Wrong Key"); }
+        }
 
-  // --- 4. PLAYER ACTION: Check Status (Sync Balance) ---
-  if (action == "checkStatus") {
-    var phone = e.parameter.phone;
-    var total = 0;
-    for (var i = 1; i < data.length; i++) {
-      var rowPhone = data[i][1] ? data[i][1].toString().trim() : "";
-      var rowStatus = data[i][6] ? data[i][6].toString().trim() : "";
-      if (rowPhone === phone.toString().trim() && rowStatus === "Approve") {
-        total += parseFloat(data[i][4] || 0);
-        sheet.getRange(i + 1, 7).setValue("SYNCED"); // Prevent double-pay
-      }
-    }
-    return ContentService.createTextOutput(JSON.stringify({approvedAmount: total}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
+        function checkAuth() {
+            if(localStorage.getItem('simba_admin') === 'ok') {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                loadData();
+            }
+        }
 
-  // --- 5. REGISTRATION ---
-  if (action == "register") {
-    sheet.appendRow([new Date(), e.parameter.phone, e.parameter.name, e.parameter.pass, 0, "", "USER"]);
-    return ContentService.createTextOutput("Success");
-  }
-}
+        async function loadData() {
+            const res = await fetch(SCRIPT_URL + "?action=getPending");
+            const data = await res.json();
+            document.getElementById('list').innerHTML = data.map(req => `
+                <div class="card">
+                    <b>Phone:</b> ${req.phone}<br>
+                    <b>Amount:</b> ${req.amount} ETB<br>
+                    <b>Details:</b> ${req.details}
+                    <button class="btn-approve" onclick="approve(${req.row})">APPROVE</button>
+                </div>
+            `).join('');
+        }
+
+        async function approve(row) {
+            await fetch(`${SCRIPT_URL}?action=updateStatus&row=${row}&status=Approve`, { mode: 'no-cors' });
+            alert("Approved!");
+            location.reload();
+        }
+    </script>
+</body>
+</html>
