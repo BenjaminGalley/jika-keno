@@ -1,4 +1,5 @@
 <script>
+    // UPDATED WITH YOUR NEW DEPLOYMENT URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec'; 
 
     async function updateDisplay() {
@@ -22,8 +23,11 @@
                 
                 if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
                 if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
+                if(document.getElementById('menuToggleBtn')) document.getElementById('menuToggleBtn').style.display = 'block';
             }
-        } catch (e) { console.log("Sync..."); }
+        } catch (e) { 
+            console.log("Syncing balance..."); 
+        }
     }
 
     function checkGameBalance(cost) {
@@ -40,25 +44,45 @@
         const amt = parseFloat(document.getElementById('wdAmount').value);
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
 
-        if (!user || !recPhone || isNaN(amt)) return alert("Fill all info");
-        if (amt > parseFloat(user.balance)) return alert("Low Balance");
+        if (!user || !recPhone || isNaN(amt)) return alert("Please fill all information!");
+        if (amt > parseFloat(user.balance)) return alert("Insufficient Balance!");
 
-        user.balance = parseFloat(user.balance) - amt;
+        // Update UI locally immediately
+        const newLocalBal = parseFloat(user.balance) - amt;
+        user.balance = newLocalBal;
         localStorage.setItem('simba_active_user', JSON.stringify(user));
-        if(document.getElementById('headerBalance')) document.getElementById('headerBalance').innerText = user.balance.toFixed(2);
+        
+        if(document.getElementById('headerBalance')) {
+            document.getElementById('headerBalance').innerText = newLocalBal.toFixed(2);
+        }
 
-        fetch(`${scriptURL}?action=withdraw&phone=${user.phone}&amount=-${amt}&details=WITHDRAW TO ${recPhone}`, { method: 'GET', mode: 'no-cors' });
-        alert("Sent!");
+        // Send to sheet - ensures amount is negative for balance subtraction
+        const withdrawAmt = -Math.abs(amt);
+        fetch(`${scriptURL}?action=withdraw&phone=${user.phone}&amount=${withdrawAmt}&details=WITHDRAW TO ${recPhone}`, { 
+            method: 'GET', 
+            mode: 'no-cors' 
+        });
+
+        alert("Withdrawal request sent!");
         window.location.href = 'index.html';
     }
 
     function toggleMenu() {
         const menu = document.getElementById('sideMenu');
-        if (menu) menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
+        const overlay = document.getElementById('menuOverlay');
+        if (menu) {
+            const isOpen = menu.style.left === '0px';
+            menu.style.left = isOpen ? '-260px' : '0px';
+            if (overlay) overlay.style.display = isOpen ? 'none' : 'block';
+        }
     }
 
-    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
+    function logout() { 
+        localStorage.removeItem('simba_active_user'); 
+        window.location.href = 'login.html'; 
+    }
 
+    // Auto-sync balance every 15 seconds
     setInterval(updateDisplay, 15000);
     window.onload = updateDisplay;
 </script>
