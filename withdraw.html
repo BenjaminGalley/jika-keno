@@ -55,7 +55,8 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // UPDATED TO MATCH YOUR WORKING ADMIN SYSTEM
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         function init() {
@@ -81,14 +82,14 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
-            // 2. Format details for Column C in Google Sheets
+            // 2. Format details for Admin to see clearly
             const details = `WITHDRAW: ${method} TO ${rName} (${rPhone})`;
             
-            // 3. Prepare the URL (Note: amount is sent as a positive number, script handles the negative in Sheet)
+            // 3. Prepare URL (Action: withdraw)
             const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
-                // Send request to Google Script
+                // Send to Google Script
                 await fetch(finalUrl, { mode: 'no-cors' });
 
                 // 4. DEDUCT LOCALLY IMMEDIATELY
@@ -106,7 +107,7 @@
                 setTimeout(() => { window.location.href = "index.html"; }, 2000);
 
             } catch (error) {
-                // If cors error occurs, the request usually still went through
+                // If network is slow, still confirm and redirect
                 alert("Request Sent!");
                 window.location.href = "index.html";
             }
