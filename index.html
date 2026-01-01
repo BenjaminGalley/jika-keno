@@ -128,7 +128,8 @@
     </footer>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // Updated with your NEW Script URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         function toggleMenu() { 
             const menu = document.getElementById('sideMenu');
@@ -146,7 +147,7 @@
             let user = JSON.parse(localStorage.getItem('simba_active_user'));
             if (!user) return;
             try {
-                // ADDED 'redirect: follow' to handle Google Script redirects correctly
+                // Using getBalance and redirect follow
                 const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
                     method: 'GET',
                     redirect: 'follow'
