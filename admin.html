@@ -33,8 +33,10 @@
         <div id="requestList"></div>
     </div>
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // UPDATED URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let isAuthorized = false;
+
         function checkPin() {
             if(document.getElementById('adminPin').value.trim() === "B328") { 
                 isAuthorized = true;
@@ -43,34 +45,57 @@
                 loadRequests();
             } else { alert("Incorrect PIN"); }
         }
+
         async function loadRequests() {
             const list = document.getElementById('requestList');
             list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing...</p>';
-            const response = await fetch(`${SCRIPT_URL}?action=getPending`);
-            const data = await response.json();
-            list.innerHTML = "";
-            data.forEach(req => {
-                let d = parseDetails(req.details || "");
-                const div = document.createElement("div");
-                div.className = "card";
-                div.innerHTML = `<div class="row-id">ROW: ${req.row}</div><div class="detail-row"><span class="detail-label">PLAYER:</span> ${req.phone}</div><div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div><div class="info-box"><div class="detail-row"><span class="detail-label">SENDER:</span> ${d.name}</div><div class="detail-row"><span class="detail-label">VIA:</span> ${d.method}</div></div><button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE</button><button class="btn-deny" onclick="processRequest(${req.row}, 'Deny')">DENY</button>`;
-                list.appendChild(div);
-            });
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getPending`, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                const data = await response.json();
+                list.innerHTML = "";
+                
+                if (data.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found.</p>';
+                    return;
+                }
+
+                data.forEach(req => {
+                    const div = document.createElement("div");
+                    div.className = "card";
+                    div.innerHTML = `
+                        <div class="row-id">ROW: ${req.row}</div>
+                        <div class="detail-row"><span class="detail-label">PLAYER:</span> ${req.phone}</div>
+                        <div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div>
+                        <div class="info-box">
+                            <div class="detail-row"><span class="detail-label">DETAILS:</span> ${req.details}</div>
+                        </div>
+                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE</button>
+                        <button class="btn-deny" onclick="processRequest(${req.row}, 'deny')">DENY</button>
+                    `;
+                    list.appendChild(div);
+                });
+            } catch (e) {
+                list.innerHTML = '<p style="text-align:center; color:red">Error loading data.</p>';
+            }
         }
-        function parseDetails(str) {
-            let res = { name: "N/A", method: "Direct" };
-            if (str.includes("FROM")) {
-                let pts = str.split(" FROM ");
-                res.method = pts[0].replace("DEP:", "").trim();
-                res.name = pts[1].split("(")[0].trim();
-            } else { res.method = str; }
-            return res;
-        }
+
         async function processRequest(row, status) {
-            if(!confirm("Proceed?")) return;
-            await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { mode: 'no-cors' });
-            alert("Database Updated!");
-            loadRequests();
+            if(!confirm("Proceed with " + status + "?")) return;
+            
+            try {
+                // Using the updated action names: 'approve' or 'deny'
+                await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { 
+                    method: 'GET',
+                    mode: 'no-cors' 
+                });
+                alert("Request " + status + "d!");
+                loadRequests();
+            } catch (e) {
+                alert("Failed to update status.");
+            }
         }
     </script>
 </body>
