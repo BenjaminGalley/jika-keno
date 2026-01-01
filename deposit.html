@@ -93,7 +93,7 @@
             btn.innerText = "SENDING...";
 
             const details = `DEP: ${method} FROM ${sName} (${sPhone})`;
-            // Updated to match the script's column structure (A:Date, B:Phone, C:Name, D:Action, E:Amount, G:Status, H:Details)
+            // Action remains 'deposit' to append a new PENDING row
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
@@ -116,7 +116,7 @@
             syncBtn.innerText = "CHECKING...";
 
             try {
-                // CHANGED: Using 'getBalance' because that's what we built into your script to sum approved rows
+                // Action 'getBalance' matches our script to get the SUM of all 'Approve' rows
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
                 const data = await response.json();
 
@@ -134,7 +134,7 @@
                     }
                 }
             } catch (e) {
-                alert("Error connecting to server.");
+                alert("Error connecting to server. Check your Internet or Script Deployment.");
             } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
