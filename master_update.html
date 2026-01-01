@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Admin | Master Control</title>
+    <style>
+        :root { --gold: #fcc201; --bg: #05070a; --card: #111827; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .admin-card { background: var(--card); padding: 30px; border-radius: 15px; border: 2px solid var(--gold); width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(252,194,1,0.2); }
+        h2 { color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+        label { display: block; text-align: left; font-size: 12px; color: #888; margin-bottom: 5px; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #333; background: #000; color: var(--gold); font-size: 18px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: var(--gold); }
+        button { width: 100%; padding: 18px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        button:active { transform: scale(0.98); }
+        #status { margin-top: 20px; font-weight: bold; font-size: 14px; padding: 10px; border-radius: 5px; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h2>Master Top-Up</h2>
+        <p style="font-size: 13px; color: #aaa; margin-bottom: 25px;">Manual Balance Injection Panel</p>
+        
+        <label>PLAYER PHONE NUMBER</label>
+        <input type="number" id="targetPhone" placeholder="09...">
+
+        <label>AMOUNT TO ADD (ETB)</label>
+        <input type="number" id="addAmount" placeholder="1000">
+
+        <button id="mainBtn" onclick="sendMoney()">UPDATE ACCOUNT</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // PASTE YOUR SCRIPT URL HERE
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+
+        async function sendMoney() {
+            const phone = document.getElementById('targetPhone').value.trim();
+            const amount = document.getElementById('addAmount').value.trim();
+            const btn = document.getElementById('mainBtn');
+            const status = document.getElementById('status');
+
+            if(!phone || !amount) {
+                alert("Please enter both phone and amount!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "COMMUNICATING WITH SHEET...";
+            status.style.display = "none";
+
+            try {
+                // We use POST to bypass browser "Refusal" (CORS) issues
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'setManualBalance',
+                        phone: phone,
+                        amount: amount
+                    })
+                });
+                
+                // Show Success
+                status.style.display = "block";
+                status.style.background = "rgba(46, 204, 113, 0.2)";
+                status.style.color = "#2ecc71";
+                status.innerHTML = `✅ Successfully added ${amount} ETB to ${phone}`;
+                
+                // Clear input
+                document.getElementById('addAmount').value = "";
+            } catch (e) {
+                status.style.display = "block";
+                status.style.background = "rgba(231, 76, 60, 0.2)";
+                status.style.color = "#e74c3c";
+                status.innerHTML = "❌ Connection Failed. Check Deployment.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "UPDATE ACCOUNT";
+            }
+        }
+    </script>
+</body>
+</html>
