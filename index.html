@@ -128,7 +128,6 @@
     </footer>
 
     <script>
-        // UPDATED WITH YOUR NEW URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         function toggleMenu() { 
@@ -147,7 +146,11 @@
             let user = JSON.parse(localStorage.getItem('simba_active_user'));
             if (!user) return;
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
+                // ADDED 'redirect: follow' to handle Google Script redirects correctly
+                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
                 const data = await res.json();
                 if (data && data.balance !== undefined) {
                     const newBal = parseFloat(data.balance).toFixed(2);
@@ -155,7 +158,7 @@
                     user.balance = newBal;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                 }
-            } catch (e) { console.log("Balance sync issue"); }
+            } catch (e) { console.log("Balance sync issue", e); }
         }
 
         function init() {
@@ -170,7 +173,7 @@
                 document.getElementById('headerBalance').innerText = parseFloat(user.balance || 0).toFixed(2);
                 
                 refreshBalance();
-                setInterval(refreshBalance, 10000);
+                setInterval(refreshBalance, 10000); // Syncs every 10 seconds
             } else {
                 document.getElementById('auth-section').style.display = 'flex';
                 document.getElementById('topBalanceArea').style.display = 'none';
