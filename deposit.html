@@ -75,7 +75,8 @@
     <a href="index.html" class="back-link">← Go Back to Lobby</a>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxHch17y0l5HMzDXkG2S7jSisG-aCEmL90Saw9yUM0vtjSDBb9L7krTn00acWspAPLV/exec";
+        // UPDATED WITH YOUR NEW DEPLOYMENT URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function submitDepositRequest() {
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
@@ -93,7 +94,6 @@
             btn.innerText = "SENDING...";
 
             const details = `DEP: ${method} FROM ${sName} (${sPhone})`;
-            // Action remains 'deposit' to append a new PENDING row
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
@@ -116,7 +116,6 @@
             syncBtn.innerText = "CHECKING...";
 
             try {
-                // Action 'getBalance' matches our script to get the SUM of all 'Approve' rows
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
                 const data = await response.json();
 
@@ -134,7 +133,7 @@
                     }
                 }
             } catch (e) {
-                alert("Error connecting to server. Check your Internet or Script Deployment.");
+                alert("Error connecting to server. Please check your internet.");
             } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
