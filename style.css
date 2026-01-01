@@ -1,98 +1,151 @@
 <style>
-    /* YOUR ORIGINAL GITHUB CSS - DO NOT TOUCH */
+    /* 1. GLOBAL & RESET */
     * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-    body, html { margin: 0; padding: 0; background: #000; font-family: sans-serif; color: white; width: 100%; height: 100%; overflow-x: hidden; }
+    body, html { 
+        margin: 0; padding: 0; background: #000; 
+        font-family: 'Segoe UI', Roboto, sans-serif; 
+        color: white; width: 100%; height: 100%; overflow: hidden; 
+    }
 
-    .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; position: sticky; top: 0; z-index: 1000; height: 55px; }
-    .left-section { display: flex; align-items: center; gap: 5px; }
-    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; }
-    .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; margin-right: 2px; }
+    /* 2. STEADY TOP SECTION (Logo, Balance, Banner) */
+    .steady-top { 
+        position: fixed; 
+        top: 0; 
+        width: 100%;
+        background: #000; 
+        z-index: 1000; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+    }
+
+    .top-nav { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 0 10px; background: #111; border-bottom: 2px solid #f1c40f; 
+        height: 55px; 
+    }
+    .left-section { display: flex; align-items: center; gap: 8px; }
+    .menu-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 5px; }
+    .brand { color: #f1c40f; font-weight: bold; font-size: 0.85rem; letter-spacing: 1px; }
+    .x-logo { background: #f1c40f; color: #000; padding: 1px 4px; border-radius: 2px; font-weight: 900; }
 
     .top-balance-area { text-align: center; flex-grow: 1; }
-    .balance-label { display: block; font-size: 0.5rem; color: #888; }
-    .balance-value { color: #f1c40f; font-weight: bold; font-size: 1rem; }
+    .balance-label { display: block; font-size: 0.55rem; color: #888; font-weight: bold; }
+    .balance-value { color: #f1c40f; font-weight: bold; font-size: 1.1rem; }
 
-    .auth-btns button { padding: 6px 10px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-    .login-btn { background: #333; color: #fff; margin-right: 4px; }
-    .register-btn { background: #fff; color: #000; }
+    .register-btn { 
+        background: #00c853; color: #fff; padding: 7px 14px; 
+        border: none; border-radius: 5px; font-weight: bold; 
+        font-size: 0.75rem; cursor: pointer; 
+    }
 
-    .hero-container { width: 100%; height: 180px; overflow: hidden; background: #000; }
-    .hero-img { width: 100%; height: 100%; object-fit: fill; display: block; }
+    .hero-container { width: 100%; height: 180px; overflow: hidden; border-bottom: 1px solid #222; }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .section-label { padding: 10px 15px; color: gold; font-weight: bold; font-size: 0.8rem; }
+    /* 3. SCROLLABLE CONTENT (Games Grid) */
+    .scrollable-content { 
+        margin-top: 235px; /* Height of steady-top */
+        height: calc(100vh - 235px); 
+        overflow-y: auto; 
+        padding-bottom: 80px; 
+        -webkit-overflow-scrolling: touch;
+    }
 
-    .games-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 10px 80px 10px; }
-    .game-card { background: #111; border: 1.5px solid #333; border-radius: 10px; text-align: center; padding: 10px 5px; border-bottom: 2.5px solid #f1c40f; }
-    .img-wrap { height: 55px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; border-radius: 5px; background: #000; overflow: hidden; }
+    .section-label { 
+        padding: 15px 15px 8px 15px; color: #f1c40f; 
+        font-weight: bold; font-size: 0.95rem; display: flex; 
+        align-items: center; gap: 6px; 
+    }
+
+    /* Sideways Categories (Keno Style) */
+    .sideways-wrap {
+        display: flex; overflow-x: auto; padding: 5px 15px; 
+        gap: 12px; white-space: nowrap;
+    }
+    .sideways-wrap::-webkit-scrollbar { display: none; }
+    .cat-item { 
+        background: #1a1a1a; padding: 8px 18px; border-radius: 20px; 
+        border: 1px solid #333; font-size: 0.75rem; font-weight: bold; 
+    }
+
+    /* 4. SHINY GAME GRID */
+    .games-container { 
+        display: grid; grid-template-columns: repeat(3, 1fr); 
+        gap: 12px; padding: 10px 15px; 
+    }
+
+    .game-card { 
+        background: linear-gradient(145deg, #1e1e1e, #0a0a0a); 
+        border: 1px solid #333; border-radius: 12px; 
+        text-align: center; padding: 15px 5px; 
+        position: relative; overflow: hidden;
+        border-bottom: 3px solid #f1c40f;
+    }
+
+    /* Shiny Animation */
+    .game-card::after {
+        content: ''; position: absolute; top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(251, 196, 15, 0.15), transparent);
+        transform: rotate(45deg); animation: shine 4s infinite;
+    }
+    @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+
+    .img-wrap { 
+        height: 65px; display: flex; align-items: center; justify-content: center; 
+        margin-bottom: 10px; border-radius: 10px; background: #000; 
+    }
     .img-wrap img { width: 85%; height: 85%; object-fit: contain; }
-    .game-card p { margin: 0; font-size: 0.65rem; color: #ddd; font-weight: bold; }
+    .game-card p { margin: 0; font-size: 0.75rem; color: #fff; font-weight: bold; }
 
-    .keno-box { background: #004488; color: white; font-weight: bold; }
-    .sba-box { background: #880000; color: white; font-weight: bold; }
-    .empty-box { background: #222; color: #555; font-weight: bold; }
-
-    .side-menu { position: fixed; left: -260px; top: 0; width: 250px; height: 100%; background: #111; z-index: 2000; transition: 0.3s; border-right: 1px solid gold; padding: 20px; }
+    /* 5. SIDE MENU & FOOTER */
+    .side-menu { 
+        position: fixed; left: -265px; top: 0; width: 260px; height: 100%; 
+        background: #111; z-index: 2000; transition: 0.3s; 
+        border-right: 2px solid #f1c40f; padding: 25px; 
+    }
     .side-menu.open { left: 0; }
-    .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; font-size: 0.9rem; }
+    .menu-links a { display: block; color: white; text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; }
 
-    .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
-    .modal-content { background: #1a1a1a; margin: 20% auto; padding: 20px; border: 1px solid gold; width: 85%; border-radius: 10px; }
-    .modal-content input { width: 100%; padding: 12px; margin: 8px 0; background: #222; border: 1px solid #444; color: white; border-radius: 5px; }
-    .submit-btn { background: #f1c40f; color: #000; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
-    .back-btn { background: none; border: none; color: #777; width: 100%; margin-top: 10px; cursor: pointer; }
-
-    .footer-stats { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-between; padding: 12px 15px; background: #000; border-top: 1px solid #333; font-size: 0.7rem; color: #888; }
-    #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; color: gold; padding: 10px 20px; border-radius: 20px; z-index: 5000; font-size: 0.8rem; border: 1px solid gold; transition: 0.3s; }
-    .toast-hidden { opacity: 0; visibility: hidden; }
+    .footer-stats { 
+        position: fixed; bottom: 0; width: 100%; 
+        display: flex; justify-content: space-between; 
+        padding: 12px 15px; background: #000; border-top: 1px solid #333; 
+        font-size: 0.7rem; color: #888; z-index: 1100; 
+    }
 </style>
 
 <script>
-    // UPDATED WITH YOUR NEW DEPLOYMENT URL
+    // UPDATED SCRIPT URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec'; 
 
     async function updateDisplay() {
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
-        if (!user) {
-            if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'flex';
-            if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'none';
-            return;
-        }
+        if (!user) return;
 
         try {
-            // Updated to getBalance + redirect follow to fix the 0.00 issue
+            // Fetch balance using phone as ID
             const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`, {
                 method: 'GET',
                 redirect: 'follow'
             });
             const data = await response.json();
             
-            if (data && data.balance !== undefined) {
-                user.balance = parseFloat(data.balance).toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(user));
-                
-                const balHeader = document.getElementById('headerBalance');
-                if(balHeader) balHeader.innerText = user.balance;
-                
-                if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
-                if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
-                if(document.getElementById('menuToggleBtn')) document.getElementById('menuToggleBtn').style.display = 'block';
-                
-                if(document.getElementById('displayID')) {
-                    document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
-                }
+            // BALANCE FIX: Check for 'balance' OR 'approvedAmount' from sheet
+            let currentBal = data.balance || data.approvedAmount || 0;
+            
+            user.balance = parseFloat(currentBal).toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+            
+            // Update Header Balance UI
+            const balHeader = document.getElementById('headerBalance');
+            if(balHeader) balHeader.innerText = user.balance;
+
+            // Update ID Display
+            if(document.getElementById('displayID')) {
+                document.getElementById('displayID').innerText = "SB-" + user.phone.toString().slice(-4);
             }
         } catch (e) { 
-            console.log("Balance Syncing..."); 
+            console.log("Sync in progress..."); 
         }
-    }
-
-    function checkGameBalance(cost) {
-        const user = JSON.parse(localStorage.getItem('simba_active_user'));
-        if (!user || parseFloat(user.balance) < cost) {
-            alert("Insufficient Balance! / በቂ ቀሪ ሂሳብ የሎትም!");
-            return false;
-        }
-        return true;
     }
 
     function toggleMenu() {
@@ -105,7 +158,7 @@
         window.location.href = 'login.html'; 
     }
 
-    // Auto-sync balance every 15 seconds
-    setInterval(updateDisplay, 15000);
+    // Refresh every 12 seconds
+    setInterval(updateDisplay, 12000);
     window.onload = updateDisplay;
 </script>
