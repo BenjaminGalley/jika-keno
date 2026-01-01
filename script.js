@@ -1,11 +1,7 @@
 <script>
-    // SIMBA BET MASTER - SYNCED & SECURE
-    const scriptURL = 'PASTE_YOUR_NEW_DEPLOY_URL_HERE'; 
+    // SIMBA BET MASTER - PLAYER SYNC
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec'; 
 
-    /**
-     * BALANCE SYNC: The "Bridge"
-     * This fixes the 0.00 ETB by correctly asking the Sheet for 'getBalance'
-     */
     async function updateDisplay() {
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
         if (!user) {
@@ -15,6 +11,7 @@
         }
 
         try {
+            // FIXED: Using getBalance to count all "Approve" rows in Column G
             const response = await fetch(`${scriptURL}?action=getBalance&phone=${user.phone}`);
             const data = await response.json();
             
@@ -28,15 +25,9 @@
                 if(document.getElementById('auth-section')) document.getElementById('auth-section').style.display = 'none';
                 if(document.getElementById('topBalanceArea')) document.getElementById('topBalanceArea').style.display = 'flex';
             }
-        } catch (e) { 
-            console.log("Network sync in progress..."); 
-        }
+        } catch (e) { console.log("Syncing..."); }
     }
 
-    /**
-     * GAME GATEKEEPER: DO NOT DELETE
-     * Your Scratch and Multiplier games call this to allow/block play.
-     */
     function checkGameBalance(cost) {
         const user = JSON.parse(localStorage.getItem('simba_active_user'));
         if (!user || parseFloat(user.balance) < cost) {
@@ -46,9 +37,6 @@
         return true;
     }
 
-    /**
-     * DEPOSIT SYSTEM
-     */
     function submitDepositRequest() {
         const method = document.getElementById('method').value;
         const sName = document.getElementById('senderName').value.trim();
@@ -62,13 +50,10 @@
         const finalURL = `${scriptURL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amt}&details=${encodeURIComponent(details)}`;
         
         fetch(finalURL, { method: 'GET', mode: 'no-cors' });
-        alert("ጥያቄዎ ተልኳል! Balance updates after Admin approval.");
+        alert("ጥያቄዎ ተልኳል! (Request Sent!)");
         window.location.href = 'index.html';
     }
 
-    /**
-     * WITHDRAWAL SYSTEM (Immediate Local Deduction)
-     */
     function processWithdraw() {
         const method = document.getElementById('wdMethod').value;
         const recPhone = document.getElementById('wdPhone').value.trim();
@@ -79,7 +64,7 @@
         if (!user || !recPhone || isNaN(amt)) return alert("እባክዎን ሁሉንም መረጃ ይሙሉ");
         if (amt > parseFloat(user.balance)) return alert("Insufficient Balance");
 
-        // Immediate Visual Update
+        // Immediate Visual Decrease
         user.balance = parseFloat(user.balance) - amt;
         localStorage.setItem('simba_active_user', JSON.stringify(user));
         if(document.getElementById('headerBalance')) document.getElementById('headerBalance').innerText = user.balance.toFixed(2);
@@ -92,22 +77,13 @@
         window.location.href = 'index.html';
     }
 
-    /**
-     * UI & NAVIGATION
-     */
     function toggleMenu() {
         const menu = document.getElementById('sideMenu');
         if (menu) menu.style.left = (menu.style.left === '0px') ? '-260px' : '0px';
     }
 
-    function logout() {
-        if(confirm("Logout?")) {
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    }
+    function logout() { localStorage.clear(); window.location.href = 'login.html'; }
 
-    // Auto-refresh every 15 seconds
     setInterval(updateDisplay, 15000);
     window.onload = updateDisplay;
 </script>
