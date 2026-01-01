@@ -32,7 +32,7 @@
             background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
         }
         
-        .game-card { background: #1a1a1a; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #333; }
+        .game-card { background: #1a1a1a; border-radius: 12px; padding: 10px; text-align: center; border: 1px solid #333; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -110,22 +110,20 @@
             document.getElementById('liveIndicator').style.display = "inline-block";
 
             try {
-                // IMPORTANT: Action "getBalance" calculates the SUM of all approved rows
+                // Fetch the calculated balance directly from Google Sheets
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
                 const data = await response.json();
 
                 if (data && typeof data.balance !== 'undefined') {
                     const serverBal = parseFloat(data.balance).toFixed(2);
                     
-                    if (document.getElementById('headerBalance').innerText !== serverBal) {
-                        document.getElementById('headerBalance').innerText = serverBal;
-                        activeUser.balance = serverBal;
-                        localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    }
+                    document.getElementById('headerBalance').innerText = serverBal;
+                    activeUser.balance = serverBal;
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     document.getElementById('syncStatus').innerText = "Live";
                 }
             } catch (e) {
-                document.getElementById('syncStatus').innerText = "Retry...";
+                document.getElementById('syncStatus').innerText = "Sync Error";
             } finally {
                 isSyncing = false;
                 setTimeout(() => { document.getElementById('liveIndicator').style.display = "none"; }, 1500);
@@ -143,7 +141,7 @@
                 document.getElementById('displayUserID').innerText = activeUser.phone.toString().slice(-4);
                 
                 refreshBalanceFromServer();
-                setInterval(refreshBalanceFromServer, 7000); // Check every 7 seconds
+                setInterval(refreshBalanceFromServer, 5000); // Check every 5 seconds
             } else {
                 document.getElementById('auth-section').style.display = 'flex';
             }
