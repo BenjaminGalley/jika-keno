@@ -75,7 +75,6 @@
     <a href="index.html" class="back-link">← Go Back to Lobby</a>
 
     <script>
-        // UPDATED WITH YOUR NEW DEPLOYMENT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
 
         async function submitDepositRequest() {
@@ -97,6 +96,7 @@
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
+                // Deposit uses no-cors because we are just sending data, not waiting for a JSON reply
                 await fetch(finalUrl, { mode: 'no-cors' });
                 alert("Deposit Request Sent! Please wait for Admin to verify.");
                 btn.innerText = "REQUEST SENT ✅";
@@ -116,7 +116,11 @@
             syncBtn.innerText = "CHECKING...";
 
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`);
+                // FIXED: Added redirect: 'follow' so the browser can see the approved balance
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
                 const data = await response.json();
 
                 if (data && data.balance !== undefined) {
@@ -129,11 +133,12 @@
                         localStorage.setItem('simba_active_user', JSON.stringify(user));
                         window.location.href = "index.html";
                     } else {
-                        alert("Status: Admin has not approved a new request yet.");
+                        alert("Status: Admin has not approved a new request yet. (ቀሪ ሂሳብዎ አልተለወጠም)");
                     }
                 }
             } catch (e) {
                 alert("Error connecting to server. Please check your internet.");
+                console.log(e);
             } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK APPROVAL STATUS";
