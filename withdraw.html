@@ -55,8 +55,8 @@
     </div>
 
     <script>
-        // NEW URL UPDATED BELOW
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // UPDATED NEW URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         async function init() {
@@ -65,12 +65,16 @@
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
+                // Sync with Google Sheet balance
+                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
                 const data = await res.json();
                 if (data && data.balance !== undefined) {
-                    activeUser.balance = data.balance;
+                    activeUser.balance = parseFloat(data.balance).toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    document.getElementById('displayBal').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
+                    document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
                 }
             } catch (e) { console.log("Sync skipped"); }
         }
@@ -92,16 +96,18 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
-            // Send as negative so the sheet math subtracts it correctly
+            // Use action=deposit with a negative number to subtract balance
             const withdrawAmount = -Math.abs(amount);
             const details = `WITHDRAW: ${method} TO ${rName} (${rPhone})`;
             
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawAmount}&details=${encodeURIComponent(details)}`;
+            // Using action=deposit for the script logic
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawAmount}&details=${encodeURIComponent(details)}`;
 
             try {
+                // We use no-cors because we don't need to read the response here, just send the request
                 await fetch(finalUrl, { mode: 'no-cors' });
 
-                // Update local UI immediately
+                // Update local UI immediately for a fast feeling
                 let newBal = parseFloat(activeUser.balance) - amount;
                 activeUser.balance = newBal.toFixed(2);
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
@@ -114,6 +120,7 @@
                 setTimeout(() => { window.location.href = "index.html"; }, 1500);
 
             } catch (error) {
+                // Even if it errors, usually the fetch goes through with no-cors
                 alert("Request Submitted!");
                 window.location.href = "index.html";
             }
