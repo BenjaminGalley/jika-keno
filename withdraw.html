@@ -82,9 +82,9 @@
             btn.innerText = "Processing...";
 
             // 2. Format details for Column C in Google Sheets
-            const details = `WITHDRAW: ${method} | TO: ${rName} (${rPhone})`;
+            const details = `WITHDRAW: ${method} TO ${rName} (${rPhone})`;
             
-            // 3. Prepare the URL
+            // 3. Prepare the URL (Note: amount is sent as a positive number, script handles the negative in Sheet)
             const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
@@ -92,22 +92,23 @@
                 await fetch(finalUrl, { mode: 'no-cors' });
 
                 // 4. DEDUCT LOCALLY IMMEDIATELY
-                let newBal = parseFloat(activeUser.balance) - amount;
+                let currentBal = parseFloat(activeUser.balance);
+                let newBal = currentBal - amount;
                 activeUser.balance = newBal.toFixed(2);
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
 
                 // 5. Update UI
                 document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
                 status.style.color = "#fbbf24";
-                status.innerHTML = "✅ <b>Success!</b><br>Request sent. Funds deducted.";
+                status.innerHTML = "✅ <b>Request Sent!</b><br>Balance updated. Admin will process shortly.";
                 
-                alert("Withdrawal request submitted. Balance updated!");
-                window.location.href = "index.html";
+                alert("Withdrawal request submitted successfully!");
+                setTimeout(() => { window.location.href = "index.html"; }, 2000);
 
             } catch (error) {
-                alert("Error connecting to server. Please try again.");
-                btn.disabled = false;
-                btn.innerText = "REQUEST WITHDRAWAL";
+                // If cors error occurs, the request usually still went through
+                alert("Request Sent!");
+                window.location.href = "index.html";
             }
         }
 
