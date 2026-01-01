@@ -17,7 +17,6 @@
             border: 2px solid #fcc201;
         }
 
-        /* NEW: Jungle Big Win Tile Style */
         .jungle-win-box {
             background: linear-gradient(135deg, #0a4d0a, #000) !important;
             border: 2px solid #2ecc71;
@@ -52,7 +51,6 @@
 
         .syncing { opacity: 0.7; font-style: italic; }
         
-        /* Sidebar Fix */
         .side-menu {
             position: fixed; top: 0; left: -260px; width: 260px; height: 100%;
             background: #111; transition: 0.3s; z-index: 200; border-right: 1px solid #fcc201;
@@ -184,9 +182,12 @@
                 
                 userIDDisplay.innerText = activeUser.id || ("SB-" + activeUser.phone.toString().slice(-4));
 
+                // Start Auto-Sync
                 syncStatus.innerText = "Syncing...";
                 try {
-                    const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${activeUser.phone}`);
+                    // Force phone to string to avoid script errors
+                    const userPhone = activeUser.phone.toString();
+                    const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${userPhone}`);
                     const data = await response.json();
                     
                     if (data && data.approvedAmount > 0) {
