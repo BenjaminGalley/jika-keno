@@ -3,80 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Withdraw | Simba Bet</title>
+    <title>Withdraw | Simba Bet Official</title>
     <style>
-        :root { --gold: #fcc201; --dark: #05070a; --red: #ef4444; --cyan: #00f2ff; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; text-align: center; }
-        .container { background: #111827; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; border: 1px solid var(--cyan); box-shadow: 0 0 20px rgba(0,242,255,0.1); }
-        .balance-card { background: #000; padding: 15px; border-radius: 10px; margin: 15px 0; border: 1px dashed var(--gold); }
-        label { display: block; text-align: left; font-size: 13px; color: #94a3b8; margin-top: 10px; }
-        select, input { width: 100%; padding: 12px; margin: 5px 0 10px; border-radius: 8px; border: 1px solid #1e293b; background: #05070a; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--cyan); }
-        .btn-withdraw { width: 100%; padding: 15px; background: var(--red); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-withdraw:disabled { background: #334155; cursor: not-allowed; }
-        .back-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 14px; }
-        .info-text { font-size: 11px; color: #64748b; margin-top: 10px; line-height: 1.4; text-align: left; }
+        /* =========================================
+           1. CORE THEME: GOLD & BLACK ONLY
+           ========================================= */
+        :root { 
+            --gold: #f1c40f; 
+            --bg: #000000; 
+            --card-bg: #0d0d0d;
+            --red: #ff3e3e;
+            --text-gray: #aaaaaa;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background-color: var(--bg) !important; 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           2. WITHDRAW CARD DESIGN
+           ========================================= */
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid #222; 
+            border-top: 5px solid var(--red); /* Red for withdrawal */
+            border-radius: 15px; 
+            padding: 25px 20px; 
+            width: 100%; 
+            max-width: 450px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8); 
+            margin-top: 10px;
+        }
+
+        h2 { 
+            color: var(--gold); 
+            text-align: center; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-size: 1.4rem; 
+            font-weight: 900;
+        }
+
+        .sub-title {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        /* Current Balance Display */
+        .balance-card { 
+            background: #000; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border: 1px dashed var(--gold); 
+            text-align: center;
+        }
+        .bal-amt { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: var(--gold); 
+            margin-top: 5px; 
+        }
+
+        /* Form Styling */
+        label { 
+            display: block; 
+            margin: 15px 0 5px; 
+            color: var(--gold); 
+            font-size: 11px; 
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .amharic-label {
+            display: block;
+            color: var(--text-gray);
+            font-size: 11px;
+            margin-top: -5px;
+            margin-bottom: 8px;
+        }
+
+        select, input { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 10px; 
+            border: 1.5px solid #333; 
+            background: #151515; 
+            color: white; 
+            font-size: 16px;
+            outline: none; 
+            transition: 0.3s;
+        }
+
+        select:focus, input:focus { border-color: var(--gold); }
+
+        /* Button Styling */
+        .btn-withdraw { 
+            background: var(--red); 
+            border: none; 
+            color: #fff; 
+            width: 100%; 
+            padding: 18px; 
+            font-weight: 900; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 25px; 
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-withdraw:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+
+        .back-nav { 
+            margin-top: 30px; 
+            color: var(--text-gray); 
+            text-decoration: none; 
+            font-size: 15px; 
+            font-weight: bold;
+            padding: 10px;
+        }
+        
+        .warn-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 15px;
+            text-align: left;
+            line-height: 1.4;
+        }
     </style>
 </head>
-<body>
+<body onload="initWithdraw()">
 
-    <div class="container">
-        <h2 style="color:var(--gold); margin-bottom: 5px;">💸 Withdraw Funds</h2>
+    <div class="card">
+        <h2>WITHDRAW</h2>
+        <p class="sub-title">ገንዘብ ያውጡ</p>
         
         <div class="balance-card">
-            <small style="color: #888;">YOUR BALANCE</small>
-            <div id="displayBal" style="font-size: 26px; font-weight: bold; color: var(--gold); margin-top: 5px;">0.00 ETB</div>
+            <small style="color: #777; font-weight: 800;">CURRENT BALANCE / ቀሪ ሂሳብ</small>
+            <div id="displayBal" class="bal-amt">0.00 ETB</div>
         </div>
 
         <label>Withdrawal Method</label>
+        <span class="amharic-label">የክፍያ መንገድ ይምረጡ</span>
         <select id="witMethod">
             <option value="Telebirr">Telebirr</option>
             <option value="CBE Birr">CBE Birr</option>
         </select>
 
-        <label>Recipient Full Name (የሚቀበለው ስም)</label>
-        <input type="text" id="recName" placeholder="Name on account">
+        <label>Recipient Name</label>
+        <span class="amharic-label">የሚቀበለው ሰው ስም</span>
+        <input type="text" id="recName" placeholder="Account holder name">
 
-        <label>Recipient Phone (የሚቀበለው ስልክ ቁጥር)</label>
-        <input type="tel" id="recPhone" placeholder="09...">
+        <label>Recipient Phone</label>
+        <span class="amharic-label">ገንዘቡ የሚላክበት ስልክ ቁጥር</span>
+        <input type="tel" id="recPhone" placeholder="09... / 07...">
 
-        <label>Amount to Withdraw (መጠን)</label>
-        <input type="number" id="witAmount" placeholder="Minimum 100 ETB">
+        <label>Withdraw Amount (ETB)</label>
+        <span class="amharic-label">የገንዘብ መጠን</span>
+        <input type="number" id="witAmount" placeholder="Min 100 ETB">
         
-        <p class="info-text">
-            * Minimum withdrawal is 100 ETB.<br>
-            * Funds are locked immediately. Rejections will refund your balance.
-        </p>
+        <div class="warn-text">
+            * Minimum withdrawal: 100 ETB<br>
+            * Withdrawal requests are processed by Admin within 1-2 hours.
+        </div>
 
-        <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL</button>
-        <div id="witStatus" style="margin-top:15px; font-size: 14px;"></div>
-
-        <a href="index.html" class="back-link">⬅ Back to Lobby</a>
+        <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL / ላክ</button>
     </div>
 
+    <a href="index.html" class="back-nav">← Back to Lobby / ወደ ዋናው ገጽ ተመለስ</a>
+
     <script>
-        // UPDATED NEW URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
-        async function init() {
+        async function initWithdraw() {
             if (!activeUser) { window.location.href = 'login.html'; return; }
             
+            // Show local balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
+            // Sync with Server for latest balance
             try {
-                // Sync with Google Sheet balance
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
+                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
                 const data = await res.json();
                 if (data && data.balance !== undefined) {
                     activeUser.balance = parseFloat(data.balance).toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
                 }
-            } catch (e) { console.log("Sync skipped"); }
+            } catch (e) { console.log("Balance sync pending..."); }
         }
 
         async function handleWithdraw() {
@@ -85,48 +219,39 @@
             const rName = document.getElementById('recName').value.trim();
             const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
-            const status = document.getElementById('witStatus');
 
-            if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
-            if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
-            if (!rName || !rPhone) { alert("Please fill recipient details!"); return; }
+            // Validation
+            if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB\nዝቅተኛው የክፍያ መጠን 100 ብር ነው::"); return; }
+            if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!\nበቂ ሂሳብ የለዎትም!"); return; }
+            if (!rName || !rPhone) { alert("Please fill recipient details!\nእባክዎ መረጃውን በትክክል ይሙሉ!"); return; }
 
             if (!confirm(`Withdraw ${amount} ETB to ${rName}?`)) return;
 
             btn.disabled = true;
-            btn.innerText = "Processing...";
+            btn.innerText = "SENDING / በመላክ ላይ...";
 
-            // Use action=deposit with a negative number to subtract balance
-            const withdrawAmount = -Math.abs(amount);
-            const details = `WITHDRAW: ${method} TO ${rName} (${rPhone})`;
+            // We send amount as a NEGATIVE number so the Google Sheet subtracts it
+            const withdrawValue = -Math.abs(amount);
+            const logDetails = `WITHDRAW_VIA_${method}_TO_${rName}_PHONE_${rPhone}`;
             
-            // Using action=deposit for the script logic
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawAmount}&details=${encodeURIComponent(details)}`;
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
 
             try {
-                // We use no-cors because we don't need to read the response here, just send the request
                 await fetch(finalUrl, { mode: 'no-cors' });
 
-                // Update local UI immediately for a fast feeling
+                // Fast UI Update
                 let newBal = parseFloat(activeUser.balance) - amount;
                 activeUser.balance = newBal.toFixed(2);
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
 
-                document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
-                status.style.color = "#fbbf24";
-                status.innerHTML = "✅ <b>Request Sent!</b><br>Admin will process shortly.";
-                
-                alert("Withdrawal request submitted!");
-                setTimeout(() => { window.location.href = "index.html"; }, 1500);
+                alert("✅ Withdrawal Request Sent!\nYour balance has been updated. Admin will process the payment soon.\n\nጥያቄዎ በትክክል ተልኳል:: አስተዳዳሪው በቅርቡ ይልካሉ::");
+                window.location.href = "index.html";
 
             } catch (error) {
-                // Even if it errors, usually the fetch goes through with no-cors
-                alert("Request Submitted!");
+                alert("Request Sent!");
                 window.location.href = "index.html";
             }
         }
-
-        window.onload = init;
     </script>
 </body>
 </html>
