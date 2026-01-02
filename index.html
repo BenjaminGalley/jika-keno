@@ -3,256 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Bet | Official</title>
+    <title>Simba Bet | Official Lobby</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* =========================================
-           1. CORE THEME & RESET
-           ========================================= */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background-color: #000000 !important; 
-            color: #ffffff; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            overflow-x: hidden;
+        :root { 
+            --gold: #fcc201; 
+            --blue: #00f2ff; 
+            --dark-bg: #05070a; 
+            --card-bg: #111827;
         }
 
-        /* =========================================
-           2. DYNAMIC HEADER
-           ========================================= */
-        header {
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+        body { 
+            background-color: var(--dark-bg); 
+            color: white; 
+            font-family: 'Goldman', sans-serif;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- HEADER & BALANCE --- */
+        .header {
+            background: #000;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 60px;
-            padding: 0 15px;
-            background: #000;
-            border-bottom: 1.5px solid #222;
-            position: sticky;
-            top: 0;
+            border-bottom: 2px solid var(--gold);
             z-index: 1000;
         }
-
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        
-        .menu-trigger {
-            background: #f1f1f1;
-            border: none;
-            width: 34px;
-            height: 30px;
-            border-radius: 4px;
-            display: none; /* Hidden until login */
-            flex-direction: column;
-            justify-content: space-around;
-            padding: 6px;
-            cursor: pointer;
+        .logo { color: var(--gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; }
+        .balance-box {
+            background: #1a1a1a;
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--gold);
+            font-weight: bold;
+            color: var(--gold);
+            box-shadow: 0 0 10px rgba(252, 194, 1, 0.2);
         }
-        .line { background: #111; height: 3px; width: 100%; border-radius: 2px; }
 
-        .brand { color: #f1c40f; font-weight: 900; font-size: 1.1rem; display: flex; align-items: center; }
-        .x-box { background: #f1c40f; color: #000; padding: 1px 6px; font-weight: 900; border-radius: 2px; margin-right: 6px; }
-
-        .auth-buttons { display: flex; gap: 8px; }
-        .btn-auth { 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            font-weight: 800; 
-            font-size: 12px; 
-            text-transform: uppercase;
-            text-decoration: none;
-        }
-        .login-btn { background: transparent; border: 1.5px solid #f1c40f; color: #f1c40f; }
-        .reg-btn { background: #f1c40f; border: 1.5px solid #f1c40f; color: #000; }
-
-        .balance-area { text-align: right; display: none; } /* Hidden until login */
-        .bal-label { font-size: 0.6rem; color: #777; font-weight: 800; }
-        .bal-val { color: #f1c40f; font-weight: 900; font-size: 1.1rem; display: block; }
-
-        /* =========================================
-           3. SIDE MENU (MODAL)
-           ========================================= */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
-            background: #0d0d0d;
-            z-index: 2000;
-            transition: 0.3s;
-            border-right: 1px solid #222;
-            padding: 20px;
-        }
-        .side-menu.active { left: 0; }
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* --- BANNER --- */
+        .banner {
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            z-index: 1500;
+            height: 120px;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://img.freepik.com/premium-photo/golden-lion-logo-black-background_853558-3561.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
-        .menu-item {
-            padding: 15px;
-            color: #fff;
-            border-bottom: 1px solid #1a1a1a;
-            display: block;
-            text-decoration: none;
-            font-weight: 600;
+
+        /* --- SIDE-TO-SIDE GAME SELECTION --- */
+        .section-label {
+            padding: 20px 20px 10px;
+            font-size: 14px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .menu-item:active { color: #f1c40f; }
 
-        /* =========================================
-           4. BANNER & GRID
-           ========================================= */
-        .hero-box { width: 100%; border-bottom: 3px solid #f1c40f; }
-        .hero-box img { width: 100%; height: auto; display: block; max-height: 250px; object-fit: cover; }
-
-        .section-tag { padding: 18px 15px 10px; color: #f1c40f; font-weight: 900; font-size: 0.95rem; }
-
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            padding: 0 15px 120px;
+        .game-scroller {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 20px 20px;
+            scroll-snap-type: x mandatory;
+            scrollbar-width: none; /* Firefox */
         }
+        .game-scroller::-webkit-scrollbar { display: none; } /* Chrome/Safari */
 
         .game-card {
-            background: #111;
-            border: 1.5px solid #222;
-            border-radius: 12px;
-            padding: 20px 5px;
+            min-width: 160px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            position: relative;
+            transition: 0.3s;
             text-align: center;
-            border-bottom: 4px solid #222;
+            padding-bottom: 12px;
+            scroll-snap-align: start;
+            flex-shrink: 0;
         }
-        .game-card img { width: 45px; height: 45px; margin-bottom: 8px; }
-        .game-card p { font-size: 0.72rem; font-weight: 800; }
+        .game-card:active { transform: scale(0.95); }
 
-        /* =========================================
-           5. FOOTER STATUS
-           ========================================= */
-        .status-footer {
+        /* Branding Colors */
+        .glow-blue { border: 1.5px solid var(--blue); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .glow-gold { border: 1.5px solid var(--gold); box-shadow: 0 0 15px rgba(252, 194, 1, 0.2); }
+
+        .game-img {
+            width: 100%;
+            height: 120px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }
+
+        .game-title {
+            padding: 12px 5px 2px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .game-tag {
+            font-size: 10px;
+            color: var(--blue);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .tag-gold { color: var(--gold); }
+
+        /* --- BOTTOM NAV --- */
+        .nav-bar {
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: #0d0d0d;
-            border-top: 1px solid #222;
-            padding: 14px 20px;
+            background: #000;
             display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            font-weight: 800;
-            z-index: 1000;
+            justify-content: space-around;
+            padding: 15px 0 25px;
+            border-top: 2px solid var(--gold);
         }
+        .nav-item {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
-<body onload="initApp()">
+<body onload="checkUser()">
 
-    <div id="overlay" class="menu-overlay" onclick="closeMenu()"></div>
-    <div id="sideMenu" class="side-menu">
-        <h3 style="color:#f1c40f; margin-bottom:20px;">SIMBA MENU</h3>
-        <a href="deposit.html" class="menu-item">Deposit (ገንዘብ ያስገቡ)</a>
-        <a href="withdraw.html" class="menu-item">Withdraw (ገንዘብ ያውጡ)</a>
-        <a href="profile.html" class="menu-item">Profile (መለያ)</a>
-        <a href="#" class="menu-item" onclick="logout()" style="color:#ff3e3e; margin-top:20px;">Logout (ውጣ)</a>
+    <div class="header">
+        <div class="logo">SIMBA BET 🦁</div>
+        <div class="balance-box" id="userBalance">0.00 ETB</div>
     </div>
 
-    <header>
-        <div class="header-left">
-            <button id="menuBtn" class="menu-trigger" onclick="openMenu()">
-                <div class="line"></div>
-                <div class="line"></div>
-                <div class="line"></div>
-            </button>
-            <div class="brand"><span class="x-box">X</span> SIMBA BET</div>
-        </div>
-
-        <div id="loggedOutUI" class="auth-buttons">
-            <a href="login.html" class="btn-auth login-btn">Login</a>
-            <a href="register.html" class="btn-auth reg-btn">Join Now</a>
-        </div>
-
-        <div id="loggedInUI" class="balance-area">
-            <span class="bal-label">BALANCE</span>
-            <span class="bal-val"><span id="userBalance">0.00</span> <small>ETB</small></span>
-        </div>
-    </header>
-
-    <div class="hero-box">
-        <img src="assets/assets/simba_bg.jpg" alt="Simba Bet Official">
+    <div class="banner">
+        <h2 style="color:var(--gold); text-shadow: 2px 2px 4px #000;">SIMBA LOBBY</h2>
     </div>
 
-    <h2 class="section-tag">NEW & HOT 🔥</h2>
-    
-    <div class="game-grid">
-        <div class="game-card" onclick="location.href='lionscratch.html'">
-            <img src="https://cdn-icons-png.flaticon.com/512/616/616412.png">
-            <p>Lion Scratch</p>
+    <div class="section-label">Featured Games</div>
+
+    <div class="game-scroller">
+        
+        <div class="game-card glow-blue" onclick="location.href='fast.keno.html'">
+            <div class="game-img">🎱</div>
+            <div class="game-title">Fast Keno 80</div>
+            <div class="game-tag">Draw Every 60s</div>
         </div>
-        <div class="game-card" onclick="location.href='multi5.html'">
-            <div style="color:#ff3e3e; font-size:1.4rem; font-weight:900; margin-bottom:5px;">×5</div>
-            <p>Multi Hot 5</p>
+
+        <div class="game-card glow-gold" onclick="location.href='multi.hot.5.html'">
+            <div class="game-img">🎰</div>
+            <div class="game-title">Multi Hot 5</div>
+            <div class="game-tag tag-gold">Hot Slots</div>
         </div>
-        <div class="game-card" onclick="location.href='fastkeno.html'">
-            <div style="color:#00f2ff; font-size:1.2rem; font-weight:900; margin-bottom:5px;">KENO</div>
-            <p>Fast Keno 80</p>
+        
+        <div class="game-card glow-gold" onclick="location.href='lion.scratch.html'">
+            <div class="game-img">🦁</div>
+            <div class="game-title">Lion Scratch</div>
+            <div class="game-tag tag-gold">Instant Win</div>
         </div>
+
+        <div class="game-card" style="opacity: 0.5;">
+            <div class="game-img">🎲</div>
+            <div class="game-title">Mega Dice</div>
+            <div class="game-tag" style="color:#666">Coming Soon</div>
+        </div>
+
     </div>
 
-    <footer class="status-footer">
-        <div style="color:#666;">PLAYER ID: <span id="pID" style="color:#f1c40f;">GUEST</span></div>
-        <div style="color:#fff;">STATUS: <span id="pStatus" style="color:#2ecc71;">Online ●</span></div>
-    </footer>
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item active">🏠<br>Lobby</a>
+        <a href="deposit.html" class="nav-item">💰<br>Deposit</a>
+        <a href="withdraw.html" class="nav-item">💸<br>Withdraw</a>
+        <a href="profile.html" class="nav-item">👤<br>Profile</a>
+    </div>
 
     <script>
-        const API = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
-
-        function initApp() {
-            const user = JSON.parse(localStorage.getItem('simba_active_user'));
-            const loggedInUI = document.getElementById('loggedInUI');
-            const loggedOutUI = document.getElementById('loggedOutUI');
-            const menuBtn = document.getElementById('menuBtn');
-
-            if (user) {
-                // If Logged In: Show Balance & Menu, Hide Login/Reg
-                loggedInUI.style.display = 'block';
-                menuBtn.style.display = 'flex';
-                loggedOutUI.style.display = 'none';
-                
-                document.getElementById('pID').innerText = "SB-" + user.phone.toString().slice(-4);
-                syncBalance(user.phone);
-            } else {
-                // If Guest: Show Login/Reg, Hide Menu
-                loggedInUI.style.display = 'none';
-                menuBtn.style.display = 'none';
-                loggedOutUI.style.display = 'flex';
+        // CRITICAL: Checks if user is actually logged in before showing the lobby
+        function checkUser() {
+            const userData = localStorage.getItem('simba_active_user');
+            
+            if (!userData) {
+                // IMPORTANT: Prevents access without login
+                window.location.href = 'login.html';
+                return;
             }
+
+            const user = JSON.parse(userData);
+            document.getElementById('userBalance').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
         }
 
-        async function syncBalance(phone) {
-            try {
-                const res = await fetch(`${API}?action=getBalance&phone=${phone}`);
-                const data = await res.json();
-                const bal = data.balance || 0;
-                document.getElementById('userBalance').innerText = parseFloat(bal).toFixed(2);
-            } catch (e) { console.log("Sync..."); }
-        }
-
-        function openMenu() {
-            document.getElementById('sideMenu').classList.add('active');
-            document.getElementById('overlay').style.display = 'block';
-        }
-
-        function closeMenu() {
-            document.getElementById('sideMenu').classList.remove('active');
-            document.getElementById('overlay').style.display = 'none';
-        }
-
-        function logout() {
-            localStorage.removeItem('simba_active_user');
-            window.location.reload();
-        }
+        // AUTO-REFRESH BALANCE
+        // This ensures if they win in a game and hit 'back', the balance updates instantly
+        window.onfocus = function() {
+            checkUser();
+        };
     </script>
 </body>
 </html>
