@@ -196,6 +196,7 @@
     </div>
 
     <script>
+        // EXACT URL YOU PROVIDED
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function submitDepositRequest() {
@@ -233,22 +234,22 @@
             syncBtn.innerText = "SYNCING...";
 
             try {
-                // Changed action to 'getUser' to match Lobby logic
-                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}&_t=${Date.now()}`);
+                // FIXED ACTION: Changed from 'getUser' to 'getBalance' to match Google Script
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
 
                 if (data && data.balance !== undefined) {
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    alert(`✅ SUCCESS!\nNew Balance: ${user.balance} ETB`);
+                    alert(`✅ SYNC COMPLETE!\nYour Balance is: ${user.balance} ETB`);
                     window.location.href = "index.html";
                 } else {
-                    alert("Still pending. Please wait.");
+                    alert("Admin has not approved yet.");
                     syncBtn.disabled = false;
                     syncBtn.innerText = "CHECK STATUS";
                 }
             } catch (e) {
-                alert("No updates yet.");
+                alert("Check back in 1 minute.");
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK STATUS";
             }
