@@ -4,58 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Profile & History | Simba Bet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #fcc201; --dark: #05070a; --cyan: #00f2ff; --green: #10b981; --red: #ef4444; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--dark); color: white; margin: 0; padding: 20px; }
+        :root { 
+            --gold: #fcc201; 
+            --dark: #05070a; 
+            --cyan: #00f2ff; 
+            --green: #10b981; 
+            --red: #ef4444; 
+            --card-bg: #111827;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: 'Goldman', sans-serif; 
+            background: var(--dark); 
+            color: white; 
+            margin: 0; 
+            padding: 0; 
+            padding-bottom: 100px; /* Space for nav */
+        }
         
-        .profile-card { background: #111827; padding: 20px; border-radius: 15px; border: 1px solid var(--cyan); margin-bottom: 25px; box-shadow: 0 0 15px rgba(0,242,255,0.1); }
-        .stat-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        /* Top Header */
+        .header {
+            background: #000;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        /* Profile Card Area */
+        .profile-container { padding: 20px; }
+
+        .profile-card { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 15px; 
+            border: 1px solid var(--cyan); 
+            margin-bottom: 25px; 
+            box-shadow: 0 0 15px rgba(0,242,255,0.1); 
+        }
+
+        .stat-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 12px; 
+            font-size: 13px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 8px;
+        }
+        .stat-row:last-child { border-bottom: none; }
         .stat-row b { color: var(--gold); }
 
+        /* History Filters */
+        .history-section { padding: 0 20px; }
         .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .filter-group { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
-        .filter-btn { background: #1e293b; border: none; color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+        .filter-group { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+        .filter-group::-webkit-scrollbar { display: none; }
+
+        .filter-btn { 
+            background: #1e293b; 
+            border: none; 
+            color: white; 
+            padding: 8px 18px; 
+            border-radius: 20px; 
+            font-size: 11px; 
+            cursor: pointer; 
+            white-space: nowrap; 
+            font-family: 'Goldman';
+        }
         .filter-btn.active { background: var(--gold); color: black; font-weight: bold; }
 
+        /* History List */
         .history-container { display: flex; flex-direction: column; gap: 12px; }
-        .transaction-card { background: #1a1d29; padding: 15px; border-radius: 12px; border-left: 4px solid #333; position: relative; }
-        .amount { font-size: 18px; font-weight: bold; position: absolute; right: 15px; top: 15px; }
-        .trans-type { font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: block; }
-        .trans-date { font-size: 11px; color: #64748b; }
+        .transaction-card { 
+            background: #0f172a; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border-left: 4px solid #333; 
+            position: relative; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .amount { font-size: 16px; font-weight: bold; position: absolute; right: 15px; top: 15px; }
+        .trans-type { font-size: 11px; font-weight: bold; text-transform: uppercase; margin-bottom: 4px; display: block; }
+        .trans-date { font-size: 10px; color: #64748b; }
         
         /* Status Badges */
-        .status-badge { display: inline-block; font-size: 10px; padding: 3px 10px; border-radius: 5px; margin-top: 8px; font-weight: bold; text-transform: uppercase; }
+        .status-badge { display: inline-block; font-size: 9px; padding: 4px 10px; border-radius: 5px; margin-top: 8px; font-weight: bold; text-transform: uppercase; }
         .status-pending { background: #334155; color: #94a3b8; }
         .status-approve, .status-synced { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
         .status-deny, .status-denied-wb { background: rgba(239, 68, 68, 0.2); color: var(--red); border: 1px solid var(--red); }
 
-        .back-btn { display: block; text-align: center; margin-top: 30px; color: var(--gold); text-decoration: none; padding: 12px; border: 1px solid var(--gold); border-radius: 8px; font-weight: bold; }
+        /* Logout & Nav */
+        .logout-btn {
+            background: none;
+            color: var(--red);
+            border: 1px solid var(--red);
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            margin-top: 20px;
+            font-family: 'Goldman';
+            font-size: 12px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 25px;
+            border-top: 2px solid var(--gold);
+            z-index: 1000;
+        }
+        .nav-item { color: #64748b; text-decoration: none; font-size: 11px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body onload="initProfile()">
 
-    <div class="profile-card">
-        <h3 style="margin-top:0; color:var(--cyan);">PLAYER PROFILE</h3>
-        <div class="stat-row"><span>Name:</span><span id="pName">-</span></div>
-        <div class="stat-row"><span>Phone:</span><span id="pPhone">-</span></div>
-        <div class="stat-row"><span>Simba ID:</span><b id="pID">-</b></div>
-        <div class="stat-row"><span>Wallet Balance:</span><b id="pBal" style="font-size:18px;">0.00 ETB</b></div>
+    <div class="header">
+        <h2 style="color:var(--gold); font-size: 18px; letter-spacing: 1px;">ACCOUNT CENTER</h2>
     </div>
 
-    <div class="filter-header">
-        <h3 style="margin:0; font-size: 16px;">History</h3>
-        <div class="filter-group">
-            <button class="filter-btn active" onclick="applyFilter(0, this)">Today</button>
-            <button class="filter-btn" onclick="applyFilter(3, this)">3 Days</button>
-            <button class="filter-btn" onclick="applyFilter(7, this)">7 Days</button>
+    <div class="profile-container">
+        <div class="profile-card">
+            <h3 style="margin-top:0; color:var(--cyan); font-size: 14px; margin-bottom: 15px;">🦁 SIMBA PLAYER</h3>
+            <div class="stat-row"><span>Username:</span><span id="pName">-</span></div>
+            <div class="stat-row"><span>Mobile:</span><span id="pPhone">-</span></div>
+            <div class="stat-row"><span>Simba ID:</span><b id="pID">-</b></div>
+            <div class="stat-row" style="border:none; margin-top:10px;">
+                <span>Wallet:</span>
+                <b id="pBal" style="font-size:20px; color:var(--gold);">0.00 ETB</b>
+            </div>
+            <button class="logout-btn" onclick="logout()">LOGOUT SESSION</button>
         </div>
     </div>
 
-    <div id="historyList" class="history-container">
-        <div style="text-align:center; padding:40px; color:#444;">Loading your transactions...</div>
+    <div class="history-section">
+        <div class="filter-header">
+            <h3 style="margin:0; font-size: 14px; color: var(--gold);">HISTORY</h3>
+            <div class="filter-group">
+                <button class="filter-btn active" onclick="applyFilter(0, this)">Today</button>
+                <button class="filter-btn" onclick="applyFilter(3, this)">3 Days</button>
+                <button class="filter-btn" onclick="applyFilter(7, this)">7 Days</button>
+            </div>
+        </div>
+
+        <div id="historyList" class="history-container">
+            <div style="text-align:center; padding:40px; color:#444;">Connecting to server...</div>
+        </div>
     </div>
 
-    <a href="index.html" class="back-btn">⬅ BACK TO LOBBY</a>
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><span>🏠</span><span>Lobby</span></a>
+        <a href="deposit.html" class="nav-item"><span>💰</span><span>Deposit</span></a>
+        <a href="withdraw.html" class="nav-item"><span>💸</span><span>Withdraw</span></a>
+        <a href="profile.html" class="nav-item active"><span>👤</span><span>Profile</span></a>
+    </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
@@ -64,9 +174,11 @@
 
         function initProfile() {
             if (!user) { window.location.href = 'login.html'; return; }
-            document.getElementById('pName').innerText = user.name;
+            
+            // Sync UI with local storage first
+            document.getElementById('pName').innerText = user.name || user.username;
             document.getElementById('pPhone').innerText = user.phone;
-            document.getElementById('pID').innerText = user.id || "REGISTRATION PENDING";
+            document.getElementById('pID').innerText = user.id || "PENDING";
             document.getElementById('pBal').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
             
             fetchData();
@@ -76,10 +188,18 @@
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
                 const data = await response.json();
+                
+                // Update balance from Google Sheets (Master Balance)
+                if(data.balance !== undefined) {
+                    user.balance = data.balance;
+                    localStorage.setItem('simba_active_user', JSON.stringify(user));
+                    document.getElementById('pBal').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
+                }
+
                 rawHistory = data.history || [];
                 render(0); // Show Today by default
             } catch (e) {
-                document.getElementById('historyList').innerHTML = "Connection error.";
+                document.getElementById('historyList').innerHTML = "<div style='text-align:center; color:var(--red); padding:20px;'>Sync Error. Check Connection.</div>";
             }
         }
 
@@ -101,26 +221,34 @@
             });
 
             if (filtered.length === 0) {
-                list.innerHTML = "<div style='text-align:center; padding:30px; color:#444;'>No activity found for this period.</div>";
+                list.innerHTML = "<div style='text-align:center; padding:30px; color:#444; font-size:12px;'>No activity found for this period.</div>";
                 return;
             }
 
             list.innerHTML = filtered.map(item => {
-                const isWithdraw = parseFloat(item.amount) < 0;
+                const amt = parseFloat(item.amount);
+                const isWithdraw = amt < 0;
                 const status = item.status.toLowerCase();
                 const displayStatus = item.status.replace('-WB', '');
 
                 return `
                     <div class="transaction-card" style="border-left-color: ${isWithdraw ? 'var(--red)' : 'var(--green)'}">
                         <span class="trans-type" style="color: ${isWithdraw ? 'var(--red)' : 'var(--green)'}">
-                            ${isWithdraw ? 'Withdrawal Request' : 'Deposit Request'}
+                            ${isWithdraw ? 'Withdrawal' : 'Deposit'}
                         </span>
-                        <div class="amount">${Math.abs(item.amount)} ETB</div>
+                        <div class="amount" style="color:${isWithdraw ? 'var(--red)' : 'var(--green)'}">
+                            ${isWithdraw ? '' : '+'}${amt.toFixed(2)}
+                        </div>
                         <div class="trans-date">${new Date(item.date).toLocaleString()}</div>
                         <div class="status-badge status-${status}">${displayStatus}</div>
                     </div>
                 `;
             }).join('');
+        }
+
+        function logout() {
+            localStorage.removeItem('simba_active_user');
+            window.location.href = 'login.html';
         }
     </script>
 </body>
