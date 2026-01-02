@@ -224,19 +224,22 @@
             const user = JSON.parse(userData);
             
             // Show local balance first for speed
-            document.getElementById('userBalance').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
+            document.getElementById('userBalance').innerText = parseFloat(user.balance || 0).toFixed(2) + " ETB";
 
-            // Fetch fresh balance from Google Sheet to ensure sync
+            // Fetch fresh balance with Cache Buster
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}`);
+                // adding _t ensures the browser gets a fresh response from the sheet
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
+                
                 if (data && data.balance !== undefined) {
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                     document.getElementById('userBalance').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
+                    console.log("Balance updated from server:", data.balance);
                 }
             } catch (e) {
-                console.log("Could not sync balance from server, using local.");
+                console.warn("Server sync failed. Using last known balance.");
             }
         }
 
