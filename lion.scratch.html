@@ -169,19 +169,27 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let balance = 0;
         let currentBet = 2;
         let isGameActive = false;
         let cardsScratched = 0;
         let prizes = [];
         let isMuted = false;
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || {balance: "100.00"};
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
 
         function init() {
-            balance = parseFloat(user.balance);
+            if (!user) { window.location.href = 'login.html'; return; }
+            balance = parseFloat(user.balance || 0);
             document.getElementById('balDisplay').innerText = balance.toFixed(2);
             document.getElementById('betDisplay').innerText = currentBet;
             createGrid();
+        }
+
+        async function syncServerBalance(newBal) {
+            try {
+                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBal}`, { mode: 'no-cors' });
+            } catch (e) { console.log("Sync queued"); }
         }
 
         function createGrid() {
@@ -217,6 +225,7 @@
             if (balance < currentBet) return alert("Low Balance!");
             balance -= currentBet;
             updateUI();
+            syncServerBalance(balance.toFixed(2));
             
             isGameActive = true;
             cardsScratched = 0;
@@ -235,18 +244,15 @@
             prizes = new Array(9).fill(0);
             let indices = [0,1,2,3,4,5,6,7,8].sort(() => 0.5 - Math.random());
 
-            // 40% chance to generate a matching set
             if (Math.random() > 0.6 && winningVal !== 0) {
                 prizes[indices[0]] = winningVal;
                 prizes[indices[1]] = winningVal;
                 prizes[indices[2]] = winningVal;
-                // Fill rest randomly from pool (excluding original winner to prevent confusion)
                 for(let i=3; i<9; i++) {
                     let r = pool[Math.floor(Math.random()*pool.length)];
                     prizes[indices[i]] = (r === winningVal) ? 0 : r;
                 }
             } else {
-                // Random no-win setup
                 for(let i=0; i<9; i++) prizes[i] = pool[Math.floor(Math.random()*pool.length)];
             }
         }
@@ -295,9 +301,11 @@
                 if (winAmount > 0) {
                     balance += winAmount;
                     handleWinEffects(winAmount, false);
+                    syncServerBalance(balance.toFixed(2));
                 } else if (isFreeTicket) {
-                    balance += currentBet; // Give money back for free play
+                    balance += currentBet; 
                     handleWinEffects("FREE TICKET", true);
+                    syncServerBalance(balance.toFixed(2));
                 } else {
                     document.getElementById('status').innerText = "TRY AGAIN";
                 }
