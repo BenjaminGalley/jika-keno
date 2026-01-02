@@ -227,10 +227,17 @@
         let isLocked = false;
         let musicStarted = false;
 
+        // ADJUSTED PAYOUT: Now supports up to 10 hits per type
         const PAYOUT_LOGIC = {
-            2: [0, 0, 50],
-            3: [0, 0, 0, 100],
-            4: [0, 0, 0, 0, 160]
+            2: [0, 0, 10],
+            3: [0, 0, 5, 20],
+            4: [0, 0, 2, 10, 80],
+            5: [0, 0, 0, 5, 20, 150],
+            6: [0, 0, 0, 2, 10, 50, 500],
+            7: [0, 0, 0, 0, 5, 20, 150, 2000],
+            8: [0, 0, 0, 0, 2, 10, 50, 500, 10000],
+            9: [0, 0, 0, 0, 0, 5, 25, 200, 2500, 25000],
+            10: [0, 0, 0, 0, 0, 2, 10, 100, 1000, 10000, 50000]
         };
 
         function init() {
@@ -270,7 +277,7 @@
             if(selected.includes(n)) {
                 selected = selected.filter(x => x !== n);
                 el.classList.remove('selected');
-            } else if(selected.length < 4) {
+            } else if(selected.length < 10) { // ADJUSTED TO 10
                 selected.push(n);
                 el.classList.add('selected');
             }
@@ -281,7 +288,9 @@
             let count = selected.length;
             let win = 0;
             if(count >= 2 && PAYOUT_LOGIC[count]) {
-                win = PAYOUT_LOGIC[count][count] * (currentBet / 2);
+                // Calculate max win based on current bet
+                let maxMultiplier = PAYOUT_LOGIC[count][count];
+                win = maxMultiplier * (currentBet / 2);
             }
             document.getElementById('potWin').innerText = win.toFixed(2) + " ETB";
         }
