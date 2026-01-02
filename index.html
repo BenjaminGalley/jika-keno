@@ -3,135 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simba Bet - Premium Gaming Lobby</title>
+    <title>Simba Bet - Official Portal</title>
     <link rel="stylesheet" href="style.html"> 
 </head>
-<body>
+<body style="background-color: #000;">
 
-    <div class="steady-top">
-        <nav class="top-nav">
-            <div class="brand-section">
-                <button class="menu-trigger" onclick="toggleSidebar()">☰</button>
-                <div class="brand-text"><span class="x-box">X</span> SIMBA BET</div>
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="sidebar-toggle" onclick="toggleNav()">☰</button>
+                <div class="brand-logo"><span class="x-box">X</span> SIMBA BET</div>
             </div>
             
-            <div class="balance-container">
-                <span class="label-small">TOTAL BALANCE</span>
-                <span class="balance-amount"><span id="headerBalance">0.00</span> <small style="font-size:0.7rem;">ETB</small></span>
+            <div class="balance-display">
+                <span class="bal-label">BALANCE</span>
+                <span class="bal-value"><span id="headerBal">0.00</span> ETB</span>
             </div>
             
-            <button class="deposit-btn-top" onclick="window.location.href='deposit.html'">DEPOSIT</button>
-        </nav>
+            <button class="dep-button" onclick="location.href='deposit.html'">DEPOSIT</button>
+        </div>
         
-        <div class="hero-banner">
-            <img src="assets/lion-banner.jpg" alt="Simba Bet Official Banner">
+        <div class="hero-banner-container">
+            <img src="assets/assets/simba_bg.jpg" class="hero-img-asset" alt="Simba Bet Banner">
         </div>
 
-        <div class="tabs-section">
+        <div class="tabs-wrapper">
             <div class="tabs-scroll">
-                <div class="category-tab active">ALL GAMES</div>
-                <div class="tab category-tab">SLOTS</div>
-                <div class="tab category-tab">CRASH</div>
-                <div class="tab category-tab">LIVE CASINO</div>
-                <div class="tab category-tab">VIRTUALS</div>
-                <div class="tab category-tab">SPORTS</div>
+                <div class="cat-tab active">ALL GAMES</div>
+                <div class="cat-tab">SLOTS</div>
+                <div class="cat-tab">CRASH</div>
+                <div class="cat-tab">LIVE</div>
+                <div class="cat-tab">VIRTUALS</div>
             </div>
+        </div>
+    </header>
+
+    <main class="content-viewport">
+        <div class="game-section-header">HOT GAMES 🔥</div>
+        
+        <div class="game-grid">
+            <div class="game-card" onclick="location.href='lionscratch.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/616/616412.png">
+                </div>
+                <p class="game-title">Lion Scratch</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='multi5.html'">
+                <div class="game-icon-box">
+                    <p style="font-size: 2rem; color: #ff3e3e; font-weight: 900; margin:0;">×5</p>
+                </div>
+                <p class="game-title">Hot Multi 5</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='fastkeno.html'">
+                <div class="game-icon-box">
+                    <p class="keno-blue-style">1 2<br>3 4</p>
+                </div>
+                <p class="game-title">Fast Keno</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='megawheel.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png">
+                </div>
+                <p class="game-title">Mega Wheel</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='aviator.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/5351/5351486.png">
+                </div>
+                <p class="game-title">Aviator X</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='fruitblast.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png">
+                </div>
+                <p class="game-title">Fruit Blast</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='goldengoal.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2619/2619245.png">
+                </div>
+                <p class="game-title">Golden Goal</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='diceroll.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png">
+                </div>
+                <p class="game-title">Dice Roll</p>
+            </div>
+
+            <div class="game-card" onclick="location.href='poker.html'">
+                <div class="game-icon-box">
+                    <img src="https://cdn-icons-png.flaticon.com/512/248/248941.png">
+                </div>
+                <p class="game-title">Poker Pro</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="sideMenu" class="side-menu-container">
+        <h2 style="color: #f1c40f; border-bottom: 1px solid #333; padding-bottom: 15px;">SIMBA BET</h2>
+        <a href="index.html" class="menu-link">🏠 Home Lobby</a>
+        <a href="deposit.html" class="menu-link">💳 Deposit Funds</a>
+        <a href="withdraw.html" class="menu-link">💸 Withdraw Winnings</a>
+        <a href="profile.html" class="menu-link">👤 My Account</a>
+        <a href="history.html" class="menu-link">📜 Game History</a>
+        
+        <div style="margin-top: 50px;">
+            <button onclick="localStorage.clear(); location.href='login.html';" style="width:100%; padding:15px; background:red; color:white; border:none; border-radius:10px; font-weight:bold;">LOGOUT</button>
         </div>
     </div>
 
-    <div class="main-scroll-area">
-        <div class="section-label-hot">
-            HOT GAMES <span style="font-size:1.2rem;">🔥</span>
-        </div>
-        
-        <div class="game-grid-layout">
-            <div class="game-item-card" onclick="window.location.href='lionscratch.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/616/616412.png" alt="Lion icon">
-                </div>
-                <p class="game-title-text">Lion Scratch</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='multi5.html'">
-                <div class="game-icon-wrapper">
-                    <p style="font-size: 2.2rem; color: #ff3e3e; font-weight: 900; margin:0;">×5</p>
-                </div>
-                <p class="game-title-text">Hot Multi 5</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='fastkeno.html'">
-                <div class="game-icon-wrapper">
-                    <p style="font-size: 1.5rem; color: #00f2ff; line-height: 1.1; font-weight: 900; background: rgba(0,242,255,0.1); padding: 5px; border-radius: 5px;">1 2<br>3 4</p>
-                </div>
-                <p class="game-title-text">Fast Keno</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='megawheel.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png" alt="Wheel icon">
-                </div>
-                <p class="game-title-text">Mega Wheel</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='aviator.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/5351/5351486.png" alt="Plane icon">
-                </div>
-                <p class="game-title-text">Aviator X</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='fruitblast.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" alt="Fruit icon">
-                </div>
-                <p class="game-title-text">Fruit Blast</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='goldengoal.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2619/2619245.png" alt="Soccer icon">
-                </div>
-                <p class="game-title-text">Golden Goal</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='diceroll.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png" alt="Dice icon">
-                </div>
-                <p class="game-title-text">Dice Roll</p>
-            </div>
-
-            <div class="game-item-card" onclick="window.location.href='poker.html'">
-                <div class="game-icon-wrapper">
-                    <img src="https://cdn-icons-png.flaticon.com/512/248/248941.png" alt="Cards icon">
-                </div>
-                <p class="game-title-text">Poker Pro</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="mainSidebar" class="side-nav-menu">
-        <div class="menu-header-box">
-            <h2 style="color: #f1c40f;">SIMBA MENU</h2>
-            <p style="font-size: 0.7rem; color: #666;">Official Gaming Portal</p>
-        </div>
-        
-        <a href="index.html" class="menu-link-item">🏠 Home Dashboard</a>
-        <a href="deposit.html" class="menu-link-item">💳 Deposit Funds</a>
-        <a href="withdraw.html" class="menu-link-item">💸 Withdraw Winnings</a>
-        <a href="profile.html" class="menu-link-item">👤 My Account</a>
-        <a href="history.html" class="menu-link-item">📜 Bet History</a>
-        
-        <div style="margin-top: 50px; padding: 10px;">
-            <button onclick="localStorage.clear(); location.href='login.html';" style="width:100%; padding:12px; background:#cc0000; color:white; border:none; border-radius:5px; font-weight:bold;">LOGOUT</button>
-        </div>
-    </div>
-
-    <footer class="global-footer-status">
-        <div>ACCOUNT: <span id="footerAccountID" style="color:#f1c40f;">SB-WAIT</span></div>
-        <div style="display:flex; align-items:center;">
-            SYSTEM: <span style="color:#27ae60; margin-left:5px;">ONLINE</span>
-            <span class="status-dot"></span>
+    <footer class="status-footer-bar">
+        <div>ID: <span id="footerID" style="color:#f1c40f;">SB-....</span></div>
+        <div style="display:flex; align-items:center; gap:5px;">
+            SYSTEM: <span style="color:#27ae60;">ONLINE</span>
+            <span style="height: 8px; width: 8px; background-color:#27ae60; border-radius:50%;"></span>
         </div>
     </footer>
 
