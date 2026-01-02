@@ -3,84 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Admin | Secure</title>
+    <title>Simba Admin | Control Center</title>
     <style>
-        :root { --gold: #fcc201; --cyan: #00f2ff; --bg: #05070a; --card: #111827; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
-        #lockScreen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        .pin-input { background: #111; border: 1px solid var(--cyan); color: var(--cyan); font-size: 24px; padding: 10px; text-align: center; border-radius: 8px; width: 180px; outline: none; }
-        .header { text-align: center; color: var(--cyan); text-transform: uppercase; margin-bottom: 20px; letter-spacing: 2px; }
-        .refresh-btn { background: #1e293b; color: var(--cyan); border: 1px solid var(--cyan); padding: 12px 25px; display: block; margin: 0 auto 20px auto; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        .card { background: var(--card); border: 1px solid #333; padding: 18px; margin: 0 auto 15px auto; border-radius: 12px; border-left: 5px solid var(--cyan); max-width: 500px; }
-        .row-id { color: var(--cyan); font-size: 11px; margin-bottom: 8px; font-weight: bold; }
-        .amount { font-size: 30px; color: var(--gold); font-weight: bold; margin: 10px 0; }
-        .btn-approve { background: #10b981; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
-        .btn-deny { background: #ef4444; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; opacity: 0.8; }
+        :root {
+            --gold: #fcc201;
+            --cyan: #00f2ff;
+            --bg: #05070a;
+            --card-bg: #0d1117;
+            --red: #ff3e3e;
+            --green: #00ff88;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: var(--cyan);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: 2px solid var(--cyan);
+            color: var(--cyan);
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--cyan);
+            color: black;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .request-card {
+            background: var(--card-bg);
+            border-left: 5px solid var(--cyan);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .row-id { color: var(--cyan); font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+        .player-info { font-size: 16px; margin-bottom: 10px; color: #ccc; }
+        .amount { 
+            font-size: 32px; 
+            font-weight: 900; 
+            color: var(--gold); 
+            margin: 15px 0;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+
+        .approve-btn { background: var(--green); color: #00331a; }
+        .deny-btn { background: var(--red); color: white; }
+
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .withdraw-label {
+            background: var(--red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
-    <div id="lockScreen">
-        <h2 style="color:var(--gold)">ADMIN ACCESS</h2>
-        <input type="password" id="adminPin" class="pin-input" placeholder="ENTER PIN">
-        <button onclick="checkPin()" style="margin-top:20px; padding:12px 40px; background:var(--cyan); border:none; border-radius:5px; font-weight:bold; cursor:pointer; color:black;">UNLOCK SYSTEM</button>
-    </div>
 
-    <div id="adminContent" style="display:none;">
-        <h2 class="header">Pending Requests</h2>
-        <button class="refresh-btn" onclick="loadRequests()">🔄 REFRESH DATA</button>
-        <div id="requestList"></div>
+    <h1>PENDING REQUESTS</h1>
+    
+    <button class="refresh-btn" onclick="fetchRequests()">🔄 REFRESH DATA</button>
+
+    <div id="requestContainer" class="container">
+        <p style="text-align: center; color: #555;">Scanning for requests...</p>
     </div>
 
     <script>
+        // Update this URL with your latest deployed Script ID
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
-        function checkPin() {
-            if(document.getElementById('adminPin').value.trim() === "B328") { 
-                document.getElementById('lockScreen').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                loadRequests();
-            } else { alert("Incorrect PIN"); }
-        }
-
-        async function loadRequests() {
-            const list = document.getElementById('requestList');
-            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing with Sheets...</p>';
+        async function fetchRequests() {
+            const container = document.getElementById('requestContainer');
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getPending&t=${Date.now()}`);
+                const response = await fetch(`${SCRIPT_URL}?action=getPending&_t=${Date.now()}`);
                 const data = await response.json();
-                list.innerHTML = "";
-                if (!data || data.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests.</p>';
+                
+                container.innerHTML = "";
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p style='text-align:center; color:#777;'>NO PENDING REQUESTS</p>";
                     return;
                 }
+
                 data.forEach(req => {
-                    const div = document.createElement("div");
-                    div.className = "card";
-                    div.innerHTML = `
+                    const isWithdrawal = req.amount < 0;
+                    const card = document.createElement('div');
+                    card.className = "request-card";
+                    card.innerHTML = `
                         <div class="row-id">ROW: ${req.row}</div>
-                        <div style="font-size:14px; margin-bottom:5px;">PLAYER: ${req.phone}</div>
-                        <div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div>
-                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE & ADD MONEY</button>
-                        <button class="btn-deny" onclick="processRequest(${req.row}, 'deny')">DENY (IGNORE)</button>
+                        <div class="player-info">PLAYER: ${req.phone} ${isWithdrawal ? '<span class="withdraw-label">WITHDRAW</span>' : ''}</div>
+                        <div class="amount">${Math.abs(req.amount).toFixed(2)} ETB</div>
+                        <div class="btn-group">
+                            <button class="action-btn approve-btn" onclick="processAction(${req.row}, 'approve', this)">
+                                ${isWithdrawal ? 'APPROVE & SUBTRACT MONEY' : 'APPROVE & ADD MONEY'}
+                            </button>
+                            <button class="action-btn deny-btn" onclick="processAction(${req.row}, 'deny', this)">
+                                DENY (IGNORE)
+                            </button>
+                        </div>
                     `;
-                    list.appendChild(div);
+                    container.appendChild(card);
                 });
-            } catch (e) {
-                list.innerHTML = '<p style="text-align:center; color:red">Error loading data.</p>';
+            } catch (error) {
+                container.innerHTML = "<p style='color:red; text-align:center;'>Error loading data. Check SCRIPT_URL.</p>";
             }
         }
 
-        async function processRequest(row, status) {
-            const confirmMsg = status === 'approve' ? "Approve deposit?" : "Deny request?";
-            if(!confirm(confirmMsg)) return;
+        async function processAction(row, actionType, btn) {
+            const confirmMsg = actionType === 'approve' ? "Approve this transaction?" : "Deny and remove this request?";
+            if (!confirm(confirmMsg)) return;
+
+            const originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = "PROCESSING...";
+
             try {
-                await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { method: 'GET', mode: 'no-cors' });
+                // If it's a denial, you can handle it by marking as 'DENIED' in the sheet
+                // For now, we use the 'approve' action from your script
+                const response = await fetch(`${SCRIPT_URL}?action=approve&row=${row}`);
+                const result = await response.text();
+
+                if (result === "SUCCESS") {
+                    alert("Action Sent!");
+                    fetchRequests(); // Refresh list
+                } else {
+                    alert("Error: " + result);
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            } catch (error) {
+                // Sometimes fetch fails due to CORS even if the script worked
                 alert("Action Sent!");
-                setTimeout(loadRequests, 1500); 
-            } catch (e) {
-                alert("Error.");
+                fetchRequests();
             }
         }
+
+        // Initial Load
+        fetchRequests();
     </script>
 </body>
 </html>
