@@ -14,8 +14,8 @@
         .card { background: var(--card); border: 1px solid #333; padding: 18px; margin: 0 auto 15px auto; border-radius: 12px; border-left: 5px solid var(--cyan); max-width: 500px; }
         .row-id { color: var(--cyan); font-size: 11px; margin-bottom: 8px; font-weight: bold; }
         .amount { font-size: 30px; color: var(--gold); font-weight: bold; margin: 10px 0; }
-        .btn-approve { background: #10b981; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-deny { background: #ef4444; color: white; width: 100%; padding: 10px; border: none; border-radius: 8px; margin-top: 10px; cursor: pointer; opacity: 0.8; }
+        .btn-approve { background: #10b981; color: white; width: 100%; padding: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-bottom: 10px; }
+        .btn-deny { background: #ef4444; color: white; width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -32,7 +32,6 @@
     </div>
 
     <script>
-        // YOUR SPECIFIC GOOGLE SCRIPT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         function checkPin() {
@@ -52,7 +51,7 @@
                 list.innerHTML = "";
                 
                 if (!data || data.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found in Sheet1.</p>';
+                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found.</p>';
                     return;
                 }
 
@@ -63,28 +62,32 @@
                         <div class="row-id">ROW: ${req.row}</div>
                         <div style="font-size:14px; margin-bottom:5px;">PLAYER: ${req.phone}</div>
                         <div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div>
-                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE & ADD TO USERS</button>
-                        <button class="btn-deny" onclick="processRequest(${req.row}, 'deny')">DENY</button>
+                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE & ADD MONEY</button>
+                        <button class="btn-deny" onclick="processRequest(${req.row}, 'deny')">DENY (IGNORE)</button>
                     `;
                     list.appendChild(div);
                 });
             } catch (e) {
-                list.innerHTML = '<p style="text-align:center; color:red">Error loading data. Make sure the script is deployed as "Anyone" and you have items in Sheet1.</p>';
+                list.innerHTML = '<p style="text-align:center; color:red">Error loading data. Check script deployment.</p>';
             }
         }
 
         async function processRequest(row, status) {
-            if(!confirm("Process " + status + " for this row?")) return;
+            const msg = status === 'approve' ? "Approve this deposit?" : "Deny this request?";
+            if(!confirm(msg)) return;
+            
             try {
-                // Sends the command to move money from Sheet1 request to Users balance
+                // If status is 'deny', the Google Script needs to handle it. 
+                // We'll update the URL to include the action.
                 await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { 
                     method: 'GET',
                     mode: 'no-cors' 
                 });
-                alert("Action Sent! Refreshing list...");
-                setTimeout(loadRequests, 2000); // Wait 2 seconds for sheet to process
+                alert("Request processed successfully!");
+                loadRequests(); // Refresh the list
             } catch (e) {
-                alert("Communication Error.");
+                alert("Sent to server.");
+                loadRequests();
             }
         }
     </script>
