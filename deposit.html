@@ -4,37 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deposit | Simba Bet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           1. ORIGINAL GOLD & BLACK THEME
+           1. INTEGRATED THEME (GOLD & CYAN)
            ========================================= */
         :root { 
-            --gold: #f1c40f; 
-            --bg: #000000; 
-            --card-bg: #0d0d0d;
+            --gold: #fcc201; 
+            --dark: #05070a; 
+            --cyan: #00f2ff; 
+            --card-bg: #111827;
             --text-gray: #aaaaaa;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body { 
-            background-color: var(--bg) !important; 
+            background-color: var(--dark) !important; 
             color: white; 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
+            font-family: 'Goldman', 'Segoe UI', sans-serif; 
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         /* =========================================
-           2. DEPOSIT CARD DESIGN
+           2. DEPOSIT CARD DESIGN (RESTORED LOGIC)
            ========================================= */
         .card { 
             background: var(--card-bg); 
@@ -42,10 +38,10 @@
             border-top: 5px solid var(--gold);
             border-radius: 15px; 
             padding: 25px 20px; 
-            width: 100%; 
+            width: 95%; 
             max-width: 450px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.8); 
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         h2 { 
@@ -66,9 +62,8 @@
             font-weight: bold;
         }
 
-        /* Payment Accounts Box */
         .instruction-box { 
-            background: rgba(241, 196, 15, 0.08); 
+            background: rgba(252, 194, 1, 0.08); 
             padding: 18px; 
             border-radius: 10px; 
             margin-bottom: 25px; 
@@ -82,14 +77,12 @@
             margin-bottom: 8px;
             font-size: 14px;
         }
-
         .pay-row:last-child { margin-bottom: 0; }
         .pay-row strong { color: var(--gold); font-size: 1.1rem; }
 
-        /* Form Styling */
         label { 
             display: block; 
-            margin: 18px 0 8px; 
+            margin: 18px 0 4px; 
             color: var(--gold); 
             font-size: 12px; 
             font-weight: 900;
@@ -100,7 +93,7 @@
             display: block;
             color: var(--text-gray);
             font-size: 11px;
-            margin-top: -5px;
+            margin-top: -2px;
             margin-bottom: 8px;
         }
 
@@ -109,19 +102,16 @@
             padding: 16px; 
             border-radius: 10px; 
             border: 1.5px solid #333; 
-            background: #151515; 
+            background: #000; 
             color: white; 
             font-size: 16px;
             outline: none; 
             transition: 0.3s;
+            font-family: 'Goldman', sans-serif;
         }
 
-        select:focus, input:focus { 
-            border-color: var(--gold);
-            background: #1a1a1a;
-        }
+        select:focus, input:focus { border-color: var(--cyan); background: #111; }
 
-        /* Button Styling */
         .btn-main { 
             background: var(--gold); 
             border: none; 
@@ -134,13 +124,13 @@
             font-size: 16px; 
             margin-top: 30px; 
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+            box-shadow: 0 4px 15px rgba(252, 194, 1, 0.3);
         }
 
         .btn-status { 
             background: transparent; 
-            border: 2px solid var(--gold); 
-            color: var(--gold); 
+            border: 2px solid var(--cyan); 
+            color: var(--cyan); 
             margin-top: 15px; 
             padding: 14px; 
             font-weight: 800;
@@ -148,20 +138,33 @@
             border-radius: 10px;
             width: 100%;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
-        .btn:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        .btn-main:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
 
-        .back-nav { 
-            margin-top: 35px; 
-            color: var(--text-gray); 
-            text-decoration: none; 
-            font-size: 15px; 
-            font-weight: bold;
-            padding: 10px;
+        /* --- BOTTOM NAV BAR --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 25px;
+            border-top: 2px solid var(--gold);
+            z-index: 1000;
         }
-
-        .back-nav:hover { color: var(--gold); }
+        .nav-item {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -201,13 +204,18 @@
         <input type="number" id="amount" placeholder="Minimum 100 ETB">
 
         <button class="btn-main" id="depositBtn" onclick="submitDepositRequest()">SUBMIT REQUEST / ላክ</button>
-        
         <button class="btn-status" id="syncBtn" onclick="checkApproval()">CHECK STATUS / ሁኔታውን አረጋግጥ</button>
     </div>
 
-    <a href="index.html" class="back-nav">← Back to Lobby / ወደ ዋናው ገጽ ተመለስ</a>
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><span>🏠</span><span>Lobby</span></a>
+        <a href="deposit.html" class="nav-item active"><span>💰</span><span>Deposit</span></a>
+        <a href="withdraw.html" class="nav-item"><span>💸</span><span>Withdraw</span></a>
+        <a href="profile.html" class="nav-item"><span>👤</span><span>Profile</span></a>
+    </div>
 
     <script>
+        // Restored EXACT Script URL and Logic from your 296-line file
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function submitDepositRequest() {
@@ -237,18 +245,19 @@
             btn.disabled = true;
             btn.innerText = "SENDING / በመላክ ላይ...";
 
-            // Combine Sender info for the Admin to see in 'Details' column
+            // RESTORED: Exact logDetails formatting for your Admin sheet
             const logDetails = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
             
-            // Constructing the API URL
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(logDetails)}`;
+            // RESTORED: Exact URL Construction including Name and Details
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name || user.username)}&amount=${amount}&details=${encodeURIComponent(logDetails)}`;
 
             try {
-                // Send request to Google Sheets
+                // RESTORED: mode 'no-cors' to handle Google Apps Script redirect behavior
                 await fetch(finalUrl, { mode: 'no-cors' });
                 alert("✅ Request Sent Successfully!\nAdmin will check and approve shortly.\n\nየተቀማጭ ጥያቄዎ በትክክል ተልኳል:: አስተዳዳሪው ሲያረጋግጥ በሂሳብዎ ላይ ይደመራል::");
                 btn.innerText = "REQUEST SENT ✅";
             } catch (e) {
+                // This catch often triggers with Google Scripts even on success due to CORS
                 alert("Request Submitted!");
                 btn.innerText = "SUCCESS ✅";
             }
@@ -263,17 +272,17 @@
             syncBtn.innerText = "SYNCING / በመፈተሽ ላይ...";
 
             try {
+                // RESTORED: Correct action 'getBalance' and redirect behavior
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
                     method: 'GET',
                     redirect: 'follow'
                 });
                 const data = await response.json();
 
-                // Logic to check if Admin has added to the balance
+                // RESTORED: Full logic for updating local storage and alerting success in Amharic
                 if (data && (data.balance !== undefined || data.approvedAmount !== undefined)) {
                     const newTotal = data.balance || data.approvedAmount || 0;
                     
-                    // Update the active user session
                     user.balance = parseFloat(newTotal).toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                     
