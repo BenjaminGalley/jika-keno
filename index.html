@@ -21,7 +21,7 @@
             font-family: 'Goldman', sans-serif;
             padding-bottom: 90px;
             overflow-x: hidden;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
@@ -34,6 +34,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
             z-index: 1000;
         }
         .logo { color: var(--gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; }
@@ -50,7 +52,7 @@
         /* --- BANNER --- */
         .banner {
             width: 100%;
-            height: 120px;
+            height: 140px;
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://img.freepik.com/premium-photo/golden-lion-logo-black-background_853558-3561.jpg');
             background-size: cover;
             background-position: center;
@@ -61,7 +63,7 @@
             flex-shrink: 0;
         }
 
-        /* --- SIDE-TO-SIDE GAME SELECTION --- */
+        /* --- GAME SELECTION --- */
         .section-label {
             padding: 20px 20px 10px;
             font-size: 14px;
@@ -76,9 +78,9 @@
             gap: 15px;
             padding: 10px 20px 20px;
             scroll-snap-type: x mandatory;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
-        .game-scroller::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        .game-scroller::-webkit-scrollbar { display: none; }
 
         .game-card {
             min-width: 160px;
@@ -92,10 +94,10 @@
             padding-bottom: 12px;
             scroll-snap-align: start;
             flex-shrink: 0;
+            cursor: pointer;
         }
         .game-card:active { transform: scale(0.95); }
 
-        /* Branding Colors */
         .glow-blue { border: 1.5px solid var(--blue); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
         .glow-gold { border: 1.5px solid var(--gold); box-shadow: 0 0 15px rgba(252, 194, 1, 0.2); }
 
@@ -133,6 +135,7 @@
             justify-content: space-around;
             padding: 15px 0 25px;
             border-top: 2px solid var(--gold);
+            z-index: 1000;
         }
         .nav-item {
             color: #64748b;
@@ -150,33 +153,47 @@
 
     <div class="header">
         <div class="logo">SIMBA BET 🦁</div>
-        <div class="balance-box" id="userBalance">0.00 ETB</div>
+        <div class="balance-box" id="userBalance">LOADING...</div>
     </div>
 
     <div class="banner">
-        <h2 style="color:var(--gold); text-shadow: 2px 2px 4px #000;">SIMBA LOBBY</h2>
+        <h2 style="color:var(--gold); text-shadow: 2px 2px 4px #000;">WELCOME TO THE JUNGLE</h2>
+        <p style="font-size: 12px; color: #fff;">Premium Betting Experience</p>
     </div>
 
-    <div class="section-label">Featured Games</div>
-
+    <div class="section-label">Slot Games</div>
     <div class="game-scroller">
-        
+        <div class="game-card glow-gold" onclick="location.href='simba-gold.html'">
+            <div class="game-img">💰</div>
+            <div class="game-title">Simba's Gold</div>
+            <div class="game-tag tag-gold">Multipliers</div>
+        </div>
+
+        <div class="game-card glow-gold" onclick="location.href='jungle.html'">
+            <div class="game-img">🌳</div>
+            <div class="game-title">Jungle Big Win</div>
+            <div class="game-tag tag-gold">Big Jackpots</div>
+        </div>
+
+        <div class="game-card glow-gold" onclick="location.href='multi.hot.5.html'">
+            <div class="game-img">🎰</div>
+            <div class="game-title">Multi Hot 5</div>
+            <div class="game-tag tag-gold">Classic Slots</div>
+        </div>
+    </div>
+
+    <div class="section-label">Instant Wins & Keno</div>
+    <div class="game-scroller">
         <div class="game-card glow-blue" onclick="location.href='fast.keno.html'">
             <div class="game-img">🎱</div>
             <div class="game-title">Fast Keno 80</div>
             <div class="game-tag">Draw Every 60s</div>
         </div>
 
-        <div class="game-card glow-gold" onclick="location.href='multi.hot.5.html'">
-            <div class="game-img">🎰</div>
-            <div class="game-title">Multi Hot 5</div>
-            <div class="game-tag tag-gold">Hot Slots</div>
-        </div>
-        
-        <div class="game-card glow-gold" onclick="location.href='lion.scratch.html'">
+        <div class="game-card glow-blue" onclick="location.href='lion.scratch.html'">
             <div class="game-img">🦁</div>
             <div class="game-title">Lion Scratch</div>
-            <div class="game-tag tag-gold">Instant Win</div>
+            <div class="game-tag">Scratch & Win</div>
         </div>
 
         <div class="game-card" style="opacity: 0.5;">
@@ -184,7 +201,6 @@
             <div class="game-title">Mega Dice</div>
             <div class="game-tag" style="color:#666">Coming Soon</div>
         </div>
-
     </div>
 
     <div class="nav-bar">
@@ -195,22 +211,36 @@
     </div>
 
     <script>
-        // CRITICAL: Checks if user is actually logged in before showing the lobby
-        function checkUser() {
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+
+        async function checkUser() {
             const userData = localStorage.getItem('simba_active_user');
             
             if (!userData) {
-                // IMPORTANT: Prevents access without login
                 window.location.href = 'login.html';
                 return;
             }
 
             const user = JSON.parse(userData);
+            
+            // Show local balance first for speed
             document.getElementById('userBalance').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
+
+            // Fetch fresh balance from Google Sheet to ensure sync
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}`);
+                const data = await response.json();
+                if (data && data.balance !== undefined) {
+                    user.balance = data.balance;
+                    localStorage.setItem('simba_active_user', JSON.stringify(user));
+                    document.getElementById('userBalance').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
+                }
+            } catch (e) {
+                console.log("Could not sync balance from server, using local.");
+            }
         }
 
-        // AUTO-REFRESH BALANCE
-        // This ensures if they win in a game and hit 'back', the balance updates instantly
+        // Auto-refresh when user returns to this tab
         window.onfocus = function() {
             checkUser();
         };
