@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <style>
     /* =========================================
-       1. GLOBAL RESET & CORE THEME 
+       1. THE BLACK THEME ENGINE
        ========================================= */
     * { 
         box-sizing: border-box; 
-        outline: none; 
-        -webkit-tap-highlight-color: transparent; 
         margin: 0; 
         padding: 0; 
+        outline: none; 
+        -webkit-tap-highlight-color: transparent; 
     }
     
-    body, html { 
-        background-color: #000000; 
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+    /* This forces the background to be black immediately to stop the white screen */
+    html, body { 
+        background-color: #000000 !important; 
         color: #ffffff; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
         width: 100%; 
         height: 100%; 
-        overflow: hidden; /* Prevents whole page from bouncing on mobile */
+        overflow: hidden; 
     }
 
     /* =========================================
-       2. TOP NAVIGATION BAR
+       2. NAVIGATION BAR
        ========================================= */
-    .steady-top { 
+    .nav-header { 
         position: fixed; 
         top: 0; 
         width: 100%; 
-        background-color: #000000; 
         z-index: 2000; 
+        background-color: #000000; 
     }
     
-    .top-nav { 
+    .nav-container { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
@@ -43,13 +44,9 @@
         height: 60px; 
     }
 
-    .brand-section { 
-        display: flex; 
-        align-items: center; 
-        gap: 12px; 
-    }
-
-    .menu-trigger { 
+    .nav-left { display: flex; align-items: center; gap: 12px; }
+    
+    .sidebar-toggle { 
         background: none; 
         border: none; 
         color: #ffffff; 
@@ -57,69 +54,67 @@
         cursor: pointer; 
     }
 
-    .brand-text { 
+    .brand-logo { 
         color: #f1c40f; 
-        font-weight: 800; 
-        font-size: 1.1rem; 
-        letter-spacing: 1px; 
-        text-transform: uppercase;
+        font-weight: 900; 
+        font-size: 1rem; 
+        letter-spacing: 0.5px;
     }
 
     .x-box { 
         background-color: #f1c40f; 
         color: #000000; 
-        padding: 2px 7px; 
-        border-radius: 4px; 
+        padding: 2px 6px; 
+        border-radius: 3px; 
         font-weight: 900; 
+        margin-right: 4px; 
     }
 
     /* =========================================
        3. BALANCE & DEPOSIT AREA
        ========================================= */
-    .balance-container { 
-        text-align: center; 
-        flex-grow: 1; 
-    }
-
-    .label-small { 
+    .balance-display { text-align: center; flex-grow: 1; }
+    
+    .bal-label { 
         display: block; 
         font-size: 0.6rem; 
-        color: #888888; 
+        color: #aaaaaa; 
+        text-transform: uppercase; 
         font-weight: bold; 
-        letter-spacing: 0.5px;
     }
 
-    .balance-amount { 
+    .bal-value { 
         color: #f1c40f; 
         font-weight: 800; 
-        font-size: 1.25rem; 
+        font-size: 1.2rem; 
     }
 
-    .deposit-btn-top { 
+    .dep-button { 
         background-color: #27ae60; 
         color: #ffffff; 
-        padding: 9px 18px; 
+        padding: 8px 16px; 
         border: none; 
         border-radius: 6px; 
         font-weight: 900; 
-        font-size: 0.85rem; 
+        font-size: 0.8rem; 
         cursor: pointer; 
-        box-shadow: 0 0 10px rgba(39, 174, 96, 0.4);
+        transition: 0.2s;
     }
 
     /* =========================================
-       4. HERO BANNER (Lion Asset)
+       4. SIMBA LION BANNER
        ========================================= */
-    .hero-banner { 
+    .hero-banner-container { 
         width: 100%; 
-        height: 210px; 
+        height: 200px; 
         overflow: hidden; 
         background-color: #000000; 
         position: relative;
         border-bottom: 1px solid #222222;
     }
     
-    .hero-banner img { 
+    /* Mobile-optimized size for simba_bg.jpg */
+    .hero-img-asset { 
         width: 100%; 
         height: 100%; 
         object-fit: cover; 
@@ -129,10 +124,10 @@
     /* =========================================
        5. CATEGORY TABS
        ========================================= */
-    .tabs-section { 
-        background-color: #0a0a0a; 
+    .tabs-wrapper { 
+        background-color: #000000; 
         padding: 12px 0; 
-        border-bottom: 1px solid #1a1a1a; 
+        border-bottom: 1px solid #111111; 
     }
 
     .tabs-scroll { 
@@ -143,105 +138,94 @@
         scrollbar-width: none; 
     }
 
-    .category-tab { 
+    .cat-tab { 
         white-space: nowrap; 
         padding: 10px 20px; 
-        border-radius: 25px; 
+        border-radius: 20px; 
         background-color: #1a1a1a; 
         color: #ffffff; 
-        font-size: 0.8rem; 
+        font-size: 0.75rem; 
         font-weight: bold; 
         border: 1px solid #333333; 
-        cursor: pointer;
     }
 
-    .category-tab.active { 
+    .cat-tab.active { 
         background-color: #f1c40f; 
         color: #000000; 
         border-color: #f1c40f; 
     }
 
     /* =========================================
-       6. MAIN SCROLLABLE CONTENT (Games)
+       6. SCROLLABLE GAMES ENGINE
        ========================================= */
-    .main-scroll-area { 
-        margin-top: 335px; /* Adjust based on top elements total height */
-        height: calc(100vh - 335px); 
+    .content-viewport { 
+        margin-top: 325px; /* Adjusting for top area height */
+        height: calc(100vh - 325px); 
         overflow-y: auto; 
-        padding-bottom: 100px; 
+        padding-bottom: 80px; 
         -webkit-overflow-scrolling: touch;
+        background-color: #000;
     }
 
-    .section-label-hot { 
-        padding: 20px 15px 10px 15px; 
+    .game-section-header { 
+        padding: 15px 15px 5px 15px; 
         color: #f1c40f; 
         font-weight: 800; 
-        font-size: 1.1rem; 
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
+        font-size: 1rem; 
     }
 
     /* =========================================
-       7. THE GAME GRID
+       7. GAME HOLDERS GRID
        ========================================= */
-    .game-grid-layout { 
+    .game-grid { 
         display: grid; 
         grid-template-columns: repeat(3, 1fr); 
-        gap: 14px; 
-        padding: 0 15px; 
+        gap: 12px; 
+        padding: 15px; 
     }
 
-    .game-item-card { 
+    .game-card { 
         background: linear-gradient(145deg, #1e1e1e, #0a0a0a); 
         border: 1px solid #2a2a2a; 
-        border-radius: 15px; 
+        border-radius: 12px; 
         text-align: center; 
-        padding: 18px 5px; 
+        padding: 15px 5px; 
         position: relative; 
         overflow: hidden; 
-        border-bottom: 4px solid #f1c40f; 
+        border-bottom: 3px solid #f1c40f; 
         cursor: pointer;
-        transition: transform 0.1s;
     }
 
-    .game-item-card:active { transform: scale(0.95); }
-
-    .game-icon-wrapper { 
-        height: 65px; 
+    .game-icon-box { 
+        height: 55px; 
         display: flex; 
         align-items: center; 
         justify-content: center; 
-        margin-bottom: 12px; 
+        margin-bottom: 8px; 
     }
 
-    .game-icon-wrapper img { 
-        width: 80%; 
-        height: 80%; 
-        object-fit: contain; 
-    }
+    .game-icon-box img { width: 42px; height: 42px; object-fit: contain; }
 
-    .game-title-text { 
-        font-size: 0.75rem; 
+    .game-title { 
+        font-size: 0.7rem; 
         color: #ffffff; 
         font-weight: 800; 
         margin: 0; 
-        text-shadow: 1px 1px 2px #000;
     }
 
-    /* SHINE ANIMATION */
-    .game-item-card::after {
-        content: ''; position: absolute; top: -50%; left: -100%;
-        width: 200%; height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(241, 196, 15, 0.1), transparent);
-        transform: rotate(45deg); animation: flash 5s infinite;
+    /* KENO LOGO CUSTOM STYLE */
+    .keno-blue-style {
+        color: #00f2ff;
+        font-size: 1.2rem;
+        font-weight: 900;
+        line-height: 1.1;
+        text-shadow: 0 0 8px rgba(0, 242, 255, 0.4);
     }
-    @keyframes flash { 100% { left: 100%; } }
 
     /* =========================================
        8. SIDE MENU
        ========================================= */
-    .side-nav-menu { 
+    .side-menu-container { 
         position: fixed; 
         left: -280px; 
         top: 0; 
@@ -254,102 +238,65 @@
         padding: 30px 20px; 
     }
 
-    .side-nav-menu.is-open { left: 0; }
+    .side-menu-container.open { left: 0; }
 
-    .menu-header-box { 
-        border-bottom: 1px solid #333; 
-        padding-bottom: 20px; 
-        margin-bottom: 20px; 
-    }
-
-    .menu-link-item { 
+    .menu-link { 
         display: flex; 
         align-items: center; 
         gap: 15px; 
         color: white; 
         text-decoration: none; 
-        padding: 18px 10px; 
+        padding: 15px 10px; 
         font-weight: bold; 
-        border-radius: 8px; 
+        border-bottom: 1px solid #222; 
     }
 
-    .menu-link-item:hover { background-color: #1a1a1a; color: #f1c40f; }
-
     /* =========================================
-       9. FOOTER STATUS BAR
+       9. STATUS FOOTER
        ========================================= */
-    .global-footer-status { 
+    .status-footer-bar { 
         position: fixed; 
         bottom: 0; 
         width: 100%; 
         display: flex; 
         justify-content: space-between; 
-        padding: 14px 20px; 
+        padding: 12px 20px; 
         background-color: #000000; 
         border-top: 1px solid #222222; 
-        font-size: 0.8rem; 
-        color: #999999; 
+        font-size: 0.75rem; 
+        color: #888888; 
         z-index: 2500; 
         font-weight: bold;
-    }
-
-    .status-dot { 
-        height: 10px; 
-        width: 10px; 
-        background-color: #27ae60; 
-        border-radius: 50%; 
-        display: inline-block; 
-        margin-left: 5px; 
-        box-shadow: 0 0 5px #27ae60;
     }
 </style>
 
 <script>
-    /* COMPLEX BALANCE LOGIC & SYNC */
-    const GOOGLE_APP_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+    /* SYSTEM SYNC LOGIC */
+    const SIMBA_API_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
 
-    async function syncSimbaSystem() {
-        const localData = localStorage.getItem('simba_active_user');
-        if (!localData) {
-            console.log("No User Session Found");
-            return;
-        }
+    async function syncSystem() {
+        const stored = localStorage.getItem('simba_active_user');
+        if (!stored) return;
         
-        const user = JSON.parse(localData);
-        
+        const user = JSON.parse(stored);
         try {
-            // Fetching the user balance and checking for 'Approved' status in Column G
-            const response = await fetch(`${GOOGLE_APP_URL}?action=getBalance&phone=${user.phone}`);
-            const data = await response.json();
+            const res = await fetch(`${SIMBA_API_URL}?action=getBalance&phone=${user.phone}`);
+            const data = await res.json();
             
-            // Critical: If the sheet shows an amount in Column E and status is 'Approve'
-            let liveBalance = data.balance || data.approvedAmount || 0;
-            user.balance = parseFloat(liveBalance).toFixed(2);
-            
-            // Update local storage so the session remains current
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
-            
-            // DOM Updates
-            if (document.getElementById('headerBalance')) {
-                document.getElementById('headerBalance').innerText = user.balance;
-            }
-            if (document.getElementById('footerAccountID')) {
-                document.getElementById('footerAccountID').innerText = "SB-" + user.phone.toString().slice(-4);
-            }
-        } catch (error) {
-            console.error("System Sync Failure:", error);
-        }
+            // Logic to pull the "Approved" deposit amount
+            let currentBal = data.balance || data.approvedAmount || 0;
+            document.getElementById('headerBal').innerText = parseFloat(currentBal).toFixed(2);
+            document.getElementById('footerID').innerText = "SB-" + user.phone.toString().slice(-4);
+        } catch (e) { console.log("System updating..."); }
     }
 
-    function toggleSidebar() {
-        document.getElementById('mainSidebar').classList.toggle('is-open');
+    function toggleNav() {
+        document.getElementById('sideMenu').classList.toggle('open');
     }
 
-    // Initialize System
     window.onload = function() {
-        syncSimbaSystem();
-        // Set interval to sync every 12 seconds to keep the balance fresh
-        setInterval(syncSimbaSystem, 12000);
+        syncSystem();
+        setInterval(syncSystem, 10000);
     };
 </script>
 </head>
