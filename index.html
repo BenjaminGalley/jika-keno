@@ -153,7 +153,7 @@
 
     <div class="header">
         <div class="logo">SIMBA BET 🦁</div>
-        <div class="balance-box" id="userBalance">LOADING...</div>
+        <div class="balance-box" id="userBalance">SYNCING...</div>
     </div>
 
     <div class="banner">
@@ -195,12 +195,6 @@
             <div class="game-title">Lion Scratch</div>
             <div class="game-tag">Scratch & Win</div>
         </div>
-
-        <div class="game-card" style="opacity: 0.5;">
-            <div class="game-img">🎲</div>
-            <div class="game-title">Mega Dice</div>
-            <div class="game-tag" style="color:#666">Coming Soon</div>
-        </div>
     </div>
 
     <div class="nav-bar">
@@ -222,31 +216,33 @@
             }
 
             const user = JSON.parse(userData);
+            const balanceDisplay = document.getElementById('userBalance');
             
-            // Show local balance first for speed
-            document.getElementById('userBalance').innerText = parseFloat(user.balance || 0).toFixed(2) + " ETB";
+            // Show local balance immediately for a better feeling
+            balanceDisplay.innerText = parseFloat(user.balance || 0).toFixed(2) + " ETB";
 
-            // Fetch fresh balance with Cache Buster
+            // Fetch live balance from 'Users' sheet
             try {
-                // adding _t ensures the browser gets a fresh response from the sheet
-                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}&_t=${Date.now()}`);
+                // FIXED: Changed action to 'getBalance' to match Google Script
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
                 
                 if (data && data.balance !== undefined) {
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    document.getElementById('userBalance').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
-                    console.log("Balance updated from server:", data.balance);
+                    balanceDisplay.innerText = parseFloat(data.balance).toFixed(2) + " ETB";
                 }
             } catch (e) {
-                console.warn("Server sync failed. Using last known balance.");
+                console.warn("Live sync failed.");
             }
         }
 
-        // Auto-refresh when user returns to this tab
-        window.onfocus = function() {
-            checkUser();
-        };
+        // Refresh balance if user switches back to this tab
+        document.addEventListener("visibilitychange", function() {
+            if (document.visibilityState === 'visible') {
+                checkUser();
+            }
+        });
     </script>
 </body>
 </html>
