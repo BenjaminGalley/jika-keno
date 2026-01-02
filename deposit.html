@@ -6,9 +6,6 @@
     <title>Deposit | Simba Bet</title>
     <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* =========================================
-           1. INTEGRATED THEME (GOLD & CYAN)
-           ========================================= */
         :root { 
             --gold: #fcc201; 
             --dark: #05070a; 
@@ -22,16 +19,13 @@
         body { 
             background-color: var(--dark) !important; 
             color: white; 
-            font-family: 'Goldman', 'Segoe UI', sans-serif; 
+            font-family: 'Goldman', sans-serif; 
             padding-bottom: 100px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* =========================================
-           2. DEPOSIT CARD DESIGN (RESTORED LOGIC)
-           ========================================= */
         .card { 
             background: var(--card-bg); 
             border: 1px solid #222; 
@@ -77,7 +71,6 @@
             margin-bottom: 8px;
             font-size: 14px;
         }
-        .pay-row:last-child { margin-bottom: 0; }
         .pay-row strong { color: var(--gold); font-size: 1.1rem; }
 
         label { 
@@ -93,7 +86,6 @@
             display: block;
             color: var(--text-gray);
             font-size: 11px;
-            margin-top: -2px;
             margin-bottom: 8px;
         }
 
@@ -106,11 +98,8 @@
             color: white; 
             font-size: 16px;
             outline: none; 
-            transition: 0.3s;
             font-family: 'Goldman', sans-serif;
         }
-
-        select:focus, input:focus { border-color: var(--cyan); background: #111; }
 
         .btn-main { 
             background: var(--gold); 
@@ -124,7 +113,6 @@
             font-size: 16px; 
             margin-top: 30px; 
             text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(252, 194, 1, 0.3);
         }
 
         .btn-status { 
@@ -141,9 +129,6 @@
             text-transform: uppercase;
         }
 
-        .btn-main:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
-
-        /* --- BOTTOM NAV BAR --- */
         .nav-bar {
             position: fixed;
             bottom: 0;
@@ -153,16 +138,12 @@
             justify-content: space-around;
             padding: 15px 0 25px;
             border-top: 2px solid var(--gold);
-            z-index: 1000;
         }
         .nav-item {
             color: #64748b;
             text-decoration: none;
             font-size: 11px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
         }
         .nav-item.active { color: var(--gold); }
     </style>
@@ -208,14 +189,13 @@
     </div>
 
     <div class="nav-bar">
-        <a href="index.html" class="nav-item"><span>🏠</span><span>Lobby</span></a>
-        <a href="deposit.html" class="nav-item active"><span>💰</span><span>Deposit</span></a>
-        <a href="withdraw.html" class="nav-item"><span>💸</span><span>Withdraw</span></a>
-        <a href="profile.html" class="nav-item"><span>👤</span><span>Profile</span></a>
+        <a href="index.html" class="nav-item">🏠<br>Lobby</a>
+        <a href="deposit.html" class="nav-item active">💰<br>Deposit</a>
+        <a href="withdraw.html" class="nav-item">💸<br>Withdraw</a>
+        <a href="profile.html" class="nav-item">👤<br>Profile</a>
     </div>
 
     <script>
-        // Restored EXACT Script URL and Logic from your 296-line file
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function submitDepositRequest() {
@@ -226,40 +206,21 @@
             const amount = document.getElementById('amount').value.trim();
             const btn = document.getElementById('depositBtn');
 
-            if (!user) {
-                alert("Session expired. Please login again.");
-                window.location.href = "login.html";
-                return;
-            }
-
-            if (!sName || !sPhone || !amount) {
-                alert("እባክዎ ሁሉንም መረጃዎች በትክክል ያስገቡ!\n(Please fill all fields!)");
-                return;
-            }
-
-            if (parseFloat(amount) < 100) {
-                alert("ዝቅተኛው የገንዘብ መጠን 100 ብር ነው::\n(Minimum deposit is 100 ETB)");
-                return;
-            }
+            if (!user) { alert("Please login again."); window.location.href = "login.html"; return; }
+            if (!sName || !sPhone || !amount) { alert("Please fill all fields!"); return; }
 
             btn.disabled = true;
-            btn.innerText = "SENDING / በመላክ ላይ...";
+            btn.innerText = "SENDING...";
 
-            // RESTORED: Exact logDetails formatting for your Admin sheet
-            const logDetails = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
-            
-            // RESTORED: Exact URL Construction including Name and Details
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name || user.username)}&amount=${amount}&details=${encodeURIComponent(logDetails)}`;
+            const details = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
-                // RESTORED: mode 'no-cors' to handle Google Apps Script redirect behavior
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("✅ Request Sent Successfully!\nAdmin will check and approve shortly.\n\nየተቀማጭ ጥያቄዎ በትክክል ተልኳል:: አስተዳዳሪው ሲያረጋግጥ በሂሳብዎ ላይ ይደመራል::");
+                alert("✅ Request Sent! Wait for Admin approval.");
                 btn.innerText = "REQUEST SENT ✅";
             } catch (e) {
-                // This catch often triggers with Google Scripts even on success due to CORS
                 alert("Request Submitted!");
-                btn.innerText = "SUCCESS ✅";
             }
         }
 
@@ -269,34 +230,27 @@
             if (!user) return;
 
             syncBtn.disabled = true;
-            syncBtn.innerText = "SYNCING / በመፈተሽ ላይ...";
+            syncBtn.innerText = "SYNCING...";
 
             try {
-                // RESTORED: Correct action 'getBalance' and redirect behavior
-                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
+                // Changed action to 'getUser' to match Lobby logic
+                const response = await fetch(`${SCRIPT_URL}?action=getUser&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
 
-                // RESTORED: Full logic for updating local storage and alerting success in Amharic
-                if (data && (data.balance !== undefined || data.approvedAmount !== undefined)) {
-                    const newTotal = data.balance || data.approvedAmount || 0;
-                    
-                    user.balance = parseFloat(newTotal).toFixed(2);
+                if (data && data.balance !== undefined) {
+                    user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    
-                    alert(`✅ SUCCESS!\nYour balance is now: ${user.balance} ETB\nሂሳብዎ በትክክል ታድሷል::`);
+                    alert(`✅ SUCCESS!\nNew Balance: ${user.balance} ETB`);
                     window.location.href = "index.html";
                 } else {
-                    alert("ጥያቄዎ ገና አልተረጋገጠም:: እባክዎ ትንሽ ይጠብቁ::\n(Still pending. Please wait for admin approval.)");
+                    alert("Still pending. Please wait.");
                     syncBtn.disabled = false;
-                    syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
+                    syncBtn.innerText = "CHECK STATUS";
                 }
             } catch (e) {
-                alert("Connection stable. No updates yet.");
+                alert("No updates yet.");
                 syncBtn.disabled = false;
-                syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
+                syncBtn.innerText = "CHECK STATUS";
             }
         }
     </script>
