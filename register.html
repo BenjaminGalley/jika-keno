@@ -5,165 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Register | Simba Bet Official</title>
     <style>
-        /* =========================================
-           1. CORE THEME: GOLD & BLACK
-           ========================================= */
-        :root { 
-            --gold: #f1c40f; 
-            --bg: #000000; 
-            --card-bg: #0d0d0d;
-        }
-
+        :root { --gold: #f1c40f; --bg: #000000; --card-bg: #0d0d0d; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body { 
-            background-color: var(--bg) !important; 
-            color: white; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-        }
-
-        /* =========================================
-           2. REGISTRATION CARD
-           ========================================= */
-        .reg-card { 
-            background: var(--card-bg); 
-            border: 1px solid #222; 
-            border-top: 5px solid var(--gold);
-            border-radius: 15px; 
-            padding: 35px 25px; 
-            width: 90%; 
-            max-width: 400px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
-            text-align: center;
-        }
-
-        .brand-name {
-            color: var(--gold);
-            font-weight: 900;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-
-        .brand-name span {
-            background: var(--gold);
-            color: #000;
-            padding: 0 8px;
-            border-radius: 3px;
-            margin-right: 5px;
-        }
-
-        .welcome-text {
-            font-size: 11px;
-            color: #777;
-            text-transform: uppercase;
-            font-weight: 800;
-            margin-bottom: 25px;
-            letter-spacing: 1px;
-        }
-
-        /* =========================================
-           3. FORM INPUTS
-           ========================================= */
-        .input-group {
-            text-align: left;
-            margin-bottom: 12px;
-        }
-
-        label {
-            font-size: 10px;
-            color: var(--gold);
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-left: 5px;
-        }
-
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            margin-top: 5px;
-            border-radius: 10px; 
-            border: 1.5px solid #222; 
-            background: #151515; 
-            color: white; 
-            font-size: 16px; 
-            outline: none; 
-            transition: 0.3s;
-        }
-
-        input:focus { 
-            border-color: var(--gold); 
-            background: #1a1a1a;
-        }
-
-        /* =========================================
-           4. ACTION BUTTONS
-           ========================================= */
-        .reg-btn { 
-            width: 100%; 
-            padding: 16px; 
-            background: var(--gold); 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            color: black; 
-            margin-top: 20px; 
-            font-size: 16px; 
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.2);
-        }
-
+        body { background-color: var(--bg) !important; color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .reg-card { background: var(--card-bg); border: 1px solid #222; border-top: 5px solid var(--gold); border-radius: 15px; padding: 35px 25px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); text-align: center; }
+        .brand-name { color: var(--gold); font-weight: 900; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 5px; }
+        .brand-name span { background: var(--gold); color: #000; padding: 0 8px; border-radius: 3px; margin-right: 5px; }
+        .welcome-text { font-size: 11px; color: #777; text-transform: uppercase; font-weight: 800; margin-bottom: 25px; letter-spacing: 1px; }
+        .input-group { text-align: left; margin-bottom: 12px; }
+        label { font-size: 10px; color: var(--gold); font-weight: 900; text-transform: uppercase; margin-left: 5px; }
+        input { width: 100%; padding: 14px; margin-top: 5px; border-radius: 10px; border: 1.5px solid #222; background: #151515; color: white; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--gold); background: #1a1a1a; }
+        .reg-btn { width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 10px; font-weight: 900; cursor: pointer; color: black; margin-top: 20px; font-size: 16px; text-transform: uppercase; }
         .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .login-link {
-            margin-top: 25px;
-            font-size: 13px;
-            color: #888;
-        }
-
-        .login-link a {
-            color: var(--gold);
-            text-decoration: none;
-            font-weight: 900;
-        }
+        .login-link { margin-top: 25px; font-size: 13px; color: #888; }
+        .login-link a { color: var(--gold); text-decoration: none; font-weight: 900; }
     </style>
 </head>
 <body>
-
     <div class="reg-card">
         <h1 class="brand-name"><span>X</span>SIMBA</h1>
         <p class="welcome-text">JOIN THE PRIDE / ቤተሰቡን ይቀላቀሉ</p>
-        
         <div class="input-group">
             <label>Full Name / ሙሉ ስም</label>
             <input type="text" id="regName" placeholder="Enter your name">
         </div>
-
         <div class="input-group">
             <label>Phone Number / ስልክ ቁጥር</label>
             <input type="number" id="regPhone" placeholder="09... / 07...">
         </div>
-
         <div class="input-group">
             <label>Password / የይለፍ ቃል</label>
             <input type="password" id="regPass" placeholder="Create a password">
         </div>
-        
         <button id="regBtn" class="reg-btn" onclick="handleRegister()">REGISTER / ተመዝገብ</button>
-        
-        <p class="login-link">
-            Already have an account? (ቀድሞ መለያ አለዎት?) <br> 
-            <a href="login.html">LOGIN HERE / ግባ</a>
-        </p>
+        <p class="login-link">Already have an account? <br> <a href="login.html">LOGIN HERE / ግባ</a></p>
     </div>
 
     <script>
-        // MASTER URL synced with your Google Script
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function handleRegister() {
@@ -172,20 +51,11 @@
             const pass = document.getElementById('regPass').value.trim();
             const btn = document.getElementById('regBtn');
 
-            if (!name || !phone || !pass) {
-                alert("Please fill all fields!\nእባክዎን ሁሉንም መረጃዎች ይሙሉ::");
-                return;
-            }
-
-            if (phone.length < 10) {
-                alert("Invalid phone number!\nትክክለኛ የስልክ ቁጥር ያስገቡ::");
-                return;
-            }
+            if (!name || !phone || !pass) { alert("Please fill all fields!"); return; }
 
             btn.disabled = true;
-            btn.innerText = "PROCESSING... (በመመዝገብ ላይ)";
+            btn.innerText = "PROCESSING...";
 
-            // Action "register" triggers your Google Apps Script logic
             const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
 
             try {
@@ -193,38 +63,22 @@
                 const data = await response.json();
 
                 if (data.status === "exists") {
-                    alert("This phone is already registered!\nይህ ስልክ ቁጥር ቀድሞ ተመዝግቧል::");
-                    resetBtn(btn);
+                    alert("Phone already registered!");
+                    btn.disabled = false; btn.innerText = "REGISTER";
                     return;
                 }
 
                 if (data.status === "success") {
-                    // Save session with data from Google (including balance and Player ID)
-                    const activeUser = {
-                        phone: phone,
-                        name: name,
-                        id: data.id || "SB-NEW",
-                        balance: "0.00"
-                    };
-                    
-                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    
-                    alert("Success! Welcome to Simba Bet.\nምዝገባዎ ተሳክቷል! ወደ ሲምባ ቤቲንግ እንኳን ደህና መጡ::");
+                    localStorage.setItem('simba_active_user', JSON.stringify({
+                        phone: phone, name: name, balance: 0, id: data.id
+                    }));
+                    alert("Success! Welcome to Simba.");
                     window.location.href = 'index.html';
                 }
-
             } catch (error) {
-                console.error("Registration Error:", error);
-                // Fallback for connectivity: save local session anyway to allow entry
-                const fallbackUser = { phone: phone, name: name, balance: "0.00" };
-                localStorage.setItem('simba_active_user', JSON.stringify(fallbackUser));
-                window.location.href = 'index.html';
+                alert("Connection error. Try again.");
+                btn.disabled = false; btn.innerText = "REGISTER";
             }
-        }
-
-        function resetBtn(btn) {
-            btn.disabled = false;
-            btn.innerText = "REGISTER / ተመዝገብ";
         }
     </script>
 </body>
