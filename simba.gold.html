@@ -84,9 +84,17 @@
         .spin-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #8c5d00; }
         .spin-btn:disabled { opacity: 0.5; filter: grayscale(1); }
         #msg { height: 30px; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+
+        .exit-btn {
+            position: absolute; top: 15px; left: 15px; background: #ff4444;
+            color: white; border: none; padding: 8px 15px; border-radius: 8px;
+            font-family: 'Goldman'; cursor: pointer; z-index: 100;
+        }
     </style>
 </head>
 <body onload="setup()">
+
+    <button class="exit-btn" onclick="location.href='index.html'">EXIT</button>
 
     <div class="balance">BAL: <span id="balDisplay">0.00</span> ETB</div>
 
@@ -108,20 +116,19 @@
     </div>
 
     <script>
-        // Assets
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         const SEVEN = "https://i.ibb.co/v38vM97/seven.png";
         const SYMBOLS = ["💎", "🍉", "🍒", "🦁", SEVEN];
         const M_VALUES = ["×1", "×2", "×1", "×3", "×1", "×5", "×2", "×4"];
         
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let balance = 0, stake = 10;
 
         function setup() {
-            // Use existing user data or default for testing
-            let userData = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: "1000.00" };
-            balance = parseFloat(userData.balance);
+            if(!user) { window.location.href = 'login.html'; return; }
+            balance = parseFloat(user.balance || 0);
             document.getElementById('balDisplay').innerText = balance.toFixed(2);
 
-            // Populate Reels with 60 items for smooth long spin
             ['mReel', 'r1', 'r2', 'r3'].forEach(id => {
                 let html = "";
                 for(let i=0; i<60; i++) {
@@ -136,21 +143,26 @@
             });
         }
 
+        async function syncBalance(newBal) {
+            try {
+                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBal}`, { mode: 'no-cors' });
+            } catch (e) { console.log("Balance sync queued."); }
+        }
+
         function runSpin() {
             if(balance < stake) return alert("Low Balance!");
             
             balance -= stake;
             updateUI();
+            syncBalance(balance.toFixed(2)); // Deduct stake from server
 
             const focus = document.getElementById('focusBox');
             focus.classList.remove('flashing');
             document.getElementById('spinBtn').disabled = true;
             document.getElementById('msg').innerText = "SPINNING...";
 
-            // Clear previous active states
             document.querySelectorAll('.mult-item').forEach(el => el.classList.remove('active-mult'));
 
-            // Calculate Random Stops (between index 10 and 50)
             const stops = [
                 Math.floor(Math.random()*40 + 10), 
                 Math.floor(Math.random()*40 + 10), 
@@ -158,51 +170,48 @@
                 Math.floor(Math.random()*40 + 10)
             ];
 
-            // Animate
             const ids = ['mReel', 'r1', 'r2', 'r3'];
             ids.forEach((id, i) => {
+                document.getElementById(id).style.transition = 'transform 2.5s cubic-bezier(0.1, 0, 0.1, 1)';
                 document.getElementById(id).style.transform = `translateY(-${stops[i] * 100}px)`;
             });
 
             setTimeout(() => {
-                // Get the multiplier from the middle row (stop index + 1)
                 const multItems = document.querySelectorAll('#mReel .mult-item');
                 const activeMultElement = multItems[stops[0] + 1];
                 const multiplier = parseInt(activeMultElement.innerText.replace('×',''));
                 
                 activeMultElement.classList.add('active-mult');
-                
-                // If high multiplier, flash the box
                 if(multiplier >= 4) focus.classList.add('flashing');
 
-                // Get symbols from the middle row of main reels
                 const s1 = document.querySelectorAll('#r1 .symbol')[stops[1] + 1].innerHTML;
                 const s2 = document.querySelectorAll('#r2 .symbol')[stops[2] + 1].innerHTML;
                 const s3 = document.querySelectorAll('#r3 .symbol')[stops[3] + 1].innerHTML;
 
-                // Win Logic
                 let win = 0;
                 if(s1 === s2 && s2 === s3) {
-                    win = 50 * multiplier; // Jackpot
+                    win = 50 * multiplier; 
                     document.getElementById('msg').innerHTML = `<span style="color:var(--gold)">JACKPOT! +${win} ETB</span>`;
                 } else if (s1 === s2 || s2 === s3 || s1 === s3) {
-                    win = 5 * multiplier; // Pair
+                    win = 5 * multiplier; 
                     document.getElementById('msg').innerHTML = `<span style="color:var(--gold)">PAIR! +${win} ETB</span>`;
                 } else {
                     document.getElementById('msg').innerText = "TRY AGAIN";
                 }
                 
-                balance += win;
-                updateUI();
+                if(win > 0) {
+                    balance += win;
+                    updateUI();
+                    syncBalance(balance.toFixed(2)); // Add win to server
+                }
                 document.getElementById('spinBtn').disabled = false;
             }, 2600);
         }
 
         function updateUI() {
             document.getElementById('balDisplay').innerText = balance.toFixed(2);
-            let u = JSON.parse(localStorage.getItem('simba_active_user')) || {phone: "Guest"};
-            u.balance = balance.toFixed(2);
-            localStorage.setItem('simba_active_user', JSON.stringify(u));
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
     </script>
 </body>
