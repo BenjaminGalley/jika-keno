@@ -76,6 +76,8 @@
             box-shadow: 0 5px 0 #5c4000;
         }
 
+        .play-btn:disabled { filter: grayscale(1); opacity: 0.6; cursor: default; }
+
         #winBanner {
             position: absolute; top: 20%; width: 100%; text-align: center;
             font-size: 45px; color: var(--gold); font-weight: 900;
@@ -85,7 +87,7 @@
 </head>
 <body>
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:6px 15px; border-radius:8px; font-weight:bold;">LOBBY</button>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:6px 15px; border-radius:8px; font-weight:bold; cursor:pointer;">LOBBY</button>
         <div class="balance"><span id="balance">0.00</span> ETB</div>
     </div>
 
@@ -107,10 +109,24 @@
     <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <script>
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: "0.00" };
-        let balance = parseFloat(user.balance);
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = 0;
         let bet = 2;
         const SYMBOLS = ['lion.jpg', 'tiger.jpg', 'giraffe.jpg', 'elephant.jpg', 'zebra.jpg', 'hippo.jpg'];
+
+        function init() {
+            if (!user) { window.location.href = 'login.html'; return; }
+            balance = parseFloat(user.balance || 0);
+            updateUI();
+            initBoard();
+        }
+
+        async function syncServerBalance(newBal) {
+            try {
+                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBal}`, { mode: 'no-cors' });
+            } catch (e) { console.log("Sync queued"); }
+        }
 
         function updateUI() {
             document.getElementById('balance').innerText = balance.toFixed(2);
@@ -120,6 +136,7 @@
         }
 
         function changeBet(amt) {
+            if (document.getElementById('spinBtn').disabled) return;
             if (bet + amt >= 2 && bet + amt <= 1000) { bet += amt; updateUI(); }
         }
 
@@ -136,7 +153,10 @@
 
         async function spin() {
             if (balance < bet) return alert("Insufficient Balance");
-            balance -= bet; updateUI();
+            
+            balance -= bet; 
+            updateUI();
+            syncServerBalance(balance.toFixed(2)); // Sync deduction
             
             const btn = document.getElementById('spinBtn');
             const board = document.getElementById('board');
@@ -179,12 +199,13 @@
                     document.getElementById('winBanner').style.display = 'block';
                     document.getElementById('sndWin').play();
                     updateUI();
+                    syncServerBalance(balance.toFixed(2)); // Sync win
                 }
                 document.getElementById('spinBtn').disabled = false;
             }, 500);
         }
 
-        window.onload = () => { updateUI(); initBoard(); };
+        window.onload = init;
     </script>
 </body>
 </html>
