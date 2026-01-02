@@ -32,6 +32,7 @@
     </div>
 
     <script>
+        // YOUR SPECIFIC GOOGLE SCRIPT URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         function checkPin() {
@@ -44,14 +45,14 @@
 
         async function loadRequests() {
             const list = document.getElementById('requestList');
-            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing...</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing with Sheets...</p>';
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getPending&t=${Date.now()}`);
                 const data = await response.json();
                 list.innerHTML = "";
                 
                 if (!data || data.length === 0) {
-                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found.</p>';
+                    list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found in Sheet1.</p>';
                     return;
                 }
 
@@ -68,23 +69,22 @@
                     list.appendChild(div);
                 });
             } catch (e) {
-                list.innerHTML = '<p style="text-align:center; color:red">Error loading data.</p>';
+                list.innerHTML = '<p style="text-align:center; color:red">Error loading data. Make sure the script is deployed as "Anyone" and you have items in Sheet1.</p>';
             }
         }
 
         async function processRequest(row, status) {
             if(!confirm("Process " + status + " for this row?")) return;
             try {
-                // This sends the signal to your Google Script to move money to the "Users" sheet
+                // Sends the command to move money from Sheet1 request to Users balance
                 await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { 
                     method: 'GET',
                     mode: 'no-cors' 
                 });
-                alert("Success! Check the Users sheet balance.");
-                loadRequests();
+                alert("Action Sent! Refreshing list...");
+                setTimeout(loadRequests, 2000); // Wait 2 seconds for sheet to process
             } catch (e) {
-                alert("Update request sent.");
-                loadRequests();
+                alert("Communication Error.");
             }
         }
     </script>
