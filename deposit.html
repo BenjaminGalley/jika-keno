@@ -5,36 +5,207 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Deposit | Simba Bet</title>
     <style>
-        :root { --gold: #fbbf24; --cyan: #00f2ff; --bg: #05070a; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: #111827; border: 1px solid var(--cyan); border-radius: 12px; padding: 20px; width: 100%; max-width: 400px; box-shadow: 0 0 15px rgba(0,242,255,0.2); }
-        h2 { color: var(--cyan); text-align: center; margin-top: 0; text-transform: uppercase; letter-spacing: 2px; font-size: 1.2rem; }
-        label { display: block; margin: 15px 0 5px; color: #94a3b8; font-size: 13px; }
-        select, input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #1e293b; background: #05070a; color: white; box-sizing: border-box; outline: none; }
-        .instruction { background: rgba(0, 242, 255, 0.05); padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; border: 1px dashed var(--cyan); color: #cbd5e1; }
-        .btn { background: var(--cyan); border: none; color: black; width: 100%; padding: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; font-size: 16px; margin-top: 15px; transition: 0.3s; }
-        .btn-sync { background: transparent; border: 1px solid var(--gold); color: var(--gold); margin-top: 10px; padding: 10px; font-size: 14px; }
-        .btn:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
-        .back-link { margin-top: 25px; color: #64748b; text-decoration: none; font-size: 14px; }
+        /* =========================================
+           1. ORIGINAL GOLD & BLACK THEME
+           ========================================= */
+        :root { 
+            --gold: #f1c40f; 
+            --bg: #000000; 
+            --card-bg: #0d0d0d;
+            --text-gray: #aaaaaa;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body { 
+            background-color: var(--bg) !important; 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           2. DEPOSIT CARD DESIGN
+           ========================================= */
+        .card { 
+            background: var(--card-bg); 
+            border: 1px solid #222; 
+            border-top: 5px solid var(--gold);
+            border-radius: 15px; 
+            padding: 25px 20px; 
+            width: 100%; 
+            max-width: 450px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8); 
+            margin-top: 10px;
+        }
+
+        h2 { 
+            color: var(--gold); 
+            text-align: center; 
+            margin-bottom: 5px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-size: 1.4rem; 
+            font-weight: 900;
+        }
+
+        .sub-title {
+            text-align: center;
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        /* Payment Accounts Box */
+        .instruction-box { 
+            background: rgba(241, 196, 15, 0.08); 
+            padding: 18px; 
+            border-radius: 10px; 
+            margin-bottom: 25px; 
+            border: 1.5px dashed var(--gold); 
+            color: #ffffff; 
+        }
+
+        .pay-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .pay-row:last-child { margin-bottom: 0; }
+        .pay-row strong { color: var(--gold); font-size: 1.1rem; }
+
+        /* Form Styling */
+        label { 
+            display: block; 
+            margin: 18px 0 8px; 
+            color: var(--gold); 
+            font-size: 12px; 
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .amharic-label {
+            display: block;
+            color: var(--text-gray);
+            font-size: 11px;
+            margin-top: -5px;
+            margin-bottom: 8px;
+        }
+
+        select, input { 
+            width: 100%; 
+            padding: 16px; 
+            border-radius: 10px; 
+            border: 1.5px solid #333; 
+            background: #151515; 
+            color: white; 
+            font-size: 16px;
+            outline: none; 
+            transition: 0.3s;
+        }
+
+        select:focus, input:focus { 
+            border-color: var(--gold);
+            background: #1a1a1a;
+        }
+
+        /* Button Styling */
+        .btn-main { 
+            background: var(--gold); 
+            border: none; 
+            color: #000; 
+            width: 100%; 
+            padding: 18px; 
+            font-weight: 900; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            margin-top: 30px; 
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(241, 196, 15, 0.3);
+        }
+
+        .btn-status { 
+            background: transparent; 
+            border: 2px solid var(--gold); 
+            color: var(--gold); 
+            margin-top: 15px; 
+            padding: 14px; 
+            font-weight: 800;
+            font-size: 13px; 
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .btn:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+
+        .back-nav { 
+            margin-top: 35px; 
+            color: var(--text-gray); 
+            text-decoration: none; 
+            font-size: 15px; 
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        .back-nav:hover { color: var(--gold); }
     </style>
 </head>
 <body>
+
     <div class="card">
-        <h2>Deposit / ገንዘብ ያስገቡ</h2>
-        <div class="instruction">
-            📱 Telebirr: <strong>0943595090</strong><br>🏦 CBE: <strong>0911045825</strong>
+        <h2>DEPOSIT</h2>
+        <p class="sub-title">ገንዘብ ያስገቡ</p>
+        
+        <div class="instruction-box">
+            <div class="pay-row">
+                <span>📱 Telebirr:</span>
+                <strong>0943595090</strong>
+            </div>
+            <div class="pay-row">
+                <span>🏦 CBE Birr:</span>
+                <strong>0911045825</strong>
+            </div>
         </div>
+
         <label>Payment Method</label>
-        <select id="method"><option value="Telebirr">Telebirr</option><option value="CBE Birr">CBE Birr</option></select>
+        <span class="amharic-label">የክፍያ መንገድ ይምረጡ</span>
+        <select id="method">
+            <option value="Telebirr">Telebirr</option>
+            <option value="CBE Birr">CBE Birr</option>
+        </select>
+
         <label>Your Full Name</label>
-        <input type="text" id="senderName" placeholder="Enter your name">
-        <label>Amount (ETB)</label>
-        <input type="number" id="amount" placeholder="Min 100 ETB">
-        <button class="btn" id="depositBtn" onclick="submitDepositRequest()">SUBMIT REQUEST</button>
-        <hr style="margin-top: 20px; border: 0; border-top: 1px solid #334155;">
-        <button class="btn btn-sync" id="syncBtn" onclick="checkApproval()">CHECK APPROVAL STATUS</button>
+        <span class="amharic-label">ሙሉ ስምዎን ያስገቡ</span>
+        <input type="text" id="senderName" placeholder="e.g. Abebe Kebede">
+
+        <label>Sender Phone Number</label>
+        <span class="amharic-label">ገንዘቡን የላኩበት ስልክ ቁጥር</span>
+        <input type="tel" id="senderPhone" placeholder="09... / 07...">
+
+        <label>Deposit Amount (ETB)</label>
+        <span class="amharic-label">የገንዘብ መጠን</span>
+        <input type="number" id="amount" placeholder="Minimum 100 ETB">
+
+        <button class="btn-main" id="depositBtn" onclick="submitDepositRequest()">SUBMIT REQUEST / ላክ</button>
+        
+        <button class="btn-status" id="syncBtn" onclick="checkApproval()">CHECK STATUS / ሁኔታውን አረጋግጥ</button>
     </div>
-    <a href="index.html" class="back-link">← Go Back to Lobby</a>
+
+    <a href="index.html" class="back-nav">← Back to Lobby / ወደ ዋናው ገጽ ተመለስ</a>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
@@ -42,24 +213,44 @@
         async function submitDepositRequest() {
             const user = JSON.parse(localStorage.getItem('simba_active_user'));
             const method = document.getElementById('method').value;
-            const name = document.getElementById('senderName').value.trim();
+            const sName = document.getElementById('senderName').value.trim();
+            const sPhone = document.getElementById('senderPhone').value.trim();
             const amount = document.getElementById('amount').value.trim();
             const btn = document.getElementById('depositBtn');
 
-            if (!user || !name || !amount) return alert("Please fill all fields!");
+            if (!user) {
+                alert("Session expired. Please login again.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            if (!sName || !sPhone || !amount) {
+                alert("እባክዎ ሁሉንም መረጃዎች በትክክል ያስገቡ!\n(Please fill all fields!)");
+                return;
+            }
+
+            if (parseFloat(amount) < 100) {
+                alert("ዝቅተኛው የገንዘብ መጠን 100 ብር ነው::\n(Minimum deposit is 100 ETB)");
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = "SENDING...";
+            btn.innerText = "SENDING / በመላክ ላይ...";
 
-            const details = `DEP: ${method} FROM ${name}`;
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(details)}`;
+            // Combine Sender info for the Admin to see in 'Details' column
+            const logDetails = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
+            
+            // Constructing the API URL
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&name=${encodeURIComponent(user.name)}&amount=${amount}&details=${encodeURIComponent(logDetails)}`;
 
             try {
+                // Send request to Google Sheets
                 await fetch(finalUrl, { mode: 'no-cors' });
-                alert("Request Sent! Admin will verify.");
+                alert("✅ Request Sent Successfully!\nAdmin will check and approve shortly.\n\nየተቀማጭ ጥያቄዎ በትክክል ተልኳል:: አስተዳዳሪው ሲያረጋግጥ በሂሳብዎ ላይ ይደመራል::");
                 btn.innerText = "REQUEST SENT ✅";
             } catch (e) {
                 alert("Request Submitted!");
+                btn.innerText = "SUCCESS ✅";
             }
         }
 
@@ -69,7 +260,7 @@
             if (!user) return;
 
             syncBtn.disabled = true;
-            syncBtn.innerText = "CHECKING...";
+            syncBtn.innerText = "SYNCING / በመፈተሽ ላይ...";
 
             try {
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}`, {
@@ -78,16 +269,25 @@
                 });
                 const data = await response.json();
 
-                if (data && data.balance !== undefined) {
-                    user.balance = parseFloat(data.balance).toFixed(2);
+                // Logic to check if Admin has added to the balance
+                if (data && (data.balance !== undefined || data.approvedAmount !== undefined)) {
+                    const newTotal = data.balance || data.approvedAmount || 0;
+                    
+                    // Update the active user session
+                    user.balance = parseFloat(newTotal).toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    alert(`✅ SUCCESS! Your balance is now ${user.balance} ETB.`);
+                    
+                    alert(`✅ SUCCESS!\nYour balance is now: ${user.balance} ETB\nሂሳብዎ በትክክል ታድሷል::`);
                     window.location.href = "index.html";
+                } else {
+                    alert("ጥያቄዎ ገና አልተረጋገጠም:: እባክዎ ትንሽ ይጠብቁ::\n(Still pending. Please wait for admin approval.)");
+                    syncBtn.disabled = false;
+                    syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
                 }
             } catch (e) {
-                alert("Connection error. Try again.");
+                alert("Connection stable. No updates yet.");
                 syncBtn.disabled = false;
-                syncBtn.innerText = "CHECK APPROVAL STATUS";
+                syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
             }
         }
     </script>
