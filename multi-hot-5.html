@@ -146,7 +146,7 @@
     </div>
 
     <script>
-        // PNG Assets from your assets/assets/ folder
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         const SYMBOLS = [
             'bell.png', 'collector.png', 'crown.png', 'double.star.png', 
             'purple.gift.png', 'red.gift.png', 'seven.triple.png', 'star.png'
@@ -154,23 +154,22 @@
         const PATH = 'assets/assets/';
         const SYMBOL_HEIGHT = 73.3;
         
-        let user = JSON.parse(localStorage.getItem('simba_active_user')) || { balance: 0 };
-        let balance = parseFloat(user.balance || 0);
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = user ? parseFloat(user.balance) : 0;
         let bet = 2;
         let spinning = false;
         let isMuted = false;
 
         function init() {
+            if(!user) { window.location.href = 'login.html'; return; }
             updateUI();
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                strip.innerHTML = ''; // Clear existing
-                // Fill strip with symbols
+                strip.innerHTML = ''; 
                 for(let j=0; j<80; j++) {
                     const imgName = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
                     strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}" onerror="this.style.display='none'"></div>`;
                 }
-                // Initial position
                 strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
             }
         }
@@ -192,6 +191,14 @@
             localStorage.setItem('simba_active_user', JSON.stringify(user));
         }
 
+        async function saveBalanceToServer(newBalance) {
+            try {
+                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBalance}`, { mode: 'no-cors' });
+            } catch (e) {
+                console.error("Sync failed, but balance kept locally.");
+            }
+        }
+
         function runSpin() {
             if(balance < bet || spinning) {
                 if(balance < bet) alert("Insufficient Balance!");
@@ -201,16 +208,14 @@
             spinning = true;
             balance -= bet;
             updateUI();
+            saveBalanceToServer(balance.toFixed(2)); // Save the deduction
             document.getElementById('spinBtn').disabled = true;
 
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById('strip' + i);
-                
-                // Reset to top instantly
                 strip.style.transition = 'none';
                 strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
                 
-                // Animate downward
                 setTimeout(() => {
                     const stopOffset = Math.floor(Math.random() * 5); 
                     strip.style.transition = 'top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
@@ -222,11 +227,11 @@
                 spinning = false;
                 document.getElementById('spinBtn').disabled = false;
                 
-                // Random win logic (approx 15% chance)
                 if(Math.random() > 0.85) {
                     let win = bet * 10;
                     balance += win;
                     updateUI();
+                    saveBalanceToServer(balance.toFixed(2)); // Save the win
                     document.getElementById('winVal').innerText = win.toFixed(2);
                     document.getElementById('winPop').style.display = 'flex';
                     setTimeout(() => { document.getElementById('winPop').style.display = 'none'; }, 2500);
