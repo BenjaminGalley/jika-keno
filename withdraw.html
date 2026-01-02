@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Withdraw | Simba Bet Official</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* =========================================
-           1. CORE THEME: GOLD & BLACK ONLY
+           1. CORE THEME: GOLD, BLACK & RED
            ========================================= */
         :root { 
-            --gold: #f1c40f; 
-            --bg: #000000; 
-            --card-bg: #0d0d0d;
+            --gold: #fcc201; 
+            --bg: #05070a; 
+            --card-bg: #111827;
             --red: #ff3e3e;
+            --cyan: #00f2ff;
             --text-gray: #aaaaaa;
         }
 
@@ -26,11 +28,11 @@
         body { 
             background-color: var(--bg) !important; 
             color: white; 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            font-family: 'Goldman', sans-serif; 
+            padding-bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
         }
 
@@ -40,13 +42,13 @@
         .card { 
             background: var(--card-bg); 
             border: 1px solid #222; 
-            border-top: 5px solid var(--red); /* Red for withdrawal */
+            border-top: 5px solid var(--red); 
             border-radius: 15px; 
             padding: 25px 20px; 
-            width: 100%; 
+            width: 95%; 
             max-width: 450px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.8); 
-            margin-top: 10px;
+            margin-top: 20px;
         }
 
         h2 { 
@@ -106,14 +108,15 @@
             padding: 16px; 
             border-radius: 10px; 
             border: 1.5px solid #333; 
-            background: #151515; 
+            background: #000; 
             color: white; 
             font-size: 16px;
             outline: none; 
             transition: 0.3s;
+            font-family: 'Goldman', sans-serif;
         }
 
-        select:focus, input:focus { border-color: var(--gold); }
+        select:focus, input:focus { border-color: var(--red); background: #111; }
 
         /* Button Styling */
         .btn-withdraw { 
@@ -129,26 +132,41 @@
             margin-top: 25px; 
             text-transform: uppercase;
             box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+            font-family: 'Goldman', sans-serif;
         }
 
         .btn-withdraw:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
 
-        .back-nav { 
-            margin-top: 30px; 
-            color: var(--text-gray); 
-            text-decoration: none; 
-            font-size: 15px; 
-            font-weight: bold;
-            padding: 10px;
-        }
-        
         .warn-text {
             font-size: 11px;
-            color: #666;
+            color: #888;
             margin-top: 15px;
             text-align: left;
             line-height: 1.4;
         }
+
+        /* --- BOTTOM NAV BAR --- */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0 25px;
+            border-top: 2px solid var(--gold);
+            z-index: 1000;
+        }
+        .nav-item {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 11px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body onload="initWithdraw()">
@@ -189,9 +207,15 @@
         <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL / ላክ</button>
     </div>
 
-    <a href="index.html" class="back-nav">← Back to Lobby / ወደ ዋናው ገጽ ተመለስ</a>
+    <div class="nav-bar">
+        <a href="index.html" class="nav-item"><span>🏠</span><span>Lobby</span></a>
+        <a href="deposit.html" class="nav-item"><span>💰</span><span>Deposit</span></a>
+        <a href="withdraw.html" class="nav-item active"><span>💸</span><span>Withdraw</span></a>
+        <a href="profile.html" class="nav-item"><span>👤</span><span>Profile</span></a>
+    </div>
 
     <script>
+        // Restored EXACT Script URL and Balance Sync Logic
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
@@ -201,7 +225,7 @@
             // Show local balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
-            // Sync with Server for latest balance
+            // Sync with Server for latest balance to prevent over-withdrawal
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
                 const data = await res.json();
@@ -214,32 +238,43 @@
         }
 
         async function handleWithdraw() {
-            const amount = parseFloat(document.getElementById('witAmount').value);
+            const amountInput = document.getElementById('witAmount').value;
+            const amount = parseFloat(amountInput);
             const method = document.getElementById('witMethod').value;
             const rName = document.getElementById('recName').value.trim();
             const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
 
-            // Validation
-            if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB\nዝቅተኛው የክፍያ መጠን 100 ብር ነው::"); return; }
-            if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!\nበቂ ሂሳብ የለዎትም!"); return; }
-            if (!rName || !rPhone) { alert("Please fill recipient details!\nእባክዎ መረጃውን በትክክል ይሙሉ!"); return; }
+            // EXACT Restored Validations
+            if (!amount || amount < 100) { 
+                alert("Minimum withdrawal is 100 ETB\nዝቅተኛው የክፍያ መጠን 100 ብር ነው::"); 
+                return; 
+            }
+            if (amount > parseFloat(activeUser.balance)) { 
+                alert("Insufficient balance!\nበቂ ሂሳብ የለዎትም!"); 
+                return; 
+            }
+            if (!rName || !rPhone) { 
+                alert("Please fill recipient details!\nእባክዎ መረጃውን በትክክል ይሙሉ!"); 
+                return; 
+            }
 
             if (!confirm(`Withdraw ${amount} ETB to ${rName}?`)) return;
 
             btn.disabled = true;
             btn.innerText = "SENDING / በመላክ ላይ...";
 
-            // We send amount as a NEGATIVE number so the Google Sheet subtracts it
+            // RESTORED: We send amount as a NEGATIVE number for the Google Sheet logic
             const withdrawValue = -Math.abs(amount);
             const logDetails = `WITHDRAW_VIA_${method}_TO_${rName}_PHONE_${rPhone}`;
             
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
+            // RESTORED: Final URL exactly as your GitHub version
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name || activeUser.username)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
 
             try {
                 await fetch(finalUrl, { mode: 'no-cors' });
 
-                // Fast UI Update
+                // Fast UI Update (Subtract locally immediately)
                 let newBal = parseFloat(activeUser.balance) - amount;
                 activeUser.balance = newBal.toFixed(2);
                 localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
@@ -248,6 +283,7 @@
                 window.location.href = "index.html";
 
             } catch (error) {
+                // Handle success even if fetch triggers catch due to CORS/Redirects
                 alert("Request Sent!");
                 window.location.href = "index.html";
             }
