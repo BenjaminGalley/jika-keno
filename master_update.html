@@ -7,22 +7,29 @@
     <style>
         body { background: #05070a; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: #111827; padding: 30px; border-radius: 15px; border: 2px solid #fcc201; width: 90%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fcc201; font-size: 18px; box-sizing: border-box; }
-        button { width: 100%; padding: 18px; background: #fcc201; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #status { margin-top: 15px; font-weight: bold; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: #fcc201; font-size: 18px; box-sizing: border-box; outline: none; }
+        input:focus { border-color: #00f2ff; }
+        button { width: 100%; padding: 18px; background: #fcc201; color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        button:disabled { background: #444; color: #888; }
+        #status { margin-top: 15px; font-weight: bold; font-size: 14px; }
+        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 12px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2 style="color:#fcc201">MASTER TOP-UP</h2>
+        <p style="color: #888; font-size: 12px; margin-bottom: 15px;">Directly update player balance</p>
+        
         <input type="number" id="phone" placeholder="Player Phone (09...)">
         <input type="number" id="amount" placeholder="Amount to Add">
-        <button id="btn" onclick="addMoney()">UPDATE ACCOUNT</button>
+        
+        <button id="btn" onclick="addMoney()">FORCE UPDATE BALANCE</button>
         <p id="status"></p>
+        
+        <a href="admin.html" class="back-link">Go to Pending Requests →</a>
     </div>
 
     <script>
-        // Updated with your NEW URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function addMoney() {
@@ -37,32 +44,32 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "UPDATING...";
+            btn.innerText = "UPDATING SHEETS...";
+            status.innerText = "Communicating with Google Sheets...";
+            status.style.color = "#fcc201";
 
-            // We use action=deposit for adding money via the Admin panel as well.
-            // This ensures the Google Script records it in the history sheet.
-            const details = encodeURIComponent("ADMIN TOP-UP");
+            // Using action=deposit but with a special 'ADMIN_FORCE' tag 
+            // so the script knows this isn't a normal player request.
+            const details = encodeURIComponent("MASTER_ADMIN_FORCE_TOPUP");
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${phone}&amount=${amount}&details=${details}`;
 
             try {
-                // Using GET with no-cors to match the simplified Google Script logic
+                // Using 'no-cors' because Google Scripts often block browser headers 
+                // but still execute the command on the server.
                 await fetch(finalUrl, {
                     method: 'GET',
                     mode: 'no-cors'
                 });
                 
-                status.innerText = "✅ Done! Request sent to Sheet.";
+                status.innerText = "✅ Command Sent! Please check Admin Panel to Approve.";
                 status.style.color = "#2ecc71";
-                
-                // Clear inputs
                 document.getElementById('amount').value = "";
             } catch (e) {
-                status.innerText = "❌ Error. Check your Script URL.";
+                status.innerText = "❌ Connection Failed.";
                 status.style.color = "#e74c3c";
-                console.error(e);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "UPDATE ACCOUNT";
+                btn.innerText = "FORCE UPDATE BALANCE";
             }
         }
     </script>
