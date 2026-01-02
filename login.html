@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Login | Simba Bet Official</title>
     <style>
-        /* =========================================
-           1. CORE THEME: GOLD & BLACK ONLY
-           ========================================= */
         :root { 
             --gold: #f1c40f; 
             --bg: #000000; 
@@ -26,9 +23,6 @@
             min-height: 100vh; 
         }
 
-        /* =========================================
-           2. LOGIN CARD DESIGN
-           ========================================= */
         .login-card { 
             background: var(--card-bg); 
             border: 1px solid #222; 
@@ -66,9 +60,6 @@
             letter-spacing: 1px;
         }
 
-        /* =========================================
-           3. FORM INPUTS
-           ========================================= */
         .input-group {
             text-align: left;
             margin-bottom: 15px;
@@ -100,9 +91,6 @@
             background: #1a1a1a;
         }
 
-        /* =========================================
-           4. ACTION BUTTONS
-           ========================================= */
         .login-btn { 
             width: 100%; 
             padding: 18px; 
@@ -158,7 +146,6 @@
     </div>
 
     <script>
-        // Syncing with your actual Google Script URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function loginUser() {
@@ -167,20 +154,20 @@
             const btn = document.getElementById('loginBtn');
 
             if (!phone || !pass) {
-                alert("Please fill in both fields!\nእባክዎ መረጃውን በትክክል ይሙሉ!");
+                alert("Please fill in both fields!");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "CHECKING... (በማጣራት ላይ)";
+            btn.innerText = "AUTHENTICATING...";
 
             try {
-                // Fetching user data from Sheet to verify existence
-                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${phone}`);
+                // FIXED ACTION: We check against getBalance which confirms user existence in the Users sheet
+                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${phone}&_t=${Date.now()}`);
                 const data = await response.json();
 
+                // If balance is present, user exists in the database
                 if (data && data.balance !== undefined) {
-                    // Success: Create Session
                     const activeUser = {
                         phone: phone,
                         name: data.name || "Simba Player",
@@ -188,20 +175,15 @@
                     };
                     
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    
-                    // Redirect to the "Very Full & Great" index we just built
                     window.location.href = 'index.html';
                 } else {
-                    alert("Account not found!\nይህ ስልክ ቁጥር አልተመዘገበም:: እባክዎ መጀመሪያ ይመዝገቡ::");
+                    alert("Account not found or details incorrect.");
                     resetBtn(btn);
                 }
             } catch (error) {
                 console.error(error);
-                // Fallback: If network is slow but user exists locally
-                alert("Login successful! Redirecting...");
-                const user = { phone: phone, name: "Simba Player", balance: "0.00" };
-                localStorage.setItem('simba_active_user', JSON.stringify(user));
-                window.location.href = 'index.html';
+                alert("Connection Error. Please try again.");
+                resetBtn(btn);
             }
         }
 
