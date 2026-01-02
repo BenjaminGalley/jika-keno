@@ -27,19 +27,18 @@
         <input type="password" id="adminPin" class="pin-input" placeholder="ENTER PIN">
         <button onclick="checkPin()" style="margin-top:20px; padding:12px 40px; background:var(--cyan); border:none; border-radius:5px; font-weight:bold; cursor:pointer; color:black;">UNLOCK SYSTEM</button>
     </div>
+
     <div id="adminContent" style="display:none;">
         <h2 class="header">Pending Requests</h2>
-        <button class="refresh-btn" onclick="loadRequests()">🔄 REFRESH DATA</button>
+        <button class="refresh-btn" id="refreshBtn" onclick="loadRequests()">🔄 REFRESH DATA</button>
         <div id="requestList"></div>
     </div>
-    <script>
-        // UPDATED URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
-        let isAuthorized = false;
 
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        
         function checkPin() {
             if(document.getElementById('adminPin').value.trim() === "B328") { 
-                isAuthorized = true;
                 document.getElementById('lockScreen').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 loadRequests();
@@ -48,16 +47,13 @@
 
         async function loadRequests() {
             const list = document.getElementById('requestList');
-            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing...</p>';
+            list.innerHTML = '<p style="text-align:center; color:var(--gold)">Syncing with Sheets...</p>';
             try {
-                const response = await fetch(`${SCRIPT_URL}?action=getPending`, {
-                    method: 'GET',
-                    redirect: 'follow'
-                });
+                const response = await fetch(`${SCRIPT_URL}?action=getPending&t=${Date.now()}`);
                 const data = await response.json();
                 list.innerHTML = "";
                 
-                if (data.length === 0) {
+                if (!data || data.length === 0) {
                     list.innerHTML = '<p style="text-align:center; color:#888;">No pending requests found.</p>';
                     return;
                 }
@@ -66,35 +62,44 @@
                     const div = document.createElement("div");
                     div.className = "card";
                     div.innerHTML = `
-                        <div class="row-id">ROW: ${req.row}</div>
-                        <div class="detail-row"><span class="detail-label">PLAYER:</span> ${req.phone}</div>
+                        <div class="row-id">ROW ID: ${req.row}</div>
+                        <div class="detail-row"><span class="detail-label">PLAYER PHONE:</span> ${req.phone}</div>
                         <div class="amount">${parseFloat(req.amount).toFixed(2)} ETB</div>
                         <div class="info-box">
-                            <div class="detail-row"><span class="detail-label">DETAILS:</span> ${req.details}</div>
+                            <div class="detail-row"><span class="detail-label">SENDER INFO:</span> ${req.details}</div>
                         </div>
-                        <button class="btn-approve" onclick="processRequest(${req.row}, 'approve')">APPROVE</button>
-                        <button class="btn-deny" onclick="processRequest(${req.row}, 'deny')">DENY</button>
+                        <button class="btn-approve" id="btn-app-${req.row}" onclick="processRequest(${req.row}, 'approve')">APPROVE & ADD MONEY</button>
+                        <button class="btn-deny" id="btn-den-${req.row}" onclick="processRequest(${req.row}, 'deny')">DENY REQUEST</button>
                     `;
                     list.appendChild(div);
                 });
             } catch (e) {
-                list.innerHTML = '<p style="text-align:center; color:red">Error loading data.</p>';
+                list.innerHTML = '<p style="text-align:center; color:red">Connection Error. Check your Script URL.</p>';
             }
         }
 
         async function processRequest(row, status) {
-            if(!confirm("Proceed with " + status + "?")) return;
+            const btnApp = document.getElementById(`btn-app-${row}`);
+            const btnDen = document.getElementById(`btn-den-${row}`);
             
+            if(!confirm(`Confirm ${status} for row ${row}?`)) return;
+
+            btnApp.disabled = true;
+            btnDen.disabled = true;
+            btnApp.innerText = "PROCESSING...";
+
             try {
-                // Using the updated action names: 'approve' or 'deny'
-                await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, { 
+                // We use redirect: 'follow' to ensure the script completes the balance transfer
+                const resp = await fetch(`${SCRIPT_URL}?action=${status}&row=${row}`, {
                     method: 'GET',
-                    mode: 'no-cors' 
+                    redirect: 'follow'
                 });
-                alert("Request " + status + "d!");
+                
+                alert(`SUCCESS: Request ${status}d!`);
                 loadRequests();
             } catch (e) {
-                alert("Failed to update status.");
+                alert("The update request was sent. Please refresh to check status.");
+                loadRequests();
             }
         }
     </script>
