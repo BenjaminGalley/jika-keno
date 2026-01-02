@@ -6,11 +6,19 @@
     <title>Fast Keno 80 | Simba Bet</title>
     <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #fcc201; --blue: #00f2ff; --glass: rgba(0, 0, 0, 0.9); }
+        /* =========================================
+           THEME: GOLD & CYAN (PRESERVED)
+           ========================================= */
+        :root { 
+            --gold: #fcc201; 
+            --blue: #00f2ff; 
+            --dark: #000000;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            background: #000; 
+            background: var(--dark); 
             color: white; 
             font-family: 'Goldman', sans-serif; 
             height: 100vh; 
@@ -30,14 +38,14 @@
             z-index: 100;
         }
 
-        /* Timer Bar */
+        /* Timer Bar (Blue preserved) */
         .status-bar { 
             background: #053305; 
             padding: 5px; 
             border-bottom: 1px solid var(--blue); 
             text-align: center; 
         }
-        .timer { color: var(--blue); font-weight: bold; font-size: 18px; }
+        .timer { color: var(--blue); font-weight: bold; font-size: 18px; text-shadow: 0 0 10px var(--blue); }
 
         .game-body { 
             flex: 1; 
@@ -46,7 +54,7 @@
             position: relative; 
         }
 
-        /* Sidebar - Winning Numbers */
+        /* Sidebar - Winning Numbers (Blue balls preserved) */
         .side-board { 
             width: 55px; 
             background: #111; 
@@ -99,10 +107,9 @@
             font-size: 13px; 
             border-radius: 4px; 
         }
-        .num-btn.selected { background: var(--gold); color: #000; font-weight: bold; }
+        .num-btn.selected { background: var(--gold); color: #000; font-weight: bold; border-color: white;}
         .num-btn.locked { opacity: 0.4; }
 
-        /* Ticket Tray - Always Visible */
         .ticket-tray { 
             height: 100px; 
             display: flex; 
@@ -131,9 +138,10 @@
             justify-content: center; 
             font-size: 10px; 
         }
+        /* Hit animation (Green/Blue mix) */
         .t-ball.hit { background: #28a745 !important; color: white; font-weight: bold; box-shadow: 0 0 5px #28a745; }
 
-        /* Fancy Number Pop-up */
+        /* Fancy Number Pop-up (Blue preserved) */
         #drawPopup { 
             position: absolute; 
             top: 40%; 
@@ -148,11 +156,10 @@
             pointer-events: none;
         }
 
-        /* Fixed Footer for Mobile */
         .footer { 
             background: #111; 
             border-top: 2px solid var(--gold); 
-            padding: 10px 15px 25px 15px; /* Added bottom padding for mobile home bars */
+            padding: 10px 15px 25px 15px; 
         }
         .bet-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .bet-display { font-size: 18px; color: var(--gold); font-weight: bold; }
@@ -176,9 +183,9 @@
 <body>
 
     <div class="header">
-        <button onclick="location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px;">LOBBY</button>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:5px 10px; border-radius:5px; font-weight: bold; cursor: pointer;">LOBBY</button>
         <button id="musicBtn" onclick="toggleMusic()" style="background:#222; border:1px solid var(--gold); color:var(--gold); padding:5px; border-radius:5px; font-size:10px;">🎵 START MUSIC</button>
-        <div class="bal-value"><span id="bal">0.00</span> <small>ETB</small></div>
+        <div class="bal-value" style="color:var(--gold); font-weight: bold;"><span id="bal">0.00</span> <small>ETB</small></div>
     </div>
 
     <div class="status-bar">
@@ -196,11 +203,11 @@
 
     <div class="footer">
         <div class="bet-row">
-            <div style="font-size: 12px; color: #aaa;">Potential Win: <span id="potWin" style="color:var(--blue)">0.00</span></div>
+            <div style="font-size: 12px; color: #aaa;">Potential Win: <span id="potWin" style="color:var(--blue)">0.00 ETB</span></div>
             <div class="bet-display">
-                <button onclick="adjBet(-2)" style="background:none; border:1px solid var(--gold); color:var(--gold); width:30px; height:30px; border-radius:50%;">-</button>
+                <button onclick="adjBet(-2)" style="background:none; border:1px solid var(--gold); color:var(--gold); width:30px; height:30px; border-radius:50%; cursor:pointer;">-</button>
                 <span id="betDisp" style="margin: 0 10px;">2</span>
-                <button onclick="adjBet(2)" style="background:none; border:1px solid var(--gold); color:var(--gold); width:30px; height:30px; border-radius:50%;">+</button>
+                <button onclick="adjBet(2)" style="background:none; border:1px solid var(--gold); color:var(--gold); width:30px; height:30px; border-radius:50%; cursor:pointer;">+</button>
             </div>
         </div>
         <button class="place-bet-btn" id="betBtn" onclick="placeBet()">PLACE BET</button>
@@ -220,16 +227,16 @@
         let isLocked = false;
         let musicStarted = false;
 
-        // Payout Logic: [Matched 0, Matched 1, Matched 2, Matched 3, Matched 4...]
-        // Multiplier based on a 2 Birr bet
         const PAYOUT_LOGIC = {
-            2: [0, 0, 50],       // 2 numbers picked: match 2 = 50
-            3: [0, 0, 0, 100],   // 3 numbers picked: match 3 = 100
-            4: [0, 0, 0, 0, 160] // 4 numbers picked: match 4 = 160
+            2: [0, 0, 50],
+            3: [0, 0, 0, 100],
+            4: [0, 0, 0, 0, 160]
         };
 
         function init() {
-            let user = JSON.parse(localStorage.getItem('simba_active_user')) || {balance: "0.00"};
+            let user = JSON.parse(localStorage.getItem('simba_active_user'));
+            if(!user) { window.location.href = 'login.html'; return; }
+            
             balance = parseFloat(user.balance);
             updateUI();
             
@@ -263,7 +270,7 @@
             if(selected.includes(n)) {
                 selected = selected.filter(x => x !== n);
                 el.classList.remove('selected');
-            } else if(selected.length < 4) { // Limits to 4 based on your specific payout request
+            } else if(selected.length < 4) {
                 selected.push(n);
                 el.classList.add('selected');
             }
@@ -301,14 +308,11 @@
             });
             
             renderTickets();
-            
-            // Clear Table Immediately for next bet
             selected = [];
             document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
             updateUI();
             updatePotential();
 
-            // Auto-scroll to newest ticket
             const tray = document.getElementById('ticketTray');
             tray.scrollLeft = tray.scrollWidth;
         }
@@ -317,7 +321,7 @@
             const tray = document.getElementById('ticketTray');
             tray.innerHTML = tickets.map(t => `
                 <div class="ticket">
-                    <div><b>TICKET #${t.id}</b></div>
+                    <div style="color:var(--gold)"><b>TICKET #${t.id}</b></div>
                     <div>Bet: ${t.amt} ETB</div>
                     <div class="t-nums">
                         ${t.nums.map(n => `<div class="t-ball" id="tb-${t.id}-${n}">${n}</div>`).join('')}
@@ -363,7 +367,6 @@
                 ball.innerText = r;
                 side.prepend(ball);
 
-                // Highlight ticket hits live
                 tickets.forEach(t => {
                     if(t.nums.includes(r)) {
                         let tb = document.getElementById(`tb-${t.id}-${r}`);
