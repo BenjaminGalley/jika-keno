@@ -6,24 +6,15 @@
     <title>Withdraw | Simba Bet Official</title>
     <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* =========================================
-           1. CORE THEME: GOLD, BLACK & RED
-           ========================================= */
         :root { 
             --gold: #fcc201; 
             --bg: #05070a; 
             --card-bg: #111827;
             --red: #ff3e3e;
-            --cyan: #00f2ff;
             --text-gray: #aaaaaa;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body { 
             background-color: var(--bg) !important; 
@@ -36,9 +27,6 @@
             min-height: 100vh;
         }
 
-        /* =========================================
-           2. WITHDRAW CARD DESIGN
-           ========================================= */
         .card { 
             background: var(--card-bg); 
             border: 1px solid #222; 
@@ -51,121 +39,35 @@
             margin-top: 20px;
         }
 
-        h2 { 
-            color: var(--gold); 
-            text-align: center; 
-            margin-bottom: 5px; 
-            text-transform: uppercase; 
-            letter-spacing: 1.5px; 
-            font-size: 1.4rem; 
-            font-weight: 900;
-        }
+        h2 { color: var(--gold); text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.4rem; font-weight: 900; }
+        .sub-title { text-align: center; color: var(--text-gray); font-size: 0.85rem; margin-bottom: 20px; font-weight: bold; }
 
-        .sub-title {
-            text-align: center;
-            color: var(--text-gray);
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        /* Current Balance Display */
         .balance-card { 
-            background: #000; 
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 25px; 
-            border: 1px dashed var(--gold); 
-            text-align: center;
+            background: #000; padding: 20px; border-radius: 10px; margin-bottom: 25px; border: 1px dashed var(--gold); text-align: center;
         }
-        .bal-amt { 
-            font-size: 28px; 
-            font-weight: 900; 
-            color: var(--gold); 
-            margin-top: 5px; 
-        }
+        .bal-amt { font-size: 28px; font-weight: 900; color: var(--gold); margin-top: 5px; }
 
-        /* Form Styling */
-        label { 
-            display: block; 
-            margin: 15px 0 5px; 
-            color: var(--gold); 
-            font-size: 11px; 
-            font-weight: 900;
-            text-transform: uppercase;
-        }
-
-        .amharic-label {
-            display: block;
-            color: var(--text-gray);
-            font-size: 11px;
-            margin-top: -5px;
-            margin-bottom: 8px;
-        }
+        label { display: block; margin: 15px 0 5px; color: var(--gold); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+        .amharic-label { display: block; color: var(--text-gray); font-size: 11px; margin-top: -5px; margin-bottom: 8px; }
 
         select, input { 
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 10px; 
-            border: 1.5px solid #333; 
-            background: #000; 
-            color: white; 
-            font-size: 16px;
-            outline: none; 
-            transition: 0.3s;
-            font-family: 'Goldman', sans-serif;
+            width: 100%; padding: 16px; border-radius: 10px; border: 1.5px solid #333; background: #000; color: white; 
+            font-size: 16px; outline: none; transition: 0.3s; font-family: 'Goldman', sans-serif;
         }
 
-        select:focus, input:focus { border-color: var(--red); background: #111; }
-
-        /* Button Styling */
         .btn-withdraw { 
-            background: var(--red); 
-            border: none; 
-            color: #fff; 
-            width: 100%; 
-            padding: 18px; 
-            font-weight: 900; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            margin-top: 25px; 
-            text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
-            font-family: 'Goldman', sans-serif;
+            background: var(--red); border: none; color: #fff; width: 100%; padding: 18px; font-weight: 900; 
+            border-radius: 10px; cursor: pointer; font-size: 16px; margin-top: 25px; text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); font-family: 'Goldman', sans-serif;
         }
 
-        .btn-withdraw:disabled { background: #444; color: #888; cursor: not-allowed; box-shadow: none; }
+        .btn-withdraw:disabled { background: #444; color: #888; cursor: not-allowed; }
 
-        .warn-text {
-            font-size: 11px;
-            color: #888;
-            margin-top: 15px;
-            text-align: left;
-            line-height: 1.4;
-        }
-
-        /* --- BOTTOM NAV BAR --- */
         .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0 25px;
-            border-top: 2px solid var(--gold);
-            z-index: 1000;
+            position: fixed; bottom: 0; width: 100%; background: #000; display: flex; justify-content: space-around;
+            padding: 15px 0 25px; border-top: 2px solid var(--gold); z-index: 1000;
         }
-        .nav-item {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 11px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .nav-item { color: #64748b; text-decoration: none; font-size: 11px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
         .nav-item.active { color: var(--gold); }
     </style>
 </head>
@@ -177,7 +79,7 @@
         
         <div class="balance-card">
             <small style="color: #777; font-weight: 800;">CURRENT BALANCE / ቀሪ ሂሳብ</small>
-            <div id="displayBal" class="bal-amt">0.00 ETB</div>
+            <div id="displayBal" class="bal-amt">SYNCING...</div>
         </div>
 
         <label>Withdrawal Method</label>
@@ -199,91 +101,64 @@
         <span class="amharic-label">የገንዘብ መጠን</span>
         <input type="number" id="witAmount" placeholder="Min 100 ETB">
         
-        <div class="warn-text">
-            * Minimum withdrawal: 100 ETB<br>
-            * Withdrawal requests are processed by Admin within 1-2 hours.
-        </div>
-
         <button class="btn-withdraw" id="witBtn" onclick="handleWithdraw()">REQUEST WITHDRAWAL / ላክ</button>
     </div>
 
     <div class="nav-bar">
-        <a href="index.html" class="nav-item"><span>🏠</span><span>Lobby</span></a>
-        <a href="deposit.html" class="nav-item"><span>💰</span><span>Deposit</span></a>
-        <a href="withdraw.html" class="nav-item active"><span>💸</span><span>Withdraw</span></a>
-        <a href="profile.html" class="nav-item"><span>👤</span><span>Profile</span></a>
+        <a href="index.html" class="nav-item">🏠<br>Lobby</a>
+        <a href="deposit.html" class="nav-item">💰<br>Deposit</a>
+        <a href="withdraw.html" class="nav-item active">💸<br>Withdraw</a>
+        <a href="profile.html" class="nav-item">👤<br>Profile</a>
     </div>
 
     <script>
-        // Restored EXACT Script URL and Balance Sync Logic
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         async function initWithdraw() {
             if (!activeUser) { window.location.href = 'login.html'; return; }
             
-            // Show local balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
-            // Sync with Server for latest balance to prevent over-withdrawal
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}`);
+                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}&_t=${Date.now()}`);
                 const data = await res.json();
                 if (data && data.balance !== undefined) {
-                    activeUser.balance = parseFloat(data.balance).toFixed(2);
+                    activeUser.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-                    document.getElementById('displayBal').innerText = activeUser.balance + " ETB";
+                    document.getElementById('displayBal').innerText = parseFloat(data.balance).toFixed(2) + " ETB";
                 }
-            } catch (e) { console.log("Balance sync pending..."); }
+            } catch (e) { console.warn("Balance sync failed."); }
         }
 
         async function handleWithdraw() {
-            const amountInput = document.getElementById('witAmount').value;
-            const amount = parseFloat(amountInput);
+            const amount = parseFloat(document.getElementById('witAmount').value);
             const method = document.getElementById('witMethod').value;
             const rName = document.getElementById('recName').value.trim();
             const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
 
-            // EXACT Restored Validations
-            if (!amount || amount < 100) { 
-                alert("Minimum withdrawal is 100 ETB\nዝቅተኛው የክፍያ መጠን 100 ብር ነው::"); 
-                return; 
-            }
-            if (amount > parseFloat(activeUser.balance)) { 
-                alert("Insufficient balance!\nበቂ ሂሳብ የለዎትም!"); 
-                return; 
-            }
-            if (!rName || !rPhone) { 
-                alert("Please fill recipient details!\nእባክዎ መረጃውን በትክክል ይሙሉ!"); 
-                return; 
-            }
+            if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
+            if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
+            if (!rName || !rPhone) { alert("Please fill all details!"); return; }
 
-            if (!confirm(`Withdraw ${amount} ETB to ${rName}?`)) return;
+            if (!confirm(`Withdraw ${amount} ETB?`)) return;
 
             btn.disabled = true;
-            btn.innerText = "SENDING / በመላክ ላይ...";
+            btn.innerText = "SENDING...";
 
-            // RESTORED: We send amount as a NEGATIVE number for the Google Sheet logic
+            // Send as negative to subtract from user sheet when approved
             const withdrawValue = -Math.abs(amount);
-            const logDetails = `WITHDRAW_VIA_${method}_TO_${rName}_PHONE_${rPhone}`;
+            const logDetails = `WITHDRAW:${method}:${rName}:${rPhone}`;
             
-            // RESTORED: Final URL exactly as your GitHub version
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name || activeUser.username)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
+            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
 
             try {
+                // Use fetch with no-cors if you encounter redirect issues, or standard fetch
                 await fetch(finalUrl, { mode: 'no-cors' });
-
-                // Fast UI Update (Subtract locally immediately)
-                let newBal = parseFloat(activeUser.balance) - amount;
-                activeUser.balance = newBal.toFixed(2);
-                localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
-
-                alert("✅ Withdrawal Request Sent!\nYour balance has been updated. Admin will process the payment soon.\n\nጥያቄዎ በትክክል ተልኳል:: አስተዳዳሪው በቅርቡ ይልካሉ::");
+                alert("✅ Withdrawal Request Sent! Admin will process it soon.");
                 window.location.href = "index.html";
-
             } catch (error) {
-                // Handle success even if fetch triggers catch due to CORS/Redirects
                 alert("Request Sent!");
                 window.location.href = "index.html";
             }
