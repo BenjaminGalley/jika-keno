@@ -1,35 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <style>
-    /* 1. CORE ENGINE - NO ANIMATIONS, STABLE BLACK THEME */
+    /* =========================================
+       1. CORE ENGINE & RESET
+       ========================================= */
     * { 
         box-sizing: border-box; 
         margin: 0; 
         padding: 0; 
         outline: none; 
         -webkit-tap-highlight-color: transparent; 
+        text-decoration: none;
     }
     
+    /* Forced Black Theme to stop white screen issues */
     html, body { 
         background-color: #000000 !important; 
         color: #ffffff; 
-        font-family: 'Segoe UI', Roboto, sans-serif; 
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
         width: 100%; 
         height: 100%; 
-        overflow: hidden; /* Stops the whole page from bouncing */
+        overflow: hidden; 
+        position: fixed; 
     }
 
-    /* 2. STABLE TOP SECTION */
-    .fixed-header-wrapper { 
+    /* =========================================
+       2. FIXED TOP NAVIGATION
+       ========================================= */
+    .header-fixed-container { 
         position: fixed; 
         top: 0; 
         width: 100%; 
-        z-index: 2000; 
+        z-index: 5000; 
         background: #000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.9);
     }
     
-    .nav-bar { 
+    .top-nav-bar { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
@@ -39,101 +47,250 @@
         border-bottom: 2px solid #f1c40f; 
     }
 
-    .nav-brand { display: flex; align-items: center; gap: 8px; }
-    .nav-brand .x-box { background: #f1c40f; color: #000; padding: 2px 6px; border-radius: 3px; font-weight: 900; }
-    .nav-brand .text { color: #f1c40f; font-weight: 800; font-size: 1rem; }
-
-    /* 3. BALANCE & DEPOSIT */
-    .bal-box { text-align: center; flex-grow: 1; }
-    .bal-label { display: block; font-size: 0.6rem; color: #888; font-weight: bold; }
-    .bal-amount { color: #f1c40f; font-weight: 800; font-size: 1.1rem; }
-    .dep-btn { 
-        background: #27ae60; color: #fff; padding: 8px 14px; 
-        border: none; border-radius: 4px; font-weight: 900; font-size: 0.8rem; 
+    .brand-id { display: flex; align-items: center; gap: 12px; }
+    
+    .menu-burger { 
+        background: none; 
+        border: none; 
+        color: #ffffff; 
+        font-size: 1.8rem; 
+        cursor: pointer; 
     }
 
-    /* 4. STABLE SIMBA ASSET - MOBILE SIZE */
-    .hero-stable-area { 
+    .brand-name { 
+        color: #f1c40f; 
+        font-weight: 900; 
+        font-size: 1rem; 
+        letter-spacing: 1px; 
+    }
+
+    .x-badge { 
+        background: #f1c40f; 
+        color: #000; 
+        padding: 2px 6px; 
+        border-radius: 4px; 
+        font-weight: 900; 
+        margin-right: 6px;
+    }
+
+    /* =========================================
+       3. BALANCE DISPLAY
+       ========================================= */
+    .balance-display-box { text-align: center; flex-grow: 1; }
+    
+    .bal-tiny-label { 
+        display: block; 
+        font-size: 0.6rem; 
+        color: #aaaaaa; 
+        font-weight: 800; 
+        text-transform: uppercase;
+    }
+
+    .bal-huge-value { 
+        color: #f1c40f; 
+        font-weight: 900; 
+        font-size: 1.25rem; 
+    }
+
+    .btn-deposit { 
+        background: linear-gradient(to bottom, #2ecc71, #27ae60);
+        color: #ffffff; 
+        padding: 8px 16px; 
+        border: none; 
+        border-radius: 6px; 
+        font-weight: 900; 
+        font-size: 0.8rem; 
+        box-shadow: 0 0 10px rgba(39, 174, 96, 0.4);
+    }
+
+    /* =========================================
+       4. STABLE UPPER ASSET
+       ========================================= */
+    .stable-asset-wrapper { 
         width: 100%; 
         height: 180px; /* Locked height for mobile stability */
         background-color: #000; 
         overflow: hidden;
-        border-bottom: 1px solid #222;
+        border-bottom: 1px solid #1a1a1a;
     }
     
-    .hero-stable-area img { 
+    .stable-asset-wrapper img { 
         width: 100%; 
         height: 100%; 
-        object-fit: contain; /* Ensures the lion is not cut off or stretched */
+        object-fit: contain; /* Keeps the lion from being cropped */
         display: block; 
     }
 
-    /* 5. STABLE TABS */
-    .tab-container { background: #000; padding: 10px 0; border-bottom: 1px solid #1a1a1a; }
-    .tab-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 15px; scrollbar-width: none; }
-    .tab-item { 
-        white-space: nowrap; padding: 8px 16px; border-radius: 15px; 
-        background: #1a1a1a; color: #fff; font-size: 0.7rem; font-weight: bold; border: 1px solid #333; 
+    /* =========================================
+       5. CATEGORY TABS
+       ========================================= */
+    .tabs-nav-strip { 
+        background: #050505; 
+        padding: 12px 0; 
+        border-bottom: 1px solid #222222; 
     }
-    .tab-item.active { background: #f1c40f; color: #000; border-color: #f1c40f; }
 
-    /* 6. SCROLLABLE LOWER PART (GAMES) */
-    .game-viewport { 
-        margin-top: 310px; /* Total height of nav + hero + tabs */
-        height: calc(100vh - 310px); 
+    .tabs-scroll-area { 
+        display: flex; 
+        gap: 12px; 
+        overflow-x: auto; 
+        padding: 0 15px; 
+        scrollbar-width: none; 
+    }
+
+    .tabs-scroll-area::-webkit-scrollbar { display: none; }
+
+    .tab-pill { 
+        white-space: nowrap; 
+        padding: 9px 18px; 
+        background: #1a1a1a; 
+        border: 1px solid #333; 
+        border-radius: 20px; 
+        color: #ffffff; 
+        font-size: 0.75rem; 
+        font-weight: bold; 
+    }
+
+    .tab-pill.active { 
+        background: #f1c40f; 
+        color: #000000; 
+        border-color: #f1c40f; 
+    }
+
+    /* =========================================
+       6. SCROLLABLE LOWER PART (GAMES)
+       ========================================= */
+    .viewport-game-scroll { 
+        margin-top: 315px; /* Combined height of Nav + Asset + Tabs */
+        height: calc(100vh - 315px); 
         overflow-y: auto; 
-        padding-bottom: 80px; 
-        background: #000;
+        padding-bottom: 90px; 
+        background-color: #000000;
         -webkit-overflow-scrolling: touch;
     }
 
-    .grid-label { padding: 15px; color: #f1c40f; font-weight: 800; }
-
-    /* 7. THE GAME HOLDERS */
-    .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
-    .game-box { 
-        background: #111; border: 1px solid #222; border-radius: 10px; 
-        padding: 12px 5px; text-align: center; border-bottom: 3px solid #f1c40f; 
+    .section-title { 
+        padding: 20px 15px 10px 15px; 
+        color: #f1c40f; 
+        font-weight: 900; 
+        font-size: 1.1rem;
     }
-    .game-icon { height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    .game-icon img { width: 40px; height: 40px; }
-    .game-txt { font-size: 0.65rem; font-weight: bold; color: #fff; }
 
-    /* BLUE KENO LOGO */
-    .blue-keno { color: #00f2ff; font-size: 1.2rem; font-weight: 900; line-height: 1; }
-
-    /* 8. SIDEBAR */
-    .side-menu { 
-        position: fixed; left: -260px; top: 0; width: 250px; height: 100%; 
-        background: #111; z-index: 3000; transition: 0.3s; border-right: 2px solid #f1c40f; 
+    /* =========================================
+       7. THE GAME GRID
+       ========================================= */
+    .grid-container { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 12px; 
+        padding: 10px 15px; 
     }
-    .side-menu.active { left: 0; }
-    .menu-btn { display: block; color: #fff; padding: 15px 20px; text-decoration: none; font-weight: bold; border-bottom: 1px solid #222; }
 
-    /* 9. FOOTER */
-    .footer-bar { 
-        position: fixed; bottom: 0; width: 100%; display: flex; 
-        justify-content: space-between; padding: 10px 20px; 
-        background: #000; border-top: 1px solid #333; font-size: 0.7rem; font-weight: bold; 
+    .game-card-link { 
+        background: linear-gradient(145deg, #151515, #000000); 
+        border: 1px solid #222222; 
+        border-radius: 12px; 
+        padding: 18px 5px; 
+        text-align: center; 
+        border-bottom: 3px solid #f1c40f; 
+        position: relative;
+    }
+
+    .icon-box { 
+        height: 55px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin-bottom: 12px; 
+    }
+
+    .icon-box img { width: 45px; height: 45px; object-fit: contain; }
+
+    .label-game { 
+        font-size: 0.75rem; 
+        font-weight: 900; 
+        color: #ffffff; 
+    }
+
+    /* BLUE KENO DESIGN */
+    .keno-design-blue {
+        color: #00f2ff;
+        font-size: 1.4rem;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    }
+
+    /* =========================================
+       8. SIDEBAR
+       ========================================= */
+    .sidebar-wrapper { 
+        position: fixed; 
+        left: -280px; 
+        top: 0; 
+        width: 270px; 
+        height: 100%; 
+        background-color: #0d0d0d; 
+        z-index: 6000; 
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        border-right: 3px solid #f1c40f; 
+        padding: 40px 20px; 
+    }
+
+    .sidebar-wrapper.open { left: 0; }
+
+    .side-link { 
+        display: block; 
+        color: #ffffff; 
+        padding: 18px 10px; 
+        font-weight: 800; 
+        border-bottom: 1px solid #1a1a1a; 
+    }
+
+    /* =========================================
+       9. STATUS BAR FOOTER
+       ========================================= */
+    .footer-status-bar { 
+        position: fixed; 
+        bottom: 0; 
+        width: 100%; 
+        display: flex; 
+        justify-content: space-between; 
+        padding: 12px 20px; 
+        background: #000; 
+        border-top: 1px solid #222; 
+        font-size: 0.75rem; 
+        font-weight: 900;
+        z-index: 5500;
     }
 </style>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
-    async function syncBal() {
-        const user = JSON.parse(localStorage.getItem('simba_active_user'));
-        if (!user) return;
+    /* SYSTEM SYNC ENGINE */
+    const GOOGLE_API_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+
+    async function syncSystemData() {
+        const stored = localStorage.getItem('simba_active_user');
+        if (!stored) return;
+        const user = JSON.parse(stored);
         try {
-            const res = await fetch(`${API_URL}?action=getBalance&phone=${user.phone}`);
-            const d = await res.json();
-            // Approved Amount Column E logic
-            let b = d.balance || d.approvedAmount || 0;
-            document.getElementById('headerBal').innerText = parseFloat(b).toFixed(2);
+            const response = await fetch(`${GOOGLE_API_URL}?action=getBalance&phone=${user.phone}`);
+            const data = await response.json();
+            // Approved Amount Column logic
+            let balVal = data.balance || data.approvedAmount || 0;
+            document.getElementById('headerBal').innerText = parseFloat(balVal).toFixed(2);
             document.getElementById('footerID').innerText = "SB-" + user.phone.toString().slice(-4);
         } catch (e) { }
     }
-    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
-    window.onload = function() { syncBal(); setInterval(syncBal, 10000); };
+
+    function toggleSidebar() {
+        document.getElementById('sidebarPanel').classList.toggle('open');
+    }
+
+    window.onload = function() {
+        syncSystemData();
+        setInterval(syncSystemData, 10000);
+    };
 </script>
 </head>
 </html>
