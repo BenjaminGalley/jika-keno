@@ -2,9 +2,7 @@
 <html>
 <head>
 <style>
-    /* =========================================
-       1. THE BLACK THEME ENGINE
-       ========================================= */
+    /* 1. CORE ENGINE - NO ANIMATIONS, STABLE BLACK THEME */
     * { 
         box-sizing: border-box; 
         margin: 0; 
@@ -13,291 +11,129 @@
         -webkit-tap-highlight-color: transparent; 
     }
     
-    /* This forces the background to be black immediately to stop the white screen */
     html, body { 
         background-color: #000000 !important; 
         color: #ffffff; 
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+        font-family: 'Segoe UI', Roboto, sans-serif; 
         width: 100%; 
         height: 100%; 
-        overflow: hidden; 
+        overflow: hidden; /* Stops the whole page from bouncing */
     }
 
-    /* =========================================
-       2. NAVIGATION BAR
-       ========================================= */
-    .nav-header { 
+    /* 2. STABLE TOP SECTION */
+    .fixed-header-wrapper { 
         position: fixed; 
         top: 0; 
         width: 100%; 
         z-index: 2000; 
-        background-color: #000000; 
+        background: #000;
     }
     
-    .nav-container { 
+    .nav-bar { 
         display: flex; 
         justify-content: space-between; 
         align-items: center; 
+        height: 60px; 
         padding: 0 15px; 
         background-color: #111111; 
         border-bottom: 2px solid #f1c40f; 
-        height: 60px; 
     }
 
-    .nav-left { display: flex; align-items: center; gap: 12px; }
-    
-    .sidebar-toggle { 
-        background: none; 
-        border: none; 
-        color: #ffffff; 
-        font-size: 1.8rem; 
-        cursor: pointer; 
+    .nav-brand { display: flex; align-items: center; gap: 8px; }
+    .nav-brand .x-box { background: #f1c40f; color: #000; padding: 2px 6px; border-radius: 3px; font-weight: 900; }
+    .nav-brand .text { color: #f1c40f; font-weight: 800; font-size: 1rem; }
+
+    /* 3. BALANCE & DEPOSIT */
+    .bal-box { text-align: center; flex-grow: 1; }
+    .bal-label { display: block; font-size: 0.6rem; color: #888; font-weight: bold; }
+    .bal-amount { color: #f1c40f; font-weight: 800; font-size: 1.1rem; }
+    .dep-btn { 
+        background: #27ae60; color: #fff; padding: 8px 14px; 
+        border: none; border-radius: 4px; font-weight: 900; font-size: 0.8rem; 
     }
 
-    .brand-logo { 
-        color: #f1c40f; 
-        font-weight: 900; 
-        font-size: 1rem; 
-        letter-spacing: 0.5px;
-    }
-
-    .x-box { 
-        background-color: #f1c40f; 
-        color: #000000; 
-        padding: 2px 6px; 
-        border-radius: 3px; 
-        font-weight: 900; 
-        margin-right: 4px; 
-    }
-
-    /* =========================================
-       3. BALANCE & DEPOSIT AREA
-       ========================================= */
-    .balance-display { text-align: center; flex-grow: 1; }
-    
-    .bal-label { 
-        display: block; 
-        font-size: 0.6rem; 
-        color: #aaaaaa; 
-        text-transform: uppercase; 
-        font-weight: bold; 
-    }
-
-    .bal-value { 
-        color: #f1c40f; 
-        font-weight: 800; 
-        font-size: 1.2rem; 
-    }
-
-    .dep-button { 
-        background-color: #27ae60; 
-        color: #ffffff; 
-        padding: 8px 16px; 
-        border: none; 
-        border-radius: 6px; 
-        font-weight: 900; 
-        font-size: 0.8rem; 
-        cursor: pointer; 
-        transition: 0.2s;
-    }
-
-    /* =========================================
-       4. SIMBA LION BANNER
-       ========================================= */
-    .hero-banner-container { 
+    /* 4. STABLE SIMBA ASSET - MOBILE SIZE */
+    .hero-stable-area { 
         width: 100%; 
-        height: 200px; 
-        overflow: hidden; 
-        background-color: #000000; 
-        position: relative;
-        border-bottom: 1px solid #222222;
+        height: 180px; /* Locked height for mobile stability */
+        background-color: #000; 
+        overflow: hidden;
+        border-bottom: 1px solid #222;
     }
     
-    /* Mobile-optimized size for simba_bg.jpg */
-    .hero-img-asset { 
+    .hero-stable-area img { 
         width: 100%; 
         height: 100%; 
-        object-fit: cover; 
+        object-fit: contain; /* Ensures the lion is not cut off or stretched */
         display: block; 
     }
 
-    /* =========================================
-       5. CATEGORY TABS
-       ========================================= */
-    .tabs-wrapper { 
-        background-color: #000000; 
-        padding: 12px 0; 
-        border-bottom: 1px solid #111111; 
+    /* 5. STABLE TABS */
+    .tab-container { background: #000; padding: 10px 0; border-bottom: 1px solid #1a1a1a; }
+    .tab-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 0 15px; scrollbar-width: none; }
+    .tab-item { 
+        white-space: nowrap; padding: 8px 16px; border-radius: 15px; 
+        background: #1a1a1a; color: #fff; font-size: 0.7rem; font-weight: bold; border: 1px solid #333; 
     }
+    .tab-item.active { background: #f1c40f; color: #000; border-color: #f1c40f; }
 
-    .tabs-scroll { 
-        display: flex; 
-        gap: 10px; 
-        overflow-x: auto; 
-        padding: 0 15px; 
-        scrollbar-width: none; 
-    }
-
-    .cat-tab { 
-        white-space: nowrap; 
-        padding: 10px 20px; 
-        border-radius: 20px; 
-        background-color: #1a1a1a; 
-        color: #ffffff; 
-        font-size: 0.75rem; 
-        font-weight: bold; 
-        border: 1px solid #333333; 
-    }
-
-    .cat-tab.active { 
-        background-color: #f1c40f; 
-        color: #000000; 
-        border-color: #f1c40f; 
-    }
-
-    /* =========================================
-       6. SCROLLABLE GAMES ENGINE
-       ========================================= */
-    .content-viewport { 
-        margin-top: 325px; /* Adjusting for top area height */
-        height: calc(100vh - 325px); 
+    /* 6. SCROLLABLE LOWER PART (GAMES) */
+    .game-viewport { 
+        margin-top: 310px; /* Total height of nav + hero + tabs */
+        height: calc(100vh - 310px); 
         overflow-y: auto; 
         padding-bottom: 80px; 
+        background: #000;
         -webkit-overflow-scrolling: touch;
-        background-color: #000;
     }
 
-    .game-section-header { 
-        padding: 15px 15px 5px 15px; 
-        color: #f1c40f; 
-        font-weight: 800; 
-        font-size: 1rem; 
+    .grid-label { padding: 15px; color: #f1c40f; font-weight: 800; }
+
+    /* 7. THE GAME HOLDERS */
+    .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px; }
+    .game-box { 
+        background: #111; border: 1px solid #222; border-radius: 10px; 
+        padding: 12px 5px; text-align: center; border-bottom: 3px solid #f1c40f; 
     }
+    .game-icon { height: 50px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+    .game-icon img { width: 40px; height: 40px; }
+    .game-txt { font-size: 0.65rem; font-weight: bold; color: #fff; }
 
-    /* =========================================
-       7. GAME HOLDERS GRID
-       ========================================= */
-    .game-grid { 
-        display: grid; 
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 12px; 
-        padding: 15px; 
+    /* BLUE KENO LOGO */
+    .blue-keno { color: #00f2ff; font-size: 1.2rem; font-weight: 900; line-height: 1; }
+
+    /* 8. SIDEBAR */
+    .side-menu { 
+        position: fixed; left: -260px; top: 0; width: 250px; height: 100%; 
+        background: #111; z-index: 3000; transition: 0.3s; border-right: 2px solid #f1c40f; 
     }
+    .side-menu.active { left: 0; }
+    .menu-btn { display: block; color: #fff; padding: 15px 20px; text-decoration: none; font-weight: bold; border-bottom: 1px solid #222; }
 
-    .game-card { 
-        background: linear-gradient(145deg, #1e1e1e, #0a0a0a); 
-        border: 1px solid #2a2a2a; 
-        border-radius: 12px; 
-        text-align: center; 
-        padding: 15px 5px; 
-        position: relative; 
-        overflow: hidden; 
-        border-bottom: 3px solid #f1c40f; 
-        cursor: pointer;
-    }
-
-    .game-icon-box { 
-        height: 55px; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        margin-bottom: 8px; 
-    }
-
-    .game-icon-box img { width: 42px; height: 42px; object-fit: contain; }
-
-    .game-title { 
-        font-size: 0.7rem; 
-        color: #ffffff; 
-        font-weight: 800; 
-        margin: 0; 
-    }
-
-    /* KENO LOGO CUSTOM STYLE */
-    .keno-blue-style {
-        color: #00f2ff;
-        font-size: 1.2rem;
-        font-weight: 900;
-        line-height: 1.1;
-        text-shadow: 0 0 8px rgba(0, 242, 255, 0.4);
-    }
-
-    /* =========================================
-       8. SIDE MENU
-       ========================================= */
-    .side-menu-container { 
-        position: fixed; 
-        left: -280px; 
-        top: 0; 
-        width: 270px; 
-        height: 100%; 
-        background-color: #111111; 
-        z-index: 3000; 
-        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        border-right: 3px solid #f1c40f; 
-        padding: 30px 20px; 
-    }
-
-    .side-menu-container.open { left: 0; }
-
-    .menu-link { 
-        display: flex; 
-        align-items: center; 
-        gap: 15px; 
-        color: white; 
-        text-decoration: none; 
-        padding: 15px 10px; 
-        font-weight: bold; 
-        border-bottom: 1px solid #222; 
-    }
-
-    /* =========================================
-       9. STATUS FOOTER
-       ========================================= */
-    .status-footer-bar { 
-        position: fixed; 
-        bottom: 0; 
-        width: 100%; 
-        display: flex; 
-        justify-content: space-between; 
-        padding: 12px 20px; 
-        background-color: #000000; 
-        border-top: 1px solid #222222; 
-        font-size: 0.75rem; 
-        color: #888888; 
-        z-index: 2500; 
-        font-weight: bold;
+    /* 9. FOOTER */
+    .footer-bar { 
+        position: fixed; bottom: 0; width: 100%; display: flex; 
+        justify-content: space-between; padding: 10px 20px; 
+        background: #000; border-top: 1px solid #333; font-size: 0.7rem; font-weight: bold; 
     }
 </style>
 
 <script>
-    /* SYSTEM SYNC LOGIC */
-    const SIMBA_API_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
-
-    async function syncSystem() {
-        const stored = localStorage.getItem('simba_active_user');
-        if (!stored) return;
-        
-        const user = JSON.parse(stored);
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+    async function syncBal() {
+        const user = JSON.parse(localStorage.getItem('simba_active_user'));
+        if (!user) return;
         try {
-            const res = await fetch(`${SIMBA_API_URL}?action=getBalance&phone=${user.phone}`);
-            const data = await res.json();
-            
-            // Logic to pull the "Approved" deposit amount
-            let currentBal = data.balance || data.approvedAmount || 0;
-            document.getElementById('headerBal').innerText = parseFloat(currentBal).toFixed(2);
+            const res = await fetch(`${API_URL}?action=getBalance&phone=${user.phone}`);
+            const d = await res.json();
+            // Approved Amount Column E logic
+            let b = d.balance || d.approvedAmount || 0;
+            document.getElementById('headerBal').innerText = parseFloat(b).toFixed(2);
             document.getElementById('footerID').innerText = "SB-" + user.phone.toString().slice(-4);
-        } catch (e) { console.log("System updating..."); }
+        } catch (e) { }
     }
-
-    function toggleNav() {
-        document.getElementById('sideMenu').classList.toggle('open');
-    }
-
-    window.onload = function() {
-        syncSystem();
-        setInterval(syncSystem, 10000);
-    };
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+    window.onload = function() { syncBal(); setInterval(syncBal, 10000); };
 </script>
 </head>
 </html>
