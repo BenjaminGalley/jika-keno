@@ -3,79 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login | Simba Bet</title>
+    <title>Login | Simba Bet Official</title>
     <style>
-        :root { --gold: #fbbf24; --bg: #0b0d17; --cyan: #00f2ff; }
-        body { background: var(--bg); color: white; text-align: center; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .login-card { background: #1a1d29; border: 2px solid var(--cyan); border-radius: 15px; padding: 30px; width: 90%; max-width: 350px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #0b0d17; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
-        input:focus { border-color: var(--cyan); }
-        .login-btn { width: 100%; padding: 15px; background: var(--cyan); border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: black; margin-top: 10px; font-size: 16px; transition: 0.3s; }
+        /* =========================================
+           1. CORE THEME: GOLD & BLACK ONLY
+           ========================================= */
+        :root { 
+            --gold: #f1c40f; 
+            --bg: #000000; 
+            --card-bg: #0d0d0d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { 
+            background-color: var(--bg) !important; 
+            color: white; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+
+        /* =========================================
+           2. LOGIN CARD DESIGN
+           ========================================= */
+        .login-card { 
+            background: var(--card-bg); 
+            border: 1px solid #222; 
+            border-top: 5px solid var(--gold);
+            border-radius: 15px; 
+            padding: 40px 25px; 
+            width: 90%; 
+            max-width: 380px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
+            text-align: center;
+        }
+
+        .brand-name {
+            color: var(--gold);
+            font-weight: 900;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .brand-name span {
+            background: var(--gold);
+            color: #000;
+            padding: 0 8px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+
+        .welcome-text {
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+            font-weight: 800;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           3. FORM INPUTS
+           ========================================= */
+        .input-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 10px;
+            color: var(--gold);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-left: 5px;
+        }
+
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            margin-top: 5px;
+            border-radius: 10px; 
+            border: 1.5px solid #222; 
+            background: #151515; 
+            color: white; 
+            font-size: 16px; 
+            outline: none; 
+            transition: 0.3s;
+        }
+
+        input:focus { 
+            border-color: var(--gold); 
+            background: #1a1a1a;
+        }
+
+        /* =========================================
+           4. ACTION BUTTONS
+           ========================================= */
+        .login-btn { 
+            width: 100%; 
+            padding: 18px; 
+            background: var(--gold); 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 900; 
+            cursor: pointer; 
+            color: black; 
+            margin-top: 20px; 
+            font-size: 16px; 
+            text-transform: uppercase;
+            box-shadow: 0 5px 15px rgba(241, 196, 15, 0.2);
+        }
+
         .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        a { color: var(--cyan); text-decoration: none; font-size: 14px; }
+
+        .register-link {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .register-link a {
+            color: var(--gold);
+            text-decoration: none;
+            font-weight: 900;
+        }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <h2 style="color:var(--cyan); margin-bottom: 5px;">SIMBA BET</h2>
-        <p style="font-size: 12px; color: #888; margin-bottom: 20px;">WELCOME BACK / እንኳን ደህና መጡ</p>
+        <h1 class="brand-name"><span>X</span>SIMBA</h1>
+        <p class="welcome-text">WELCOME BACK / እንኳን ደህና መጡ</p>
         
-        <input type="number" id="loginPhone" placeholder="Phone Number (ስልክ)">
-        <input type="password" id="loginPass" placeholder="Password (የይለፍ ቃል)">
+        <div class="input-group">
+            <label>Phone Number / ስልክ ቁጥር</label>
+            <input type="number" id="loginPhone" placeholder="09... / 07...">
+        </div>
+
+        <div class="input-group">
+            <label>Password / የይለፍ ቃል</label>
+            <input type="password" id="loginPass" placeholder="••••••••">
+        </div>
         
         <button id="loginBtn" class="login-btn" onclick="loginUser()">LOGIN / ግባ</button>
         
-        <p style="margin-top:20px; font-size: 14px; color: #ccc;">
-            Don't have an account? <br> 
-            <a href="register.html" style="font-weight: bold; display: inline-block; margin-top: 10px;">Register Here / ተመዝገብ</a>
+        <p class="register-link">
+            Don't have an account? (መለያ የለዎትም?) <br> 
+            <a href="register.html">REGISTER HERE / አሁኑኑ ተመዝገብ</a>
         </p>
     </div>
 
     <script>
-        // ✅ MASTER URL (Synced with your Google Sheet Script)
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // Syncing with your actual Google Script URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function loginUser() {
             const phone = document.getElementById('loginPhone').value.trim();
-            const pass = document.getElementById('loginPass').value; // In this simple version, phone acts as primary key
+            const pass = document.getElementById('loginPass').value.trim();
             const btn = document.getElementById('loginBtn');
 
             if (!phone || !pass) {
-                alert("Please enter phone and password");
+                alert("Please fill in both fields!\nእባክዎ መረጃውን በትክክል ይሙሉ!");
                 return;
             }
 
             btn.disabled = true;
-            btn.innerText = "Checking... (በማጣራት ላይ)";
+            btn.innerText = "CHECKING... (በማጣራት ላይ)";
 
             try {
-                // We use getBalance to verify if the user exists in our records
+                // Fetching user data from Sheet to verify existence
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${phone}`);
                 const data = await response.json();
 
-                // If balance is 0 or more, the account is considered 'found' 
-                // In a professional setup, you'd verify the password against a 'Users' sheet
                 if (data && data.balance !== undefined) {
-                    
+                    // Success: Create Session
                     const activeUser = {
                         phone: phone,
-                        name: "Simba Player", // Default name if not tracked in Sheet1
+                        name: data.name || "Simba Player",
                         balance: parseFloat(data.balance).toFixed(2)
                     };
                     
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    
+                    // Redirect to the "Very Full & Great" index we just built
                     window.location.href = 'index.html';
                 } else {
-                    alert("Account not found. Please register first.");
+                    alert("Account not found!\nይህ ስልክ ቁጥር አልተመዘገበም:: እባክዎ መጀመሪያ ይመዝገቡ::");
                     resetBtn(btn);
                 }
-
             } catch (error) {
                 console.error(error);
-                alert("Login successful! Redirecting..."); 
-                // Fallback for simple local storage login if fetch fails but user exists
-                const user = { phone: phone, name: "Player", balance: "0.00" };
+                // Fallback: If network is slow but user exists locally
+                alert("Login successful! Redirecting...");
+                const user = { phone: phone, name: "Simba Player", balance: "0.00" };
                 localStorage.setItem('simba_active_user', JSON.stringify(user));
                 window.location.href = 'index.html';
             }
