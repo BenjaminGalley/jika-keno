@@ -11,7 +11,7 @@
     <div class="steady-top">
         <nav class="top-nav">
             <div class="left-section">
-                <button class="menu-btn" onclick="document.getElementById('sideMenu').classList.toggle('open')">☰</button>
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
                 <div class="brand"><span class="x-logo">X</span> SIMBA BET</div>
             </div>
             <div class="top-balance-area">
@@ -37,25 +37,33 @@
                 <p>Hot Multi 5</p>
             </div>
             <div class="game-card" onclick="window.location.href='fastkeno.html'">
-                <div class="img-wrap"><p style="font-size: 1.5rem; color: #00f2ff; line-height: 1; font-weight:bold;">1 2<br>3 4</p></div>
+                <div class="img-wrap"><p style="font-size: 1.5rem; color: #00f2ff; line-height: 1;">1 2<br>3 4</p></div>
                 <p>Fast Keno</p>
             </div>
             <div class="game-card" onclick="window.location.href='megawheel.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/1055/1055823.png"></div><p>Mega Wheel</p></div>
             <div class="game-card" onclick="window.location.href='aviator.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/5351/5351486.png"></div><p>Aviator X</p></div>
             <div class="game-card" onclick="window.location.href='fruitblast.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png"></div><p>Fruit Blast</p></div>
+            <div class="game-card" onclick="window.location.href='goldengoal.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2619/2619245.png"></div><p>Golden Goal</p></div>
+            <div class="game-card" onclick="window.location.href='diceroll.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/2933/2933116.png"></div><p>Dice Roll</p></div>
+            <div class="game-card" onclick="window.location.href='poker.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/248/248941.png"></div><p>Poker Pro</p></div>
+            <div class="game-card" onclick="window.location.href='777.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/4342/4342733.png"></div><p>777 Classic</p></div>
+            <div class="game-card" onclick="window.location.href='roulette.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/3411/3411511.png"></div><p>Roulette</p></div>
+            <div class="game-card" onclick="window.location.href='penalty.html'"><div class="img-wrap"><img src="https://cdn-icons-png.flaticon.com/512/824/824239.png"></div><p>Penalty Kick</p></div>
         </div>
     </div>
 
-    <div id="sideMenu" style="position:fixed; left:-250px; top:0; width:250px; height:100%; background:#111; z-index:2000; transition:0.3s; border-right:1px solid gold; padding:20px;">
-        <h3 style="color:gold;">Menu</h3>
-        <a href="index.html" style="display:block; color:white; padding:10px 0; text-decoration:none;">Home</a>
-        <a href="deposit.html" style="display:block; color:white; padding:10px 0; text-decoration:none;">Deposit</a>
-        <a href="withdraw.html" style="display:block; color:white; padding:10px 0; text-decoration:none;">Withdraw</a>
+    <div class="side-menu" id="sideMenu">
+        <h2 style="color:gold;">SIMBA MENU</h2>
+        <div class="menu-links">
+            <a href="index.html">🏠 Home</a>
+            <a href="deposit.html">💳 Deposit</a>
+            <a href="withdraw.html">💸 Withdraw</a>
+        </div>
     </div>
 
     <div class="footer-stats">
-        <div>ID: <span id="displayID" style="color:gold; font-weight:bold;">SB-....</span></div>
-        <div>STATUS: <span style="color:#00c853; font-weight:bold;">Live ●</span></div>
+        <div>ID: <span id="displayID" style="color:gold; font-weight: bold;">SB-....</span></div>
+        <div>STATUS: <span style="color:#00c853; font-weight: bold;">Live ●</span></div>
     </div>
 
 </body>
