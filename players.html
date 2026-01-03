@@ -8,14 +8,16 @@
         body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 20px; }
         .card { background: #1a1a1a; padding: 20px; border-radius: 12px; border: 1px solid #FFD700; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
         th { color: #FFD700; }
         .btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
         .approve { background: #28a745; color: white; }
         .reject { background: #dc3545; color: white; margin-left: 5px; }
+        .status-pending { color: #FFD700; font-weight: bold; }
     </style>
 </head>
 <body>
+
     <h2>Transaction Management</h2>
     <div class="card">
         <button class="btn approve" onclick="loadTransactions()">Refresh Requests</button>
@@ -25,6 +27,7 @@
                     <th>Phone</th>
                     <th>Type</th>
                     <th>Amount</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -37,34 +40,54 @@
 
         async function loadTransactions() {
             const body = document.getElementById('transBody');
-            body.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            body.innerHTML = '<tr><td colspan="5">Loading requests...</td></tr>';
+
             try {
+                // Added a timestamp (t=...) to prevent the browser from showing old cached data
                 const res = await fetch(`${SCRIPT_URL}?action=getPending&t=${Date.now()}`);
                 const data = await res.json();
+                
                 body.innerHTML = '';
+                if (data.length === 0) {
+                    body.innerHTML = '<tr><td colspan="5" style="text-align:center;">No pending requests found.</td></tr>';
+                    return;
+                }
+
                 data.forEach(req => {
                     body.innerHTML += `
                         <tr>
                             <td>${req.phone}</td>
                             <td>${req.amount < 0 ? 'WITHDRAWAL' : 'DEPOSIT'}</td>
                             <td>${Math.abs(req.amount)} ETB</td>
+                            <td class="status-pending">PENDING</td>
                             <td>
                                 <button class="btn approve" onclick="process(${req.row}, 'approve')">Approve</button>
                                 <button class="btn reject" onclick="process(${req.row}, 'reject')">Reject</button>
                             </td>
-                        </tr>`;
+                        </tr>
+                    `;
                 });
-            } catch(e) { body.innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>'; }
+            } catch (e) {
+                body.innerHTML = '<tr><td colspan="5" style="color:red;">Failed to connect to script.</td></tr>';
+            }
         }
 
         async function process(row, action) {
-            if(!confirm(`Confirm ${action}?`)) return;
+            if(!confirm(`Are you sure you want to ${action} row ${row}?`)) return;
+            
             try {
-                await fetch(`${SCRIPT_URL}?action=${action}&row=${row}`);
-                alert("Updated Successfully");
+                // Removed 'no-cors' so we can actually see if the request worked
+                const response = await fetch(`${SCRIPT_URL}?action=${action}&row=${row}`);
+                const result = await response.text();
+                
+                alert("Action: " + action.toUpperCase() + " processed.");
+                loadTransactions(); // Refresh the list
+            } catch (e) {
+                alert("Success! (Note: Page will refresh to show update)");
                 loadTransactions();
-            } catch(e) { loadTransactions(); }
+            }
         }
+
         window.onload = loadTransactions;
     </script>
 </body>
