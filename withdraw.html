@@ -145,39 +145,35 @@
             if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
             if (!rName || !rPhone) { alert("Please fill all details!"); return; }
 
-            if (!confirm(`Confirm: Withdraw ${amount} ETB? \nThis will be deducted from your account balance immediately.`)) return;
+            if (!confirm(`Confirm: Withdraw ${amount} ETB?\nThis will be deducted from your account immediately.`)) return;
 
             // 2. Lock UI
             btn.disabled = true;
             btn.innerText = "DEDUCTING...";
 
             // 3. Deduction & Request Logic
-            const nameParam = encodeURIComponent(activeUser.name || rName);
-            const details = `${method}-${rPhone}`;
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${nameParam}&amount=${amount}&details=${encodeURIComponent(details)}`;
+            const details = `WIT: ${method} | Recipient: ${rName} (${rPhone})`;
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
                 const response = await fetch(finalUrl);
-                const result = await response.text();
+                const result = await response.json();
 
-                if (result === "SUCCESS") {
-                    // Update Local Storage immediately (Instant Burn)
-                    activeUser.balance = (parseFloat(activeUser.balance) - amount).toFixed(2);
+                if (result.status === "SUCCESS") {
+                    // Update Local Storage with the new balance returned from server
+                    activeUser.balance = result.newBalance;
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     
-                    alert("✅ SUCCESS!\nAmount deducted. Your request is being processed.");
+                    alert(`✅ REQUEST SENT!\nYour new balance is ${result.newBalance} ETB.\nAdmin will send your money shortly.`);
                     window.location.href = "index.html";
-                } else if (result === "INSUFFICIENT_FUNDS") {
-                    alert("⚠️ Balance has changed. Please try again.");
-                    location.reload();
                 } else {
-                    alert("Server error: " + result);
+                    alert("Error: " + (result.message || "Failed to process request"));
                     btn.disabled = false;
                     btn.innerText = "REQUEST WITHDRAWAL / ላክ";
                 }
             } catch (error) {
-                // Handle cases where the request goes through but returns a CORS error
-                alert("Request Sent. Please refresh your profile to see updated balance.");
+                // Handling script delays/CORS
+                alert("Request Submitted. Your balance will update in a moment.");
                 window.location.href = "index.html";
             }
         }
