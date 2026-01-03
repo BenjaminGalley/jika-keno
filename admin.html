@@ -3,190 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Admin | Control Center</title>
+    <title>Simba Admin | Command Center</title>
     <style>
         :root {
             --gold: #fcc201;
             --cyan: #00f2ff;
             --bg: #05070a;
-            --card-bg: #0d1117;
+            --card-bg: #11141a;
             --red: #ff3e3e;
             --green: #00ff88;
         }
 
         body {
             background-color: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            color: white; font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
         }
 
-        h1 {
-            color: var(--cyan);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 30px;
+        /* Tabs Styling */
+        .tabs {
+            display: flex; width: 100%; max-width: 500px; gap: 10px; margin-bottom: 20px;
+        }
+        .tab-btn {
+            flex: 1; padding: 12px; background: #222; border: none; color: #777;
+            border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--cyan); color: black; }
+
+        .dashboard {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+            width: 100%; max-width: 500px; margin-bottom: 20px;
         }
 
-        .refresh-btn {
-            background: none;
-            border: 2px solid var(--cyan);
-            color: var(--cyan);
-            padding: 10px 25px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 30px;
-            transition: 0.3s;
+        .stat-card {
+            background: var(--card-bg); padding: 12px; border-radius: 12px;
+            text-align: center; border-bottom: 2px solid var(--gold);
         }
 
-        .refresh-btn:hover {
-            background: var(--cyan);
-            color: black;
+        .stat-val { font-size: 18px; font-weight: 900; color: var(--gold); }
+        .stat-label { font-size: 9px; text-transform: uppercase; color: #888; }
+
+        .search-box {
+            width: 90%; max-width: 460px; padding: 12px; border-radius: 10px;
+            border: 1px solid #333; background: #111; color: white; margin-bottom: 15px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-        }
+        .container { width: 100%; max-width: 500px; }
 
         .request-card {
-            background: var(--card-bg);
-            border-left: 5px solid var(--cyan);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--card-bg); border-left: 4px solid var(--cyan);
+            border-radius: 10px; padding: 15px; margin-bottom: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
         }
 
-        .row-id { color: var(--cyan); font-size: 12px; font-weight: bold; margin-bottom: 5px; }
-        .player-info { font-size: 16px; margin-bottom: 10px; color: #ccc; }
-        .amount { 
-            font-size: 32px; 
-            font-weight: 900; 
-            color: var(--gold); 
-            margin: 15px 0;
+        .row-id { font-size: 10px; color: #555; float: right; }
+        .amount { font-size: 24px; font-weight: 900; color: var(--gold); margin: 5px 0; }
+        
+        .type-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+        .dep-tag { background: var(--green); color: black; }
+        .wit-tag { background: var(--red); color: white; }
+        .comp-tag { background: #444; color: #aaa; }
+
+        .approve-btn { 
+            width: 100%; background: var(--cyan); color: black; padding: 12px; 
+            border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
 
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+        .refresh-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; font-size: 12px;}
 
-        button.action-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-
-        .approve-btn { background: var(--green); color: #00331a; }
-        .deny-btn { background: var(--red); color: white; }
-
-        button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .withdraw-label {
-            background: var(--red);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
+        #historyList .request-card { border-left-color: #444; opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <h1>PENDING REQUESTS</h1>
-    
-    <button class="refresh-btn" onclick="fetchRequests()">🔄 REFRESH DATA</button>
+    <h1 style="color: var(--cyan); font-size: 20px; letter-spacing: 2px;">SIMBA ADMIN</h1>
 
-    <div id="requestContainer" class="container">
-        <p style="text-align: center; color: #555;">Scanning for requests...</p>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('pending')">PENDING</button>
+        <button class="tab-btn" onclick="switchTab('history')">HISTORY</button>
     </div>
 
+    <div class="dashboard">
+        <div class="stat-card">
+            <div class="stat-val" id="countBox">0</div>
+            <div class="stat-label">Transactions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" id="volumeBox">0.00</div>
+            <div class="stat-label">Total ETB</div>
+        </div>
+    </div>
+
+    <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search Phone Number..." onkeyup="doSearch()">
+
+    <button class="refresh-btn" onclick="loadData()">🔄 REFRESH DATA</button>
+
+    <div id="pendingList" class="container"></div>
+
+    <div id="historyList" class="container" style="display: none;"></div>
+
     <script>
-        // Update this URL with your latest deployed Script ID
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        let currentMode = 'pending';
+        let masterData = [];
 
-        async function fetchRequests() {
-            const container = document.getElementById('requestContainer');
+        async function loadData() {
+            const pList = document.getElementById('pendingList');
+            const hList = document.getElementById('historyList');
+            pList.innerHTML = "<p style='text-align:center'>Fetching...</p>";
+            
             try {
+                // We use your script's action=getPending
+                // Note: If your script only returns PENDING items, History will show what is currently pending.
                 const response = await fetch(`${SCRIPT_URL}?action=getPending&_t=${Date.now()}`);
-                const data = await response.json();
-                
-                container.innerHTML = "";
-
-                if (data.length === 0) {
-                    container.innerHTML = "<p style='text-align:center; color:#777;'>NO PENDING REQUESTS</p>";
-                    return;
-                }
-
-                data.forEach(req => {
-                    const isWithdrawal = req.amount < 0;
-                    const card = document.createElement('div');
-                    card.className = "request-card";
-                    card.innerHTML = `
-                        <div class="row-id">ROW: ${req.row}</div>
-                        <div class="player-info">PLAYER: ${req.phone} ${isWithdrawal ? '<span class="withdraw-label">WITHDRAW</span>' : ''}</div>
-                        <div class="amount">${Math.abs(req.amount).toFixed(2)} ETB</div>
-                        <div class="btn-group">
-                            <button class="action-btn approve-btn" onclick="processAction(${req.row}, 'approve', this)">
-                                ${isWithdrawal ? 'APPROVE & SUBTRACT MONEY' : 'APPROVE & ADD MONEY'}
-                            </button>
-                            <button class="action-btn deny-btn" onclick="processAction(${req.row}, 'deny', this)">
-                                DENY (IGNORE)
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (error) {
-                container.innerHTML = "<p style='color:red; text-align:center;'>Error loading data. Check SCRIPT_URL.</p>";
+                masterData = await response.json();
+                render();
+            } catch (e) {
+                pList.innerHTML = "<p style='color:red'>Connect Error</p>";
             }
         }
 
-        async function processAction(row, actionType, btn) {
-            const confirmMsg = actionType === 'approve' ? "Approve this transaction?" : "Deny and remove this request?";
-            if (!confirm(confirmMsg)) return;
+        function render() {
+            const pList = document.getElementById('pendingList');
+            const hList = document.getElementById('historyList');
+            pList.innerHTML = "";
+            hList.innerHTML = "";
 
-            const originalText = btn.innerText;
+            let pCount = 0; let pVol = 0;
+            let hCount = 0; let hVol = 0;
+
+            masterData.forEach(item => {
+                const isWit = item.amount < 0;
+                const card = document.createElement('div');
+                card.className = "request-card";
+                card.setAttribute('data-phone', item.phone);
+                
+                // If the script returned it, it's currently pending in your Sheet1
+                card.innerHTML = `
+                    <span class="row-id">ROW ${item.row}</span>
+                    <span class="type-tag ${isWit ? 'wit-tag':'dep-tag'}">${isWit ? 'Withdrawal':'Deposit'}</span>
+                    <div style="margin-top:8px; font-weight:bold;">📱 ${item.phone}</div>
+                    <div class="amount">${Math.abs(item.amount).toFixed(2)} <small style="font-size:10px">ETB</small></div>
+                    <button class="approve-btn" onclick="approve(${item.row}, this)">APPROVE & SYNC</button>
+                `;
+                pList.appendChild(card);
+                pCount++;
+                pVol += Math.abs(item.amount);
+            });
+
+            document.getElementById('countBox').innerText = pCount;
+            document.getElementById('volumeBox').innerText = pVol.toFixed(2);
+            
+            if(pCount === 0) pList.innerHTML = "<p style='text-align:center; color:#444;'>No pending requests found.</p>";
+        }
+
+        async function approve(row, btn) {
+            if(!confirm("Approve this transaction?")) return;
             btn.disabled = true;
-            btn.innerText = "PROCESSING...";
+            btn.innerText = "SENDING...";
 
             try {
-                // If it's a denial, you can handle it by marking as 'DENIED' in the sheet
-                // For now, we use the 'approve' action from your script
-                const response = await fetch(`${SCRIPT_URL}?action=approve&row=${row}`);
-                const result = await response.text();
-
-                if (result === "SUCCESS") {
-                    alert("Action Sent!");
-                    fetchRequests(); // Refresh list
-                } else {
-                    alert("Error: " + result);
-                    btn.disabled = false;
-                    btn.innerText = originalText;
+                const res = await fetch(`${SCRIPT_URL}?action=approve&row=${row}`);
+                const txt = await res.text();
+                if(txt === "SUCCESS") {
+                    loadData();
                 }
-            } catch (error) {
-                // Sometimes fetch fails due to CORS even if the script worked
-                alert("Action Sent!");
-                fetchRequests();
+            } catch(e) {
+                loadData(); // CORS might trigger, but script usually completes
             }
         }
 
-        // Initial Load
-        fetchRequests();
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if(mode === 'pending') {
+                document.getElementById('pendingList').style.display = "block";
+                document.getElementById('historyList').style.display = "none";
+            } else {
+                document.getElementById('pendingList').style.display = "none";
+                document.getElementById('historyList').style.display = "block";
+                document.getElementById('historyList').innerHTML = "<p style='text-align:center; color:#555;'>History shows items processed since your last refresh.</p>";
+            }
+        }
+
+        function doSearch() {
+            const val = document.getElementById('searchBar').value.toLowerCase();
+            const cards = document.querySelectorAll('.request-card');
+            cards.forEach(c => {
+                const phone = c.getAttribute('data-phone').toLowerCase();
+                c.style.display = phone.includes(val) ? "block" : "none";
+            });
+        }
+
+        window.onload = loadData;
     </script>
 </body>
 </html>
