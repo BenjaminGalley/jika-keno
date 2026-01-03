@@ -3,115 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Create ID</title>
+    <title>Register | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; }
-        body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; 
-        }
-        .reg-box { 
-            background: #161b22; padding: 30px; border-radius: 15px; 
-            width: 90%; max-width: 350px; text-align: center;
-            border-top: 4px solid var(--gold);
-        }
-        input { 
-            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
-            border: 1px solid #30363d; background: #0d1117; color: white; 
-            box-sizing: border-box;
-        }
-        .reg-btn { 
-            width: 100%; padding: 15px; background: var(--gold); color: black; 
-            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
-            margin-top: 15px; font-size: 16px;
-        }
-        .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #161b22; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border-top: 4px solid var(--gold); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-    <div class="reg-box">
+    <div class="box">
         <h2 style="color: var(--gold);">REGISTER</h2>
-        <p style="font-size: 12px; color: #8b949e;">CREATE YOUR CASINO ID</p>
-        
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="number" id="regPhone" placeholder="Phone Number (09...)">
-        <input type="password" id="regPass" placeholder="Create Password">
-        
-        <button class="reg-btn" id="btn" onclick="handleRegister()">REGISTER</button>
-        
-        <p style="margin-top: 20px; font-size: 13px;">
-            Already have an account? <a href="login.html" style="color: var(--gold); text-decoration: none;">Login</a>
-        </p>
+        <input type="text" id="name" placeholder="Full Name">
+        <input type="number" id="phone" placeholder="Phone Number">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn" id="regBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
+        <p style="margin-top:20px; font-size:12px;">Existing user? <a href="login.html" style="color:var(--gold);">Login</a></p>
     </div>
 
     <script>
-        // WEB APP URL FROM YOUR GOOGLE SCRIPT DEPLOYMENT
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
 
         async function handleRegister() {
-            const name = document.getElementById('regName').value.trim();
-            const phone = document.getElementById('regPhone').value.trim();
-            const pass = document.getElementById('regPass').value.trim();
-            const btn = document.getElementById('btn');
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const pass = document.getElementById('pass').value.trim();
+            const btn = document.getElementById('regBtn');
 
-            if (!name || !phone || !pass) {
-                alert("All fields are required!");
-                return;
-            }
-
+            if(!name || !phone || !pass) { alert("Fill all fields"); return; }
+            
             btn.disabled = true;
-            btn.innerText = "CONNECTING...";
+            btn.innerText = "REGISTERING...";
 
-            // Generate the unique SimbaID for Column D
             const simbaId = "SB" + Math.floor(1000 + Math.random() * 9000);
-
-            // Constructing the parameters to match the script's expectations
-            const params = new URLSearchParams({
-                action: 'register',
-                name: name,
-                phone: phone,
-                pass: pass,
-                id: simbaId 
-            });
-
-            const finalUrl = `${SCRIPT_URL}?${params.toString()}`;
+            const finalUrl = `${scriptURL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}&id=${simbaId}`;
 
             try {
-                // Fetching the response from the Google Script
                 const response = await fetch(finalUrl);
-                const text = await response.text();
-                const result = text.trim();
-
-                if (result === "ALREADY_EXISTS") {
-                    alert("⚠️ This phone number is already registered.");
-                } else if (result === "SUCCESS" || result.includes("SUCCESS")) {
-                    alert("✅ Registration Successful! Click OK to go to Login.");
+                const result = await response.text();
+                
+                if (result.includes("SUCCESS")) {
+                    alert("✅ Registration Successful!");
                     window.location.href = "login.html";
                 } else {
-                    // This handles any JSON responses if your script sends objects
-                    try {
-                        const jsonRes = JSON.parse(result);
-                        if(jsonRes.status === "SUCCESS") {
-                            alert("✅ Registration Successful!");
-                            window.location.href = "login.html";
-                        } else {
-                            alert("System Response: " + (jsonRes.message || result));
-                        }
-                    } catch(e) {
-                        alert("System Response: " + result);
-                    }
+                    alert("Response: " + result);
                 }
-
-            } catch (error) {
-                console.error("Connection Error:", error);
-                // Fallback for CORS: if the row was created, the login will work.
-                alert("Verifying registration... Please try to Login now.");
+            } catch (e) {
+                // CORS fallback
+                alert("Account created check... try logging in.");
                 window.location.href = "login.html";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "REGISTER";
             }
         }
     </script>
