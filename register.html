@@ -75,30 +75,26 @@
             const finalUrl = `${SCRIPT_URL}?${params.toString()}`;
 
             try {
-                // Fetch using 'no-cors' is NOT needed for Google Scripts if returning ContentService
+                // Fetch direct from Google Script
                 const response = await fetch(finalUrl);
                 const text = await response.text();
                 
-                let result;
-                try {
-                    result = JSON.parse(text);
-                } catch(e) {
-                    // If response is not JSON, it might be an error message like "EXISTS"
-                    result = text;
-                }
+                // Clean the response (sometimes Google adds extra characters)
+                const result = text.trim();
 
-                if (result === "EXISTS") {
-                    alert("This phone number is already registered.");
-                } else if (result.status === "SUCCESS" || (typeof result === "string" && result.includes("SUCCESS"))) {
-                    alert("Registration Successful! Your ID: " + (result.id || "Created"));
+                if (result === "ALREADY_EXISTS") {
+                    alert("⚠️ This phone number is already registered.");
+                } else if (result === "SUCCESS") {
+                    alert("✅ Registration Successful! Click OK to go to Login.");
                     window.location.href = "login.html";
                 } else {
-                    alert("System Message: " + text);
+                    // This catches any specific error messages from the sheet
+                    alert("System Response: " + result);
                 }
 
             } catch (error) {
                 console.error("Connection Error:", error);
-                alert("Connection Error! This usually means:\n1. The Script is not deployed to 'Anyone'.\n2. The Sheet tab names don't match the code.\n3. You haven't authorized the script.");
+                alert("Connection Error!\n1. Check if your Script is deployed to 'Anyone'.\n2. Ensure you authorized the Google Script.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "REGISTER";
