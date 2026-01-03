@@ -264,7 +264,7 @@
             
             const p = prizes[index];
             if (p === "FREE") {
-                card.querySelector('.prize-value').innerHTML = "<span style='color:#00f2ff'>FREE<br>TICKET</span>";
+                card.querySelector('.prize-value').innerHTML = "<span style='color:#00f2ff'>FREE<br>100 ETB</span>";
             } else {
                 card.querySelector('.prize-value').innerText = p > 0 ? p + " ETB" : "❌";
             }
@@ -298,13 +298,13 @@
             }
 
             setTimeout(() => {
-                if (winAmount > 0) {
+                if (isFreeTicket) {
+                    balance += 100; // Giving 100 ETB for free ticket match
+                    handleWinEffects(100, true);
+                    syncServerBalance(balance.toFixed(2));
+                } else if (winAmount > 0) {
                     balance += winAmount;
                     handleWinEffects(winAmount, false);
-                    syncServerBalance(balance.toFixed(2));
-                } else if (isFreeTicket) {
-                    balance += currentBet; 
-                    handleWinEffects("FREE TICKET", true);
                     syncServerBalance(balance.toFixed(2));
                 } else {
                     document.getElementById('status').innerText = "TRY AGAIN";
@@ -316,7 +316,7 @@
 
         function handleWinEffects(displayVal, isFree) {
             if(!isMuted) document.getElementById('sndWin').play();
-            document.getElementById('status').innerText = isFree ? "FREE TICKET!" : "WINNER: " + displayVal + " ETB!";
+            document.getElementById('status').innerText = isFree ? "FREE PRIZE: 100 ETB!" : "WINNER: " + displayVal + " ETB!";
             document.getElementById('scratchBox').classList.add('winner-glow');
             
             confetti({ 
