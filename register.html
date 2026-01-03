@@ -2,115 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Register | Simba Bet Official</title>
-    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Bet | Create ID</title>
     <style>
-        :root { --gold: #fcc201; --bg: #05070a; --card: #111827; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --gold: #fcc201; --bg: #0b0e14; }
         body { 
-            background: var(--bg); color: white; font-family: 'Goldman', sans-serif;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: var(--bg); color: white; font-family: sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; 
         }
-        .reg-card { 
-            background: var(--card); width: 90%; max-width: 400px; padding: 30px; 
-            border-radius: 20px; border: 1px solid #222; border-top: 5px solid var(--gold);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        .reg-box { 
+            background: #161b22; padding: 30px; border-radius: 15px; 
+            width: 90%; max-width: 350px; text-align: center;
+            border-top: 4px solid var(--gold);
         }
-        h2 { text-align: center; color: var(--gold); letter-spacing: 2px; margin-bottom: 5px; }
-        .sub { text-align: center; color: #777; font-size: 12px; margin-bottom: 25px; }
-        
-        .input-group { margin-bottom: 15px; position: relative; }
-        label { display: block; font-size: 10px; color: var(--gold); margin-bottom: 5px; text-transform: uppercase; }
         input { 
-            width: 100%; padding: 15px; background: #000; border: 1.5px solid #333; 
-            border-radius: 10px; color: white; font-family: 'Goldman'; outline: none;
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
+            border: 1px solid #30363d; background: #0d1117; color: white; 
+            box-sizing: border-box;
         }
-        input:focus { border-color: var(--gold); }
-        
-        .toggle-eye { 
-            position: absolute; right: 15px; top: 38px; cursor: pointer; color: var(--gold); font-size: 18px;
+        .reg-btn { 
+            width: 100%; padding: 15px; background: var(--gold); color: black; 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
+            margin-top: 15px; font-size: 16px;
         }
-
-        .btn-reg { 
-            width: 100%; padding: 18px; background: var(--gold); border: none; 
-            border-radius: 10px; font-weight: 900; cursor: pointer; margin-top: 10px;
-            font-family: 'Goldman'; text-transform: uppercase;
-        }
-        .link { text-align: center; margin-top: 20px; font-size: 13px; color: #aaa; cursor: pointer; }
+        .reg-btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <div class="reg-card">
-        <h2>REGISTER</h2>
-        <p class="sub">CREATE YOUR CASINO ID</p>
-
-        <div class="input-group">
-            <label>Full Name / ሙሉ ስም</label>
-            <input type="text" id="regName" placeholder="Enter Full Name">
-        </div>
-
-        <div class="input-group">
-            <label>Phone Number / ስልክ ቁጥር</label>
-            <input type="tel" id="regPhone" placeholder="09... or 07...">
-        </div>
-
-        <div class="input-group">
-            <label>Create Password / ሚስጥር ቃል</label>
-            <input type="password" id="regPass" placeholder="••••••••">
-            <span class="toggle-eye" onclick="toggleView('regPass')">👁️</span>
-        </div>
-
-        <button class="btn-reg" id="regBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
+    <div class="reg-box">
+        <h2 style="color: var(--gold);">REGISTER</h2>
+        <p style="font-size: 12px; color: #8b949e;">CREATE YOUR CASINO ID</p>
         
-        <div class="link" onclick="location.href='login.html'">Already have an account? Login</div>
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="number" id="regPhone" placeholder="Phone Number (09...)">
+        <input type="password" id="regPass" placeholder="Create Password">
+        
+        <button class="reg-btn" id="btn" onclick="handleRegister()">CREATING ID...</button>
+        
+        <p style="margin-top: 20px; font-size: 13px;">
+            Already have an account? <a href="login.html" style="color: var(--gold); text-decoration: none;">Login</a>
+        </p>
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE";
-
-        function toggleView(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === "password" ? "text" : "password";
-        }
+        // URL EXACTLY FROM YOUR SCREENSHOT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function handleRegister() {
-            const name = document.getElementById('regName').value.trim();
-            const phone = document.getElementById('regPhone').value.trim();
-            const pass = document.getElementById('regPass').value.trim();
-            const btn = document.getElementById('regBtn');
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const pass = document.getElementById('regPass').value;
+            const btn = document.getElementById('btn');
 
-            if(!name || !phone || !pass) return alert("Please fill all fields!");
+            if (!name || !phone || !pass) return alert("Please fill all fields");
 
             btn.disabled = true;
-            btn.innerText = "CREATING ID...";
+            btn.innerText = "CONNECTING...";
 
             try {
-                const url = `${SCRIPT_URL}?action=register&phone=${phone}&pass=${encodeURIComponent(pass)}&name=${encodeURIComponent(name)}`;
-                const response = await fetch(url);
-                const data = await response.json();
+                // Constructing the full URL for the GET request
+                const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+                
+                const response = await fetch(finalUrl);
+                const result = await response.text();
 
-                if(data.status === "SUCCESS") {
-                    alert("Welcome! Your Unique ID is: " + data.id);
-                    // Save session
-                    localStorage.setItem('simba_active_user', JSON.stringify({
-                        phone: phone,
-                        name: name,
-                        id: data.id,
-                        balance: 0
-                    }));
-                    location.href = "index.html";
+                if (result === "EXISTS") {
+                    alert("This phone is already registered!");
+                } else if (result.includes("SUCCESS")) {
+                    const data = JSON.parse(result);
+                    alert("Registration Successful! ID: " + data.id);
+                    window.location.href = "login.html";
                 } else {
-                    alert("This phone number is already registered!");
-                    btn.disabled = false;
-                    btn.innerText = "CREATE ACCOUNT";
+                    alert("Server Error: " + result);
                 }
-            } catch (e) {
-                alert("Connection Error. Try again.");
+            } catch (error) {
+                console.error(error);
+                alert("Connection Error. Please check your internet or Script Deployment.");
+            } finally {
                 btn.disabled = false;
+                btn.innerText = "REGISTER";
             }
         }
+
+        // Set button text on load
+        window.onload = () => document.getElementById('btn').innerText = "REGISTER";
     </script>
 </body>
 </html>
