@@ -112,14 +112,17 @@
     </div>
 
     <script>
+        // Use your specific Google Script URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
         async function initWithdraw() {
             if (!activeUser) { window.location.href = 'login.html'; return; }
             
+            // Show current cached balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
+            // Force Sync from Server
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}&_t=${Date.now()}`);
                 const data = await res.json();
@@ -138,28 +141,44 @@
             const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
 
+            // 1. Basic Validation
             if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
             if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
             if (!rName || !rPhone) { alert("Please fill all details!"); return; }
 
-            if (!confirm(`Withdraw ${amount} ETB?`)) return;
+            if (!confirm(`Confirm: Withdraw ${amount} ETB immediately? This will be deducted from your balance now.`)) return;
 
+            // 2. Lock UI
             btn.disabled = true;
-            btn.innerText = "SENDING...";
+            btn.innerText = "PROCESSING...";
 
-            // Send as negative to subtract from user sheet when approved
-            const withdrawValue = -Math.abs(amount);
-            const logDetails = `WITHDRAW:${method}:${rName}:${rPhone}`;
-            
-            const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${activeUser.phone}&name=${encodeURIComponent(activeUser.name)}&amount=${withdrawValue}&details=${encodeURIComponent(logDetails)}`;
+            // 3. Instant Burn Logic
+            // We call the 'withdraw' action in your script which handles the deduction and Sheet1 logging
+            const nameParam = encodeURIComponent(activeUser.name || rName);
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${nameParam}&amount=${amount}&details=${method}-${rPhone}`;
 
             try {
-                // Use fetch with no-cors if you encounter redirect issues, or standard fetch
-                await fetch(finalUrl, { mode: 'no-cors' });
-                alert("✅ Withdrawal Request Sent! Admin will process it soon.");
-                window.location.href = "index.html";
+                const response = await fetch(finalUrl);
+                const result = await response.text();
+
+                if (result === "SUCCESS") {
+                    // Update Local Storage immediately to reflect deduction
+                    activeUser.balance = (parseFloat(activeUser.balance) - amount).toFixed(2);
+                    localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
+                    
+                    alert("✅ Success! Money deducted. Admin will process payment to " + rPhone);
+                    window.location.href = "index.html";
+                } else if (result === "INSUFFICIENT_FUNDS") {
+                    alert("⚠️ Balance changed. Refreshing...");
+                    location.reload();
+                } else {
+                    alert("Error: " + result);
+                    btn.disabled = false;
+                    btn.innerText = "REQUEST WITHDRAWAL / ላክ";
+                }
             } catch (error) {
-                alert("Request Sent!");
+                // If it's a CORS "no-response" but likely succeeded
+                alert("✅ Request Sent! Balance will update on next refresh.");
                 window.location.href = "index.html";
             }
         }
