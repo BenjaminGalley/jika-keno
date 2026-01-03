@@ -2,111 +2,94 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Login | Simba Bet Official</title>
-    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simba Bet | Login</title>
     <style>
-        :root { --gold: #fcc201; --bg: #05070a; --card: #111827; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --gold: #fcc201; --bg: #0b0e14; }
         body { 
-            background: var(--bg); color: white; font-family: 'Goldman', sans-serif;
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: var(--bg); color: white; font-family: sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; margin: 0; 
         }
-        .login-card { 
-            background: var(--card); width: 90%; max-width: 400px; padding: 35px 25px; 
-            border-radius: 20px; border: 1px solid #222; border-top: 5px solid var(--gold);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        .login-box { 
+            background: #161b22; padding: 30px; border-radius: 15px; 
+            width: 90%; max-width: 350px; text-align: center;
+            border-top: 4px solid var(--gold);
         }
-        h2 { text-align: center; color: var(--gold); letter-spacing: 3px; margin-bottom: 30px; }
-        
-        .input-group { margin-bottom: 20px; position: relative; }
-        label { display: block; font-size: 10px; color: var(--gold); margin-bottom: 8px; text-transform: uppercase; font-weight: bold; }
         input { 
-            width: 100%; padding: 16px; background: #000; border: 1.5px solid #333; 
-            border-radius: 12px; color: white; font-family: 'Goldman'; outline: none; font-size: 16px;
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
+            border: 1px solid #30363d; background: #0d1117; color: white; 
+            box-sizing: border-box;
         }
-        input:focus { border-color: var(--gold); box-shadow: 0 0 10px rgba(252, 194, 1, 0.1); }
-        
-        .toggle-eye { 
-            position: absolute; right: 15px; top: 40px; cursor: pointer; color: var(--gold); font-size: 20px;
+        .login-btn { 
+            width: 100%; padding: 15px; background: var(--gold); color: black; 
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
+            margin-top: 15px; font-size: 16px;
         }
-
-        .btn-login { 
-            width: 100%; padding: 18px; background: var(--gold); border: none; 
-            border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 15px;
-            font-family: 'Goldman'; text-transform: uppercase; font-size: 16px;
-            box-shadow: 0 5px 15px rgba(252, 194, 1, 0.2);
-        }
-        .btn-login:active { transform: scale(0.98); }
-
-        .footer-links { text-align: center; margin-top: 25px; font-size: 13px; color: #777; }
-        .footer-links span { color: var(--gold); cursor: pointer; font-weight: bold; }
+        .login-btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <h2>LOGIN</h2>
-
-        <div class="input-group">
-            <label>Phone Number / ስልክ</label>
-            <input type="tel" id="loginPhone" placeholder="09... / 07...">
-        </div>
-
-        <div class="input-group">
-            <label>Password / ሚስጥር ቃል</label>
-            <input type="password" id="loginPass" placeholder="••••••••">
-            <span class="toggle-eye" onclick="toggleView('loginPass')">👁️</span>
-        </div>
-
-        <button class="btn-login" id="loginBtn" onclick="handleLogin()">ENTER CASINO</button>
+    <div class="login-box">
+        <h2 style="color: var(--gold);">LOGIN</h2>
+        <p style="font-size: 12px; color: #8b949e;">ENTER YOUR CREDENTIALS</p>
         
-        <div class="footer-links">
-            Don't have an account? <span onclick="location.href='register.html'">Register</span>
-        </div>
+        <input type="number" id="loginPhone" placeholder="Phone Number">
+        <input type="password" id="loginPass" placeholder="Password">
+        
+        <button class="login-btn" id="loginBtn" onclick="handleLogin()">LOGIN</button>
+        
+        <p style="margin-top: 20px; font-size: 13px;">
+            New player? <a href="register.html" style="color: var(--gold); text-decoration: none;">Register here</a>
+        </p>
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE";
-
-        function toggleView(id) {
-            const input = document.getElementById(id);
-            input.type = input.type === "password" ? "text" : "password";
-        }
+        // URL MATCHING YOUR SCREENSHOT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function handleLogin() {
             const phone = document.getElementById('loginPhone').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
+            const pass = document.getElementById('loginPass').value;
             const btn = document.getElementById('loginBtn');
 
-            if(!phone || !pass) return alert("Please enter phone and password");
+            if (!phone || !pass) return alert("Please enter phone and password");
 
             btn.disabled = true;
-            btn.innerText = "AUTHENTICATING...";
+            btn.innerText = "VERIFYING...";
 
             try {
-                const url = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-                const response = await fetch(url);
-                const text = await response.text();
+                // Matches your script: action=login&phone=X&pass=Y
+                const finalUrl = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+                
+                const response = await fetch(finalUrl);
+                const result = await response.text();
 
-                if (text === "INVALID") {
-                    alert("❌ Incorrect Phone or Password!");
-                    btn.disabled = false;
-                    btn.innerText = "ENTER CASINO";
-                } else {
-                    const data = JSON.parse(text);
-                    // Login Success
-                    localStorage.setItem('simba_active_user', JSON.stringify({
+                // Check if the response is JSON (Success) or plain text (Invalid)
+                if (result.includes("SUCCESS")) {
+                    const data = JSON.parse(result);
+                    
+                    // Save user session for the game
+                    const sessionData = {
                         phone: phone,
-                        balance: data.balance,
-                        name: "Player" // Script could be updated to return name too
-                    }));
-                    location.href = "index.html";
+                        balance: data.balance
+                    };
+                    localStorage.setItem('simba_active_user', JSON.stringify(sessionData));
+                    
+                    alert("Login Successful!");
+                    window.location.href = "index.html"; // Go to Lobby
+                } else if (result === "INVALID") {
+                    alert("Incorrect phone or password.");
+                } else {
+                    alert("System Response: " + result);
                 }
-            } catch (e) {
-                alert("Login Failed. Check your connection.");
+            } catch (error) {
+                console.error(error);
+                alert("Connection Error. Check your Script Deployment or Internet.");
+            } finally {
                 btn.disabled = false;
-                btn.innerText = "ENTER CASINO";
+                btn.innerText = "LOGIN";
             }
         }
     </script>
