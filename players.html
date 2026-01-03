@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Management | Simba Bet</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 20px; }
+        .card { background: #1a1a1a; padding: 20px; border-radius: 12px; border: 1px solid #FFD700; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { color: #FFD700; }
+        .btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
+        .approve { background: #28a745; color: white; }
+        .reject { background: #dc3545; color: white; margin-left: 5px; }
+        .status-pending { color: #FFD700; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>Transaction Management (Sheet1)</h2>
+    <div class="card">
+        <button class="btn approve" onclick="loadTransactions()">Refresh Requests</button>
+        <table id="transTable">
+            <thead>
+                <tr>
+                    <th>Phone</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="transBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "YOUR_DEPLOYED_APPS_SCRIPT_URL";
+
+        async function loadTransactions() {
+            const res = await fetch(`${SCRIPT_URL}?action=getPending`);
+            const data = await res.json();
+            const body = document.getElementById('transBody');
+            body.innerHTML = '';
+            
+            data.forEach(req => {
+                body.innerHTML += `
+                    <tr>
+                        <td>${req.phone}</td>
+                        <td>${req.amount < 0 ? 'WITHDRAWAL' : 'DEPOSIT'}</td>
+                        <td>${Math.abs(req.amount)} ETB</td>
+                        <td class="status-pending">PENDING</td>
+                        <td>
+                            <button class="btn approve" onclick="process(${req.row}, 'approve')">Approve</button>
+                            <button class="btn reject" onclick="process(${req.row}, 'reject')">Reject</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function process(row, action) {
+            if(!confirm(`Are you sure you want to ${action}?`)) return;
+            await fetch(`${SCRIPT_URL}?action=${action}&row=${row}`, { mode: 'no-cors' });
+            alert("Action Processed");
+            loadTransactions();
+        }
+
+        window.onload = loadTransactions;
+    </script>
+</body>
+</html>
