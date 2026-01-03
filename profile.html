@@ -168,18 +168,19 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyr8EHHAKYy7q1QyCHVnsFZgPrX2FkAyKa_mSwh4yDz3IFHaO9dBCvN-kaNuG5hZz2P/exec";
+        // FIXED URL FROM SCREENSHOT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let rawHistory = [];
 
         function initProfile() {
             if (!user) { window.location.href = 'login.html'; return; }
             
-            // Sync UI with local storage first
-            document.getElementById('pName').innerText = user.name || user.username;
+            // UI Update
+            document.getElementById('pName').innerText = user.name || "User";
             document.getElementById('pPhone').innerText = user.phone;
-            document.getElementById('pID').innerText = user.id || "PENDING";
-            document.getElementById('pBal').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
+            document.getElementById('pID').innerText = user.id || "1000";
+            document.getElementById('pBal').innerText = parseFloat(user.balance || 0).toFixed(2) + " ETB";
             
             fetchData();
         }
@@ -189,7 +190,6 @@
                 const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}`);
                 const data = await response.json();
                 
-                // Update balance from Google Sheets (Master Balance)
                 if(data.balance !== undefined) {
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
@@ -197,7 +197,7 @@
                 }
 
                 rawHistory = data.history || [];
-                render(0); // Show Today by default
+                render(0); // Default to Today
             } catch (e) {
                 document.getElementById('historyList').innerHTML = "<div style='text-align:center; color:var(--red); padding:20px;'>Sync Error. Check Connection.</div>";
             }
@@ -228,8 +228,8 @@
             list.innerHTML = filtered.map(item => {
                 const amt = parseFloat(item.amount);
                 const isWithdraw = amt < 0;
-                const status = item.status.toLowerCase();
-                const displayStatus = item.status.replace('-WB', '');
+                const status = (item.status || "pending").toLowerCase();
+                const displayStatus = item.status ? item.status.replace('-WB', '') : "PENDING";
 
                 return `
                     <div class="transaction-card" style="border-left-color: ${isWithdraw ? 'var(--red)' : 'var(--green)'}">
