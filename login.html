@@ -15,37 +15,42 @@
             background: #161b22; padding: 30px; border-radius: 15px; 
             width: 90%; max-width: 350px; text-align: center;
             border-top: 4px solid var(--gold);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         input { 
             width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
             border: 1px solid #30363d; background: #0d1117; color: white; 
-            box-sizing: border-box;
+            box-sizing: border-box; font-size: 14px;
         }
+        input:focus { border-color: var(--gold); outline: none; }
         .login-btn { 
             width: 100%; padding: 15px; background: var(--gold); color: black; 
             border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
-            margin-top: 15px; font-size: 16px;
+            margin-top: 15px; font-size: 16px; text-transform: uppercase;
         }
-        .login-btn:disabled { opacity: 0.5; }
+        .login-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .footer-link { margin-top: 20px; font-size: 13px; color: #8b949e; }
+        .footer-link a { color: var(--gold); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="login-box">
         <h2 style="color: var(--gold);">LOGIN</h2>
-        <p style="font-size: 12px; color: #8b949e;">ENTER YOUR CREDENTIALS</p>
+        <p style="font-size: 12px; color: #8b949e; margin-bottom: 20px;">ENTER YOUR CREDENTIALS</p>
         
         <input type="number" id="loginPhone" placeholder="Phone Number">
         <input type="password" id="loginPass" placeholder="Password">
         
         <button class="login-btn" id="loginBtn" onclick="handleLogin()">LOGIN</button>
         
-        <p style="margin-top: 20px; font-size: 13px;">
-            New player? <a href="register.html" style="color: var(--gold); text-decoration: none;">Register here</a>
+        <p class="footer-link">
+            New player? <a href="register.html">Register here</a>
         </p>
     </div>
 
     <script>
+        // WEB APP URL - Verified identical to your provided link
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function handleLogin() {
@@ -53,35 +58,40 @@
             const pass = document.getElementById('loginPass').value;
             const btn = document.getElementById('loginBtn');
 
-            if (!phone || !pass) return alert("Please enter phone and password");
+            if (!phone || !pass) {
+                alert("Please enter phone and password");
+                return;
+            }
 
             btn.disabled = true;
             btn.innerText = "VERIFYING...";
 
             try {
-                // We fetch the full user object from the script
+                // Encode password to handle special characters safely
                 const finalUrl = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+                
                 const response = await fetch(finalUrl);
                 const result = await response.json();
 
-                if (result.status === "SUCCESS") {
-                    // CRITICAL: We save the Name and ID so profile.html can see them
+                if (result && result.status === "SUCCESS") {
+                    // CRITICAL: We save the full session object
                     const sessionData = {
                         phone: phone,
                         balance: result.balance,
                         name: result.name || "User",
                         id: result.id || "1000"
                     };
+                    
                     localStorage.setItem('simba_active_user', JSON.stringify(sessionData));
                     
-                    alert("Login Successful!");
+                    alert("✅ Login Successful!");
                     window.location.href = "index.html"; 
                 } else {
-                    alert("Invalid phone or password.");
+                    alert("❌ Invalid phone or password.");
                 }
             } catch (error) {
-                console.error(error);
-                alert("Connection Error. Ensure your Google Script is deployed to 'Anyone'.");
+                console.error("Login Error:", error);
+                alert("Connection Error!\nEnsure the Google Script is deployed as 'Anyone' and that you have registered first.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "LOGIN";
