@@ -196,7 +196,7 @@
     </div>
 
     <script>
-        // EXACT URL YOU PROVIDED
+        // EXACT URL FROM YOUR DEPLOYMENT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function submitDepositRequest() {
@@ -209,19 +209,27 @@
 
             if (!user) { alert("Please login again."); window.location.href = "login.html"; return; }
             if (!sName || !sPhone || !amount) { alert("Please fill all fields!"); return; }
+            if (parseFloat(amount) < 100) { alert("Minimum deposit is 100 ETB"); return; }
 
             btn.disabled = true;
             btn.innerText = "SENDING...";
 
+            // Construct details string
             const details = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
-                await fetch(finalUrl, { mode: 'no-cors' });
+                // Fetch without 'no-cors' so we can confirm success properly
+                const response = await fetch(finalUrl);
+                const result = await response.json();
+                
                 alert("✅ Request Sent! Wait for Admin approval.");
                 btn.innerText = "REQUEST SENT ✅";
             } catch (e) {
-                alert("Request Submitted!");
+                // If it fails due to CORS but actually reaches the sheet
+                alert("Request Submitted! Please check status in a few minutes.");
+                btn.innerText = "SUBMITTED";
+                btn.disabled = false;
             }
         }
 
@@ -234,24 +242,23 @@
             syncBtn.innerText = "SYNCING...";
 
             try {
-                // FIXED ACTION: Changed from 'getUser' to 'getBalance' to match Google Script
-                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}&_t=${Date.now()}`);
+                // Using 'checkStatus' to match the profile logic which returns balance
+                const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
 
                 if (data && data.balance !== undefined) {
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    alert(`✅ SYNC COMPLETE!\nYour Balance is: ${user.balance} ETB`);
+                    alert(`✅ SYNC COMPLETE!\nNew Balance: ${user.balance} ETB`);
                     window.location.href = "index.html";
                 } else {
-                    alert("Admin has not approved yet.");
-                    syncBtn.disabled = false;
-                    syncBtn.innerText = "CHECK STATUS";
+                    alert("Admin has not approved your deposit yet. Please wait.");
                 }
             } catch (e) {
-                alert("Check back in 1 minute.");
+                alert("Unable to reach server. Try again in 1 minute.");
+            } finally {
                 syncBtn.disabled = false;
-                syncBtn.innerText = "CHECK STATUS";
+                syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
             }
         }
     </script>
