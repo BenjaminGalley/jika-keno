@@ -8,17 +8,15 @@
         body { background: #0a0a0a; color: white; font-family: sans-serif; padding: 20px; }
         .card { background: #1a1a1a; padding: 20px; border-radius: 12px; border: 1px solid #FFD700; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; font-size: 13px; }
         th { color: #FFD700; }
         .btn { padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; border: none; }
         .approve { background: #28a745; color: white; }
         .reject { background: #dc3545; color: white; margin-left: 5px; }
-        .status-pending { color: #FFD700; font-weight: bold; }
     </style>
 </head>
 <body>
-
-    <h2>Transaction Management (Sheet1)</h2>
+    <h2>Transaction Management</h2>
     <div class="card">
         <button class="btn approve" onclick="loadTransactions()">Refresh Requests</button>
         <table id="transTable">
@@ -27,7 +25,6 @@
                     <th>Phone</th>
                     <th>Type</th>
                     <th>Amount</th>
-                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -36,37 +33,38 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_DEPLOYED_APPS_SCRIPT_URL";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function loadTransactions() {
-            const res = await fetch(`${SCRIPT_URL}?action=getPending`);
-            const data = await res.json();
             const body = document.getElementById('transBody');
-            body.innerHTML = '';
-            
-            data.forEach(req => {
-                body.innerHTML += `
-                    <tr>
-                        <td>${req.phone}</td>
-                        <td>${req.amount < 0 ? 'WITHDRAWAL' : 'DEPOSIT'}</td>
-                        <td>${Math.abs(req.amount)} ETB</td>
-                        <td class="status-pending">PENDING</td>
-                        <td>
-                            <button class="btn approve" onclick="process(${req.row}, 'approve')">Approve</button>
-                            <button class="btn reject" onclick="process(${req.row}, 'reject')">Reject</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            body.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=getPending&t=${Date.now()}`);
+                const data = await res.json();
+                body.innerHTML = '';
+                data.forEach(req => {
+                    body.innerHTML += `
+                        <tr>
+                            <td>${req.phone}</td>
+                            <td>${req.amount < 0 ? 'WITHDRAWAL' : 'DEPOSIT'}</td>
+                            <td>${Math.abs(req.amount)} ETB</td>
+                            <td>
+                                <button class="btn approve" onclick="process(${req.row}, 'approve')">Approve</button>
+                                <button class="btn reject" onclick="process(${req.row}, 'reject')">Reject</button>
+                            </td>
+                        </tr>`;
+                });
+            } catch(e) { body.innerHTML = '<tr><td colspan="4">Error loading data.</td></tr>'; }
         }
 
         async function process(row, action) {
-            if(!confirm(`Are you sure you want to ${action}?`)) return;
-            await fetch(`${SCRIPT_URL}?action=${action}&row=${row}`, { mode: 'no-cors' });
-            alert("Action Processed");
-            loadTransactions();
+            if(!confirm(`Confirm ${action}?`)) return;
+            try {
+                await fetch(`${SCRIPT_URL}?action=${action}&row=${row}`);
+                alert("Updated Successfully");
+                loadTransactions();
+            } catch(e) { loadTransactions(); }
         }
-
         window.onload = loadTransactions;
     </script>
 </body>
