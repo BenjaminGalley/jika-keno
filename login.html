@@ -67,14 +67,14 @@
             btn.innerText = "VERIFYING...";
 
             try {
-                // Encode password to handle special characters safely
+                // Construct the URL to match the script's action=login requirement
                 const finalUrl = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
                 
                 const response = await fetch(finalUrl);
                 const result = await response.json();
 
                 if (result && result.status === "SUCCESS") {
-                    // CRITICAL: We save the full session object
+                    // CRITICAL: We save the full session object to LocalStorage
                     const sessionData = {
                         phone: phone,
                         balance: result.balance,
@@ -91,7 +91,7 @@
                 }
             } catch (error) {
                 console.error("Login Error:", error);
-                alert("Connection Error!\nEnsure the Google Script is deployed as 'Anyone' and that you have registered first.");
+                alert("Connection Error!\n1. Verify Sheet3 has Phone in Column A.\n2. Ensure the Script is deployed to 'Anyone'.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "LOGIN";
