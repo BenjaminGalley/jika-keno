@@ -153,7 +153,7 @@
 
     <div class="header">
         <div class="logo">SIMBA BET 🦁</div>
-        <div class="balance-box" id="userBalance">SYNCING...</div>
+        <div id="userBalance" class="balance-box">SYNCING...</div>
     </div>
 
     <div class="banner">
@@ -205,39 +205,43 @@
     </div>
 
     <script>
+        // WEB APP URL - Must match your Deployment exactly
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function checkUser() {
-            const userData = localStorage.getItem('simba_active_user');
+            const rawData = localStorage.getItem('simba_active_user');
             
-            if (!userData) {
+            if (!rawData) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            const user = JSON.parse(userData);
+            const user = JSON.parse(rawData);
             const balanceDisplay = document.getElementById('userBalance');
             
-            // Show local balance immediately for a better feeling
-            balanceDisplay.innerText = parseFloat(user.balance || 0).toFixed(2) + " ETB";
+            // Step 1: Show what we have locally (Instant feedback)
+            if (user.balance !== undefined) {
+                balanceDisplay.innerText = parseFloat(user.balance).toFixed(2) + " ETB";
+            }
 
-            // Fetch live balance from 'Users' sheet
+            // Step 2: Live Sync from Server
             try {
-                // FIXED: Changed action to 'getBalance' to match Google Script
+                // Using 'getBalance' as defined in our Master Script
                 const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
                 
                 if (data && data.balance !== undefined) {
+                    // Update LocalStorage and UI with fresh server data
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
                     balanceDisplay.innerText = parseFloat(data.balance).toFixed(2) + " ETB";
                 }
             } catch (e) {
-                console.warn("Live sync failed.");
+                console.warn("Lobby sync failed, using cached balance.");
             }
         }
 
-        // Refresh balance if user switches back to this tab
+        // Auto-refresh when user returns to this tab
         document.addEventListener("visibilitychange", function() {
             if (document.visibilityState === 'visible') {
                 checkUser();
