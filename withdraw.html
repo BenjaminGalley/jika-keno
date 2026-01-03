@@ -112,7 +112,6 @@
     </div>
 
     <script>
-        // Use your specific Google Script URL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let activeUser = JSON.parse(localStorage.getItem('simba_active_user'));
 
@@ -122,9 +121,9 @@
             // Show current cached balance first
             document.getElementById('displayBal').innerText = parseFloat(activeUser.balance || 0).toFixed(2) + " ETB";
 
-            // Force Sync from Server
+            // Sync from Server to ensure accuracy before withdrawal
             try {
-                const res = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${activeUser.phone}&_t=${Date.now()}`);
+                const res = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${activeUser.phone}&_t=${Date.now()}`);
                 const data = await res.json();
                 if (data && data.balance !== undefined) {
                     activeUser.balance = data.balance;
@@ -141,44 +140,44 @@
             const rPhone = document.getElementById('recPhone').value.trim();
             const btn = document.getElementById('witBtn');
 
-            // 1. Basic Validation
+            // 1. Validation
             if (!amount || amount < 100) { alert("Minimum withdrawal is 100 ETB"); return; }
             if (amount > parseFloat(activeUser.balance)) { alert("Insufficient balance!"); return; }
             if (!rName || !rPhone) { alert("Please fill all details!"); return; }
 
-            if (!confirm(`Confirm: Withdraw ${amount} ETB immediately? This will be deducted from your balance now.`)) return;
+            if (!confirm(`Confirm: Withdraw ${amount} ETB? \nThis will be deducted from your account balance immediately.`)) return;
 
             // 2. Lock UI
             btn.disabled = true;
-            btn.innerText = "PROCESSING...";
+            btn.innerText = "DEDUCTING...";
 
-            // 3. Instant Burn Logic
-            // We call the 'withdraw' action in your script which handles the deduction and Sheet1 logging
+            // 3. Deduction & Request Logic
             const nameParam = encodeURIComponent(activeUser.name || rName);
-            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${nameParam}&amount=${amount}&details=${method}-${rPhone}`;
+            const details = `${method}-${rPhone}`;
+            const finalUrl = `${SCRIPT_URL}?action=withdraw&phone=${activeUser.phone}&name=${nameParam}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
                 const response = await fetch(finalUrl);
                 const result = await response.text();
 
                 if (result === "SUCCESS") {
-                    // Update Local Storage immediately to reflect deduction
+                    // Update Local Storage immediately (Instant Burn)
                     activeUser.balance = (parseFloat(activeUser.balance) - amount).toFixed(2);
                     localStorage.setItem('simba_active_user', JSON.stringify(activeUser));
                     
-                    alert("✅ Success! Money deducted. Admin will process payment to " + rPhone);
+                    alert("✅ SUCCESS!\nAmount deducted. Your request is being processed.");
                     window.location.href = "index.html";
                 } else if (result === "INSUFFICIENT_FUNDS") {
-                    alert("⚠️ Balance changed. Refreshing...");
+                    alert("⚠️ Balance has changed. Please try again.");
                     location.reload();
                 } else {
-                    alert("Error: " + result);
+                    alert("Server error: " + result);
                     btn.disabled = false;
                     btn.innerText = "REQUEST WITHDRAWAL / ላክ";
                 }
             } catch (error) {
-                // If it's a CORS "no-response" but likely succeeded
-                alert("✅ Request Sent! Balance will update on next refresh.");
+                // Handle cases where the request goes through but returns a CORS error
+                alert("Request Sent. Please refresh your profile to see updated balance.");
                 window.location.href = "index.html";
             }
         }
