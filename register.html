@@ -4,46 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Register | Simba Bet Official</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #f1c40f; --bg: #000000; --card-bg: #0d0d0d; }
+        :root { --gold: #fcc201; --bg: #05070a; --card: #111827; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg) !important; color: white; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .reg-card { background: var(--card-bg); border: 1px solid #222; border-top: 5px solid var(--gold); border-radius: 15px; padding: 35px 25px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); text-align: center; }
-        .brand-name { color: var(--gold); font-weight: 900; font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 5px; }
-        .brand-name span { background: var(--gold); color: #000; padding: 0 8px; border-radius: 3px; margin-right: 5px; }
-        .welcome-text { font-size: 11px; color: #777; text-transform: uppercase; font-weight: 800; margin-bottom: 25px; letter-spacing: 1px; }
-        .input-group { text-align: left; margin-bottom: 12px; }
-        label { font-size: 10px; color: var(--gold); font-weight: 900; text-transform: uppercase; margin-left: 5px; }
-        input { width: 100%; padding: 14px; margin-top: 5px; border-radius: 10px; border: 1.5px solid #222; background: #151515; color: white; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--gold); background: #1a1a1a; }
-        .reg-btn { width: 100%; padding: 16px; background: var(--gold); border: none; border-radius: 10px; font-weight: 900; cursor: pointer; color: black; margin-top: 20px; font-size: 16px; text-transform: uppercase; }
-        .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .login-link { margin-top: 25px; font-size: 13px; color: #888; }
-        .login-link a { color: var(--gold); text-decoration: none; font-weight: 900; }
+        body { 
+            background: var(--bg); color: white; font-family: 'Goldman', sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+        .reg-card { 
+            background: var(--card); width: 90%; max-width: 400px; padding: 30px; 
+            border-radius: 20px; border: 1px solid #222; border-top: 5px solid var(--gold);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+        }
+        h2 { text-align: center; color: var(--gold); letter-spacing: 2px; margin-bottom: 5px; }
+        .sub { text-align: center; color: #777; font-size: 12px; margin-bottom: 25px; }
+        
+        .input-group { margin-bottom: 15px; position: relative; }
+        label { display: block; font-size: 10px; color: var(--gold); margin-bottom: 5px; text-transform: uppercase; }
+        input { 
+            width: 100%; padding: 15px; background: #000; border: 1.5px solid #333; 
+            border-radius: 10px; color: white; font-family: 'Goldman'; outline: none;
+        }
+        input:focus { border-color: var(--gold); }
+        
+        .toggle-eye { 
+            position: absolute; right: 15px; top: 38px; cursor: pointer; color: var(--gold); font-size: 18px;
+        }
+
+        .btn-reg { 
+            width: 100%; padding: 18px; background: var(--gold); border: none; 
+            border-radius: 10px; font-weight: 900; cursor: pointer; margin-top: 10px;
+            font-family: 'Goldman'; text-transform: uppercase;
+        }
+        .link { text-align: center; margin-top: 20px; font-size: 13px; color: #aaa; cursor: pointer; }
     </style>
 </head>
 <body>
+
     <div class="reg-card">
-        <h1 class="brand-name"><span>X</span>SIMBA</h1>
-        <p class="welcome-text">JOIN THE PRIDE / ቤተሰቡን ይቀላቀሉ</p>
+        <h2>REGISTER</h2>
+        <p class="sub">CREATE YOUR CASINO ID</p>
+
         <div class="input-group">
             <label>Full Name / ሙሉ ስም</label>
-            <input type="text" id="regName" placeholder="Enter your name">
+            <input type="text" id="regName" placeholder="Enter Full Name">
         </div>
+
         <div class="input-group">
             <label>Phone Number / ስልክ ቁጥር</label>
-            <input type="number" id="regPhone" placeholder="09... / 07...">
+            <input type="tel" id="regPhone" placeholder="09... or 07...">
         </div>
+
         <div class="input-group">
-            <label>Password / የይለፍ ቃል</label>
-            <input type="password" id="regPass" placeholder="Create a password">
+            <label>Create Password / ሚስጥር ቃል</label>
+            <input type="password" id="regPass" placeholder="••••••••">
+            <span class="toggle-eye" onclick="toggleView('regPass')">👁️</span>
         </div>
-        <button id="regBtn" class="reg-btn" onclick="handleRegister()">REGISTER / ተመዝገብ</button>
-        <p class="login-link">Already have an account? <br> <a href="login.html">LOGIN HERE / ግባ</a></p>
+
+        <button class="btn-reg" id="regBtn" onclick="handleRegister()">CREATE ACCOUNT</button>
+        
+        <div class="link" onclick="location.href='login.html'">Already have an account? Login</div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE";
+
+        function toggleView(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === "password" ? "text" : "password";
+        }
 
         async function handleRegister() {
             const name = document.getElementById('regName').value.trim();
@@ -51,33 +81,34 @@
             const pass = document.getElementById('regPass').value.trim();
             const btn = document.getElementById('regBtn');
 
-            if (!name || !phone || !pass) { alert("Please fill all fields!"); return; }
+            if(!name || !phone || !pass) return alert("Please fill all fields!");
 
             btn.disabled = true;
-            btn.innerText = "PROCESSING...";
-
-            const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
+            btn.innerText = "CREATING ID...";
 
             try {
-                const response = await fetch(finalUrl);
+                const url = `${SCRIPT_URL}?action=register&phone=${phone}&pass=${encodeURIComponent(pass)}&name=${encodeURIComponent(name)}`;
+                const response = await fetch(url);
                 const data = await response.json();
 
-                if (data.status === "exists") {
-                    alert("Phone already registered!");
-                    btn.disabled = false; btn.innerText = "REGISTER";
-                    return;
-                }
-
-                if (data.status === "success") {
+                if(data.status === "SUCCESS") {
+                    alert("Welcome! Your Unique ID is: " + data.id);
+                    // Save session
                     localStorage.setItem('simba_active_user', JSON.stringify({
-                        phone: phone, name: name, balance: 0, id: data.id
+                        phone: phone,
+                        name: name,
+                        id: data.id,
+                        balance: 0
                     }));
-                    alert("Success! Welcome to Simba.");
-                    window.location.href = 'index.html';
+                    location.href = "index.html";
+                } else {
+                    alert("This phone number is already registered!");
+                    btn.disabled = false;
+                    btn.innerText = "CREATE ACCOUNT";
                 }
-            } catch (error) {
-                alert("Connection error. Try again.");
-                btn.disabled = false; btn.innerText = "REGISTER";
+            } catch (e) {
+                alert("Connection Error. Try again.");
+                btn.disabled = false;
             }
         }
     </script>
