@@ -37,29 +37,32 @@
         .game-container {
             flex: 1; display: flex; align-items: center; justify-content: center;
             position: relative; padding: 10px;
-            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
+            /* Using a dark gradient as fallback for the background */
+            background: radial-gradient(circle, #2a0000 0%, #000 100%);
         }
 
         .slot-frame {
-            width: 340px; height: 220px; border: 6px solid #444; border-radius: 12px;
+            width: 340px; height: 230px; border: 6px solid #444; border-radius: 12px;
             background: #000; position: relative; overflow: hidden;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
         }
 
-        /* The Grid Image */
+        /* The Grid Image from your assets */
         .reels-container { 
             display: flex; width: 100%; height: 100%; 
             background-image: url('assets/assets/grid.jpg');
             background-size: 100% 100%;
+            background-repeat: no-repeat;
         }
 
-        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.05); }
+        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.1); }
+        .reel:last-child { border-right: none; }
 
         .reel-strip { position: absolute; width: 100%; top: 0; transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
 
-        .symbol { height: 73.3px; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .symbol { height: 76.6px; width: 100%; display: flex; align-items: center; justify-content: center; }
 
-        .symbol img { width: 52px; height: 52px; object-fit: contain; }
+        .symbol img { width: 55px; height: 55px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
 
         /* Bottom Controls: Bet Selector & Spin */
         .bottom-ui {
@@ -88,25 +91,25 @@
         }
 
         .spin-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6b00; }
-        .spin-btn:disabled { background: #333; color: #666; box-shadow: none; transform: none; }
+        .spin-btn:disabled { background: #333 !important; color: #666 !important; box-shadow: none !important; transform: none !important; }
 
         /* Big Win Overlay */
         .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
             display: none; flex-direction: column; align-items: center; 
             justify-content: center; z-index: 100;
         }
 
         .exit-btn {
-            position: absolute; top: 10px; left: 10px; background: #ff4444;
-            color: white; border: none; padding: 5px 10px; border-radius: 5px;
-            font-size: 12px; cursor: pointer; z-index: 20;
+            position: absolute; top: 10px; left: 10px; background: #444;
+            color: white; border: 1px solid var(--gold); padding: 8px 15px; border-radius: 5px;
+            font-size: 14px; cursor: pointer; z-index: 20; font-weight: bold;
         }
     </style>
 </head>
 <body onload="init()">
 
-    <button class="exit-btn" onclick="location.href='index.html'">EXIT</button>
+    <button class="exit-btn" onclick="location.href='index.html'">LOBBY</button>
 
     <div class="header">
         <div class="game-title">MULTI HOT 5</div>
@@ -137,107 +140,4 @@
             <div class="bet-display">BET: <span id="betAmt">2</span></div>
             <button class="step-btn" onclick="changeBet(2)">+</button>
         </div>
-        <button class="spin-btn" id="spinBtn" onclick="runSpin()">SPIN</button>
-    </div>
-
-    <div id="winPop" class="modal">
-        <div style="font-size: 48px; color: var(--gold); font-weight: 900; text-shadow: 0 0 20px gold;">BIG WIN!</div>
-        <div style="font-size: 32px; color: white; margin-top: 10px;"><span id="winVal">0</span> ETB</div>
-    </div>
-
-    <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
-        const SYMBOLS = [
-            'bell.png', 'collector.png', 'crown.png', 'double.star.png', 
-            'purple.gift.png', 'red.gift.png', 'seven.triple.png', 'star.png'
-        ];
-        const PATH = 'assets/assets/';
-        const SYMBOL_HEIGHT = 73.3;
-        
-        let user = JSON.parse(localStorage.getItem('simba_active_user'));
-        let balance = user ? parseFloat(user.balance) : 0;
-        let bet = 2;
-        let spinning = false;
-        let isMuted = false;
-
-        function init() {
-            if(!user) { window.location.href = 'login.html'; return; }
-            updateUI();
-            for(let i=0; i<5; i++) {
-                const strip = document.getElementById('strip' + i);
-                strip.innerHTML = ''; 
-                for(let j=0; j<80; j++) {
-                    const imgName = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                    strip.innerHTML += `<div class="symbol"><img src="${PATH}${imgName}" onerror="this.style.display='none'"></div>`;
-                }
-                strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
-            }
-        }
-
-        function toggleMute() {
-            isMuted = !isMuted;
-            document.getElementById('muteBtn').innerText = isMuted ? '🔇' : '🔊';
-        }
-
-        function changeBet(v) {
-            if(spinning) return;
-            bet = Math.max(2, bet + v);
-            document.getElementById('betAmt').innerText = bet;
-        }
-
-        function updateUI() {
-            document.getElementById('balDisplay').innerText = balance.toFixed(2);
-            user.balance = balance.toFixed(2);
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
-        }
-
-        async function saveBalanceToServer(newBalance) {
-            try {
-                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBalance}`, { mode: 'no-cors' });
-            } catch (e) {
-                console.error("Sync failed, but balance kept locally.");
-            }
-        }
-
-        function runSpin() {
-            if(balance < bet || spinning) {
-                if(balance < bet) alert("Insufficient Balance!");
-                return;
-            }
-            
-            spinning = true;
-            balance -= bet;
-            updateUI();
-            saveBalanceToServer(balance.toFixed(2)); // Save the deduction
-            document.getElementById('spinBtn').disabled = true;
-
-            for(let i=0; i<5; i++) {
-                const strip = document.getElementById('strip' + i);
-                strip.style.transition = 'none';
-                strip.style.top = `-${70 * SYMBOL_HEIGHT}px`;
-                
-                setTimeout(() => {
-                    const stopOffset = Math.floor(Math.random() * 5); 
-                    strip.style.transition = 'top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95)';
-                    strip.style.top = `-${stopOffset * SYMBOL_HEIGHT}px`;
-                }, 50 + (i * 120));
-            }
-
-            setTimeout(() => {
-                spinning = false;
-                document.getElementById('spinBtn').disabled = false;
-                
-                if(Math.random() > 0.85) {
-                    let win = bet * 10;
-                    balance += win;
-                    updateUI();
-                    saveBalanceToServer(balance.toFixed(2)); // Save the win
-                    document.getElementById('winVal').innerText = win.toFixed(2);
-                    document.getElementById('winPop').style.display = 'flex';
-                    setTimeout(() => { document.getElementById('winPop').style.display = 'none'; }, 2500);
-                }
-            }, 2800);
-        }
-    </script>
-</body>
-</html>
+        <button class="spin-btn" id="spinBtn" onclick="runSpin()">SPIN
