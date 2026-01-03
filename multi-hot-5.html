@@ -4,127 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multi Hot 5 | Simba Bet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #FFD700;
-            --bg: #000;
-            --panel: #0a0e17;
+            --dark: #050505;
+            --panel: rgba(0, 0, 0, 0.85);
         }
 
         body { 
-            background: var(--bg); color: white; font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #000 url('assets/assets/background.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white; font-family: 'Goldman', sans-serif; 
             margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* Top Header: Name & Speaker */
+        /* Unique Header */
         .header { 
-            background: var(--panel); height: 60px; display: flex; 
+            background: var(--panel); height: 50px; display: flex; 
             justify-content: space-between; align-items: center; padding: 0 15px;
-            border-bottom: 2px solid var(--gold); flex-shrink: 0; z-index: 10;
-        }
-        .game-title { color: var(--gold); font-weight: 900; font-size: 18px; letter-spacing: 1px; }
-        
-        .header-right { display: flex; align-items: center; gap: 15px; }
-        
-        .mute-btn {
-            background: none; border: none; cursor: pointer; color: var(--gold);
-            font-size: 24px; padding: 5px; display: flex; align-items: center;
+            border-bottom: 2px solid var(--gold); z-index: 100;
         }
 
-        .balance-box { color: var(--gold); font-weight: bold; font-size: 16px; text-align: right; }
+        .balance-box { color: var(--gold); font-weight: bold; font-size: 18px; }
 
-        /* Game Area */
         .game-container {
             flex: 1; display: flex; align-items: center; justify-content: center;
-            position: relative; padding: 10px;
-            /* Using a dark gradient as fallback for the background */
-            background: radial-gradient(circle, #2a0000 0%, #000 100%);
+            position: relative;
         }
 
+        /* Visible Slot Frame */
         .slot-frame {
-            width: 340px; height: 230px; border: 6px solid #444; border-radius: 12px;
-            background: #000; position: relative; overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+            width: 360px; height: 260px; border: 5px solid #333; border-radius: 15px;
+            background: rgba(0,0,0,0.9); position: relative; overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
-        /* The Grid Image from your assets */
+        /* The Grid Backdrop */
         .reels-container { 
             display: flex; width: 100%; height: 100%; 
-            background-image: url('assets/assets/grid.jpg');
+            background: url('assets/assets/grid.jpg') no-repeat;
             background-size: 100% 100%;
-            background-repeat: no-repeat;
         }
 
-        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.1); }
-        .reel:last-child { border-right: none; }
+        .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.05); }
 
-        .reel-strip { position: absolute; width: 100%; top: 0; transition: top 2s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
+        /* Smooth Scroll Strip */
+        .reel-strip { 
+            position: absolute; width: 100%; top: -1600px; 
+            display: flex; flex-direction: column;
+        }
 
-        .symbol { height: 76.6px; width: 100%; display: flex; align-items: center; justify-content: center; }
+        .symbol { 
+            height: 86.6px; width: 100%; display: flex; 
+            align-items: center; justify-content: center; 
+        }
+        .symbol img { width: 68px; height: 68px; object-fit: contain; }
 
-        .symbol img { width: 55px; height: 55px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
-
-        /* Bottom Controls: Bet Selector & Spin */
+        /* Bottom UI: Unique Bet & Spin */
         .bottom-ui {
-            background: var(--panel); border-top: 3px solid #1e293b;
-            padding: 15px 15px 30px 15px; flex-shrink: 0; display: flex;
-            flex-direction: column; align-items: center; gap: 15px;
+            background: var(--panel); border-top: 3px solid var(--gold);
+            padding: 10px 10px 25px 10px; display: flex;
+            flex-direction: column; align-items: center; gap: 12px;
         }
 
         .bet-selector {
-            display: flex; align-items: center; gap: 20px; background: #1a1a1a; 
-            padding: 8px 25px; border-radius: 30px; border: 1.5px solid var(--gold);
+            display: flex; align-items: center; gap: 25px; background: #111; 
+            padding: 8px 30px; border-radius: 50px; border: 1.5px solid var(--gold);
+            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
         }
 
         .step-btn { 
-            background: var(--gold); color: black; border: none; width: 38px; height: 38px; 
-            border-radius: 50%; font-weight: bold; font-size: 24px; cursor: pointer;
+            background: var(--gold); color: black; border: none; width: 35px; height: 35px; 
+            border-radius: 50%; font-weight: 900; font-size: 20px; cursor: pointer;
         }
-
-        .bet-display { color: var(--gold); font-weight: bold; font-size: 20px; min-width: 100px; text-align: center; }
 
         .spin-btn {
-            background: linear-gradient(180deg, var(--gold), #b8860b);
-            border: none; width: 95%; height: 60px; font-weight: 900; border-radius: 35px;
-            font-size: 22px; color: black; cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 5px 0 #8b6b00; transition: 0.1s;
+            background: linear-gradient(180deg, #ffeb3b, #fbc02d);
+            border: none; width: 95%; height: 60px; font-weight: 900; border-radius: 40px;
+            font-size: 24px; color: #212121; cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 6px 0 #b8860b, 0 10px 20px rgba(0,0,0,0.5);
+            transition: 0.1s; letter-spacing: 2px;
         }
 
-        .spin-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #8b6b00; }
-        .spin-btn:disabled { background: #333 !important; color: #666 !important; box-shadow: none !important; transform: none !important; }
+        .spin-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #b8860b; }
+        .spin-btn:disabled { filter: grayscale(1); opacity: 0.5; }
 
-        /* Big Win Overlay */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            display: none; flex-direction: column; align-items: center; 
-            justify-content: center; z-index: 100;
+        #winBanner {
+            position: absolute; top: 25%; width: 100%; text-align: center;
+            font-size: 45px; color: var(--gold); font-weight: 900;
+            text-shadow: 0 0 30px #000, 0 0 10px #fff; z-index: 200; display: none;
+            pointer-events: none; animation: winPulse 0.5s infinite alternate;
         }
 
-        .exit-btn {
-            position: absolute; top: 10px; left: 10px; background: #444;
-            color: white; border: 1px solid var(--gold); padding: 8px 15px; border-radius: 5px;
-            font-size: 14px; cursor: pointer; z-index: 20; font-weight: bold;
-        }
+        @keyframes winPulse { from { transform: scale(1); } to { transform: scale(1.1); } }
     </style>
 </head>
 <body onload="init()">
 
-    <button class="exit-btn" onclick="location.href='index.html'">LOBBY</button>
-
     <div class="header">
-        <div class="game-title">MULTI HOT 5</div>
-        <div class="header-right">
-            <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔊</button>
-            <div class="balance-box">
-                <div style="font-size: 10px; opacity: 0.8; color: white;">BALANCE</div>
-                <span id="balDisplay">0.00</span> ETB
-            </div>
-        </div>
+        <button onclick="location.href='index.html'" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:4px 12px; border-radius:5px; font-size:12px;">LOBBY</button>
+        <div class="balance-box"><span id="balDisplay">0.00</span> <small>ETB</small></div>
+        <button id="musicBtn" onclick="toggleMusic()" style="background:none; border:none; font-size:20px;">🎵</button>
     </div>
 
     <div class="game-container">
+        <div id="winBanner">MEGA WIN!</div>
         <div class="slot-frame">
-            <div class="reels-container" id="reels">
+            <div class="reels-container">
                 <div class="reel"><div class="reel-strip" id="strip0"></div></div>
                 <div class="reel"><div class="reel-strip" id="strip1"></div></div>
                 <div class="reel"><div class="reel-strip" id="strip2"></div></div>
@@ -136,8 +123,129 @@
 
     <div class="bottom-ui">
         <div class="bet-selector">
-            <button class="step-btn" onclick="changeBet(-2)">-</button>
-            <div class="bet-display">BET: <span id="betAmt">2</span></div>
-            <button class="step-btn" onclick="changeBet(2)">+</button>
+            <button class="step-btn" onclick="changeBet(-5)">-</button>
+            <div style="color:var(--gold); font-size: 18px;">BET: <span id="betAmt">5</span></div>
+            <button class="step-btn" onclick="changeBet(5)">+</button>
         </div>
-        <button class="spin-btn" id="spinBtn" onclick="runSpin()">SPIN
+        <button class="spin-btn" id="spinBtn" onclick="runSpin()">SPIN</button>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // GOOGLE SCRIPT PLANTATION (Controller Bridge)
+        const WALLET_URL = "YOUR_WALLET_APP_SCRIPT_URL";
+        const CTRL_URL = "YOUR_CONTROLLER_APP_SCRIPT_URL";
+
+        const ASSET_PATH = 'assets/assets/';
+        const SYMBOLS = [
+            '777.png', 'collector.png', 'bell.png', 
+            'purple.png', 'gift.png', 'cherry.png'
+        ];
+
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
+        let balance = 0;
+        let bet = 5;
+        let isMusicPlaying = false;
+
+        function init() {
+            if (!user) { window.location.href = 'login.html'; return; }
+            balance = parseFloat(user.balance);
+            updateUI();
+            
+            // Build Initial visible symbols
+            for(let i=0; i<5; i++) {
+                const strip = document.getElementById(`strip${i}`);
+                fillStrip(strip);
+            }
+        }
+
+        function fillStrip(strip, outcomeSym = null) {
+            strip.innerHTML = '';
+            // Create a long strip of 30 symbols for smooth scrolling
+            for(let j=0; j<30; j++) {
+                const sym = (j === 2 && outcomeSym) ? outcomeSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+                const div = document.createElement('div');
+                div.className = 'symbol';
+                div.innerHTML = `<img src="${ASSET_PATH}${sym}">`;
+                strip.appendChild(div);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('balDisplay').innerText = balance.toFixed(2);
+            document.getElementById('betAmt').innerText = bet;
+            user.balance = balance.toFixed(2);
+            localStorage.setItem('simba_active_user', JSON.stringify(user));
+        }
+
+        function toggleMusic() {
+            const m = document.getElementById('bgMusic');
+            if(!isMusicPlaying) { m.play(); m.volume = 0.3; isMusicPlaying = true; }
+            else { m.pause(); isMusicPlaying = false; }
+        }
+
+        function changeBet(v) { if(bet + v >= 5 && !document.getElementById('spinBtn').disabled) { bet += v; updateUI(); } }
+
+        async function runSpin() {
+            if (balance < bet) return alert("Low Balance");
+            
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            document.getElementById('winBanner').style.display = 'none';
+
+            // 1. Deduct Balance
+            balance -= bet;
+            updateUI();
+            
+            // 2. Fetch Control Seed (RTP Logic)
+            let winChance = 0.15; // Default 15%
+            try {
+                let res = await fetch(`${CTRL_URL}?action=getSpin&game=multihot5&phone=${user.phone}`);
+                let data = await res.json();
+                if(data.mode === "hard") winChance = 0.05;
+                if(data.mode === "easy") winChance = 0.35;
+            } catch(e) { /* Default to normal */ }
+
+            const isWin = Math.random() < winChance;
+            const winSym = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+
+            // 3. Animate Reels (Top-to-Bottom Smooth Scroll)
+            for(let i=0; i<5; i++) {
+                const strip = document.getElementById(`strip${i}`);
+                const result = isWin ? winSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+                
+                fillStrip(strip, result);
+                
+                strip.style.transition = 'none';
+                strip.style.top = '-2000px'; // Start far up
+                
+                setTimeout(() => {
+                    strip.style.transition = `top ${2 + (i * 0.2)}s cubic-bezier(0.15, 0, 0.15, 1)`;
+                    strip.style.top = '0px'; // Smoothly slide down to the "index 2" symbol
+                }, 50);
+            }
+
+            // 4. Finalize Win
+            setTimeout(() => {
+                if(isWin) {
+                    let mult = (winSym === '777.png') ? 20 : 5;
+                    let winAmt = bet * mult;
+                    balance += winAmt;
+                    document.getElementById('winBanner').innerText = `WIN ${winAmt} ETB!`;
+                    document.getElementById('winBanner').style.display = 'block';
+                    updateUI();
+                    
+                    // Update Google Sheets Wallet
+                    fetch(`${WALLET_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`, {mode:'no-cors'});
+                }
+                btn.disabled = false;
+            }, 3200);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
