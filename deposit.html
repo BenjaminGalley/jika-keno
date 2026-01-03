@@ -114,6 +114,7 @@
             margin-top: 30px; 
             text-transform: uppercase;
         }
+        .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .btn-status { 
             background: transparent; 
@@ -196,7 +197,6 @@
     </div>
 
     <script>
-        // EXACT URL FROM YOUR DEPLOYMENT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function submitDepositRequest() {
@@ -214,22 +214,28 @@
             btn.disabled = true;
             btn.innerText = "SENDING...";
 
-            // Construct details string
-            const details = `DEP_VIA_${method}_SENDER_${sName}_PHONE_${sPhone}`;
+            // Create a clean string for the Admin to see in Sheet2
+            const details = `DEP: ${method} | From: ${sName} (${sPhone})`;
+            
+            // Build the URL for the 'deposit' action
             const finalUrl = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${amount}&details=${encodeURIComponent(details)}`;
 
             try {
-                // Fetch without 'no-cors' so we can confirm success properly
                 const response = await fetch(finalUrl);
                 const result = await response.json();
                 
-                alert("✅ Request Sent! Wait for Admin approval.");
-                btn.innerText = "REQUEST SENT ✅";
+                if (result.status === "SUCCESS") {
+                    alert("✅ Request Sent Successfully!\nPlease wait for Admin approval.");
+                    btn.innerText = "REQUEST SENT ✅";
+                } else {
+                    alert("Server Error: " + result.message);
+                    btn.disabled = false;
+                    btn.innerText = "SUBMIT REQUEST / ላክ";
+                }
             } catch (e) {
-                // If it fails due to CORS but actually reaches the sheet
-                alert("Request Submitted! Please check status in a few minutes.");
+                // Handle success even if CORS block occurs (typical for Apps Script)
+                alert("Request Submitted! Admin will verify your deposit soon.");
                 btn.innerText = "SUBMITTED";
-                btn.disabled = false;
             }
         }
 
@@ -242,20 +248,25 @@
             syncBtn.innerText = "SYNCING...";
 
             try {
-                // Using 'checkStatus' to match the profile logic which returns balance
+                // Fetch the current balance from the 'Users' sheet
                 const response = await fetch(`${SCRIPT_URL}?action=checkStatus&phone=${user.phone}&_t=${Date.now()}`);
                 const data = await response.json();
 
                 if (data && data.balance !== undefined) {
-                    user.balance = data.balance;
-                    localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    alert(`✅ SYNC COMPLETE!\nNew Balance: ${user.balance} ETB`);
-                    window.location.href = "index.html";
-                } else {
-                    alert("Admin has not approved your deposit yet. Please wait.");
+                    const oldBalance = parseFloat(user.balance || 0);
+                    const newBalance = parseFloat(data.balance);
+
+                    if (newBalance > oldBalance) {
+                        alert(`✅ DEPOSIT APPROVED!\nOld Balance: ${oldBalance} ETB\nNew Balance: ${newBalance} ETB`);
+                        user.balance = newBalance;
+                        localStorage.setItem('simba_active_user', JSON.stringify(user));
+                        window.location.href = "index.html";
+                    } else {
+                        alert("Your deposit is still being processed. Please check back in a few minutes.");
+                    }
                 }
             } catch (e) {
-                alert("Unable to reach server. Try again in 1 minute.");
+                alert("Connection Error. Please try again.");
             } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerText = "CHECK STATUS / ሁኔታውን አረጋግጥ";
