@@ -26,7 +26,7 @@
             border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
             margin-top: 15px; font-size: 16px;
         }
-        .reg-btn:disabled { opacity: 0.5; }
+        .reg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -39,7 +39,7 @@
         <input type="number" id="regPhone" placeholder="Phone Number (09...)">
         <input type="password" id="regPass" placeholder="Create Password">
         
-        <button class="reg-btn" id="btn" onclick="handleRegister()">CREATING ID...</button>
+        <button class="reg-btn" id="btn" onclick="handleRegister()">REGISTER</button>
         
         <p style="margin-top: 20px; font-size: 13px;">
             Already have an account? <a href="login.html" style="color: var(--gold); text-decoration: none;">Login</a>
@@ -47,47 +47,63 @@
     </div>
 
     <script>
-        // URL EXACTLY FROM YOUR SCREENSHOT
+        // WEB APP URL FROM YOUR GOOGLE SCRIPT DEPLOYMENT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         async function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const pass = document.getElementById('regPass').value;
+            const name = document.getElementById('regName').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const pass = document.getElementById('regPass').value.trim();
             const btn = document.getElementById('btn');
 
-            if (!name || !phone || !pass) return alert("Please fill all fields");
+            if (!name || !phone || !pass) {
+                alert("All fields are required!");
+                return;
+            }
 
             btn.disabled = true;
             btn.innerText = "CONNECTING...";
 
+            // Use URLSearchParams for clean encoding
+            const params = new URLSearchParams({
+                action: 'register',
+                name: name,
+                phone: phone,
+                pass: pass
+            });
+
+            const finalUrl = `${SCRIPT_URL}?${params.toString()}`;
+
             try {
-                // Constructing the full URL for the GET request
-                const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-                
+                // Fetch using 'no-cors' is NOT needed for Google Scripts if returning ContentService
                 const response = await fetch(finalUrl);
-                const result = await response.text();
+                const text = await response.text();
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch(e) {
+                    // If response is not JSON, it might be an error message like "EXISTS"
+                    result = text;
+                }
 
                 if (result === "EXISTS") {
-                    alert("This phone is already registered!");
-                } else if (result.includes("SUCCESS")) {
-                    const data = JSON.parse(result);
-                    alert("Registration Successful! ID: " + data.id);
+                    alert("This phone number is already registered.");
+                } else if (result.status === "SUCCESS" || (typeof result === "string" && result.includes("SUCCESS"))) {
+                    alert("Registration Successful! Your ID: " + (result.id || "Created"));
                     window.location.href = "login.html";
                 } else {
-                    alert("Server Error: " + result);
+                    alert("System Message: " + text);
                 }
+
             } catch (error) {
-                console.error(error);
-                alert("Connection Error. Please check your internet or Script Deployment.");
+                console.error("Connection Error:", error);
+                alert("Connection Error! This usually means:\n1. The Script is not deployed to 'Anyone'.\n2. The Sheet tab names don't match the code.\n3. You haven't authorized the script.");
             } finally {
                 btn.disabled = false;
                 btn.innerText = "REGISTER";
             }
         }
-
-        // Set button text on load
-        window.onload = () => document.getElementById('btn').innerText = "REGISTER";
     </script>
 </body>
 </html>
