@@ -64,37 +64,51 @@
             btn.disabled = true;
             btn.innerText = "CONNECTING...";
 
-            // Use URLSearchParams for clean encoding
+            // Generate the unique SimbaID for Column D
+            const simbaId = "SB" + Math.floor(1000 + Math.random() * 9000);
+
+            // Constructing the parameters to match the script's expectations
             const params = new URLSearchParams({
                 action: 'register',
                 name: name,
                 phone: phone,
-                pass: pass
+                pass: pass,
+                id: simbaId 
             });
 
             const finalUrl = `${SCRIPT_URL}?${params.toString()}`;
 
             try {
-                // Fetch direct from Google Script
+                // Fetching the response from the Google Script
                 const response = await fetch(finalUrl);
                 const text = await response.text();
-                
-                // Clean the response (sometimes Google adds extra characters)
                 const result = text.trim();
 
                 if (result === "ALREADY_EXISTS") {
                     alert("⚠️ This phone number is already registered.");
-                } else if (result === "SUCCESS") {
+                } else if (result === "SUCCESS" || result.includes("SUCCESS")) {
                     alert("✅ Registration Successful! Click OK to go to Login.");
                     window.location.href = "login.html";
                 } else {
-                    // This catches any specific error messages from the sheet
-                    alert("System Response: " + result);
+                    // This handles any JSON responses if your script sends objects
+                    try {
+                        const jsonRes = JSON.parse(result);
+                        if(jsonRes.status === "SUCCESS") {
+                            alert("✅ Registration Successful!");
+                            window.location.href = "login.html";
+                        } else {
+                            alert("System Response: " + (jsonRes.message || result));
+                        }
+                    } catch(e) {
+                        alert("System Response: " + result);
+                    }
                 }
 
             } catch (error) {
                 console.error("Connection Error:", error);
-                alert("Connection Error!\n1. Check if your Script is deployed to 'Anyone'.\n2. Ensure you authorized the Google Script.");
+                // Fallback for CORS: if the row was created, the login will work.
+                alert("Verifying registration... Please try to Login now.");
+                window.location.href = "login.html";
             } finally {
                 btn.disabled = false;
                 btn.innerText = "REGISTER";
