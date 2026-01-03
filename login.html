@@ -3,80 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Login</title>
+    <title>Login | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; }
-        body { 
-            background: var(--bg); color: white; font-family: sans-serif; 
-            display: flex; justify-content: center; align-items: center; 
-            height: 100vh; margin: 0; 
-        }
-        .login-box { 
-            background: #161b22; padding: 30px; border-radius: 15px; 
-            width: 90%; max-width: 350px; text-align: center;
-            border-top: 4px solid var(--gold);
-        }
-        input { 
-            width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; 
-            border: 1px solid #30363d; background: #0d1117; color: white; 
-            box-sizing: border-box;
-        }
-        .login-btn { 
-            width: 100%; padding: 15px; background: var(--gold); color: black; 
-            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; 
-            margin-top: 15px;
-        }
+        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #161b22; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border-top: 4px solid var(--gold); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
     </style>
 </head>
 <body>
-
-    <div class="login-box">
+    <div class="box">
         <h2 style="color: var(--gold);">LOGIN</h2>
-        <input type="number" id="loginPhone" placeholder="Phone Number">
-        <input type="password" id="loginPass" placeholder="Password">
-        <button class="login-btn" id="loginBtn" onclick="handleLogin()">LOGIN</button>
-        <p style="margin-top:20px; font-size:12px;">New? <a href="register.html" style="color:var(--gold);">Register</a></p>
+        <input type="number" id="lPhone" placeholder="Phone Number">
+        <input type="password" id="lPass" placeholder="Password">
+        <button class="btn" id="lBtn" onclick="handleLogin()">LOGIN</button>
+        <p style="margin-top:20px; font-size:12px;">New player? <a href="register.html" style="color:var(--gold);">Register</a></p>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
 
         async function handleLogin() {
-            const phone = document.getElementById('loginPhone').value.trim();
-            const pass = document.getElementById('loginPass').value.trim();
-            const btn = document.getElementById('loginBtn');
+            const phone = document.getElementById('lPhone').value.trim();
+            const pass = document.getElementById('lPass').value.trim();
+            const btn = document.getElementById('lBtn');
 
-            if (!phone || !pass) { alert("Enter credentials"); return; }
+            if(!phone || !pass) { alert("Enter credentials"); return; }
 
             btn.disabled = true;
             btn.innerText = "VERIFYING...";
 
             try {
-                // Testing with a direct URL string to avoid encoding errors
-                const finalUrl = SCRIPT_URL + "?action=login&phone=" + phone + "&pass=" + encodeURIComponent(pass);
-                
-                const response = await fetch(finalUrl);
-                const result = await response.json();
+                const response = await fetch(`${scriptURL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`);
+                const data = await response.json();
 
-                if (result.status === "SUCCESS") {
-                    localStorage.setItem('simba_active_user', JSON.stringify({
+                if (data.status === "SUCCESS") {
+                    // This creates the EXACT object the Engine v2.0.0 needs
+                    const sessionData = {
                         phone: phone,
-                        balance: result.balance,
-                        name: result.name,
-                        id: result.id
-                    }));
-                    alert("Login Successful!");
-                    window.location.href = "index.html"; 
+                        balance: data.balance || 0,
+                        name: data.name || "User",
+                        id: data.id || "SB-User"
+                    };
+                    localStorage.setItem('simba_active_user', JSON.stringify(sessionData));
+                    window.location.href = "index.html";
                 } else {
-                    alert("System Says: " + result.message);
+                    alert("Invalid Credentials");
+                    btn.disabled = false;
+                    btn.innerText = "LOGIN";
                 }
-            } catch (error) {
-                // This will now show us the REAL error from the script
-                alert("Technical Error. Please check if your Google Script has 'Anyone' access and you have 'Deployed' the latest version.");
-                console.error(error);
-            } finally {
+            } catch (e) {
+                alert("Connection Error. Check if your password is correct'.");
                 btn.disabled = false;
-                btn.innerText = "LOGIN";
             }
         }
     </script>
