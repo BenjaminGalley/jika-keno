@@ -109,10 +109,8 @@
     <audio id="sndWin" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
 
     <script>
-        // WALLET_URL is for your Users sheet (Balances)
-        const WALLET_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
-        // CTRL_URL is for the NEW script we will create to control difficulty
-        const CTRL_URL = "YOUR_NEW_CONTROLLER_URL_HERE";
+        // SYNCED TO YOUR GOOGLE SCRIPT
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let balance = 0;
@@ -124,12 +122,6 @@
             balance = parseFloat(user.balance || 0);
             updateUI();
             initBoard();
-        }
-
-        async function syncServerBalance(newBal) {
-            try {
-                await fetch(`${WALLET_URL}?action=updateBalance&phone=${user.phone}&balance=${newBal}`, { mode: 'no-cors' });
-            } catch (e) { console.log("Sync queued"); }
         }
 
         function updateUI() {
@@ -162,28 +154,16 @@
             const board = document.getElementById('board');
             btn.disabled = true;
             
-            // 1. DEDUCT LOCALLY FIRST
+            // 1. DEDUCT LOCALLY & ON SERVER
             balance -= bet; 
             updateUI();
-            syncServerBalance(balance.toFixed(2));
+            fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=-${bet}&details=Jungle_Bet`, {mode:'no-cors'});
             
             document.getElementById('winBanner').style.display = 'none';
             board.innerHTML = '';
 
-            // 2. CONTACT CONTROLLER FOR DIFFICULTY
-            let difficulty = "medium"; // Default
-            try {
-                const check = await fetch(`${CTRL_URL}?action=getSpinLogic&phone=${user.phone}&bet=${bet}`);
-                const ctrlData = await check.json();
-                difficulty = ctrlData.mode; // Returns "hard", "easy", "normal"
-            } catch(e) { difficulty = "normal"; }
-
-            // 3. APPLY WINNING LOGIC BASED ON CONTROLLER
-            // "hard" = 5% chance, "normal" = 15% chance, "easy" = 35% chance
-            let winChance = 0.15; 
-            if(difficulty === "hard") winChance = 0.05;
-            if(difficulty === "easy") winChance = 0.35;
-
+            // 2. WINNING LOGIC (Calculated locally for speed)
+            let winChance = 0.20; // 20% win rate
             let isWin = Math.random() < winChance;
             let results = [];
             let winSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
@@ -191,16 +171,11 @@
             for(let i=0; i<9; i++) results.push(SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]);
             
             if(isWin) { 
-                // Force a match of 3 symbols in a line or random spots
                 const indices = [0,1,2,3,4,5,6,7,8].sort(() => 0.5 - Math.random()).slice(0,3);
                 indices.forEach(idx => results[idx] = winSym); 
-            } else {
-                // Ensure NO accidental matches of 3 if it's a loss
-                results = results.map((s, i) => i % 2 === 0 ? SYMBOLS[0] : SYMBOLS[1]); 
-                results = results.sort(() => Math.random() - 0.5);
             }
 
-            // 4. ANIMATION
+            // 3. ANIMATION
             for(let i=0; i<9; i++) {
                 await new Promise(r => setTimeout(r, 60));
                 let tile = document.createElement('div');
@@ -211,16 +186,17 @@
                 document.getElementById('sndSlide').play();
             }
 
-            // 5. PROCESS RESULTS
+            // 4. PROCESS RESULTS
             setTimeout(() => {
                 if(isWin) {
-                    let winAmt = bet * 3; // Standardized payout (3x)
+                    let winAmt = bet * 3; 
                     balance += winAmt;
                     document.getElementById('winBanner').innerText = `WIN: ${winAmt} ETB`;
                     document.getElementById('winBanner').style.display = 'block';
                     document.getElementById('sndWin').play();
                     updateUI();
-                    syncServerBalance(balance.toFixed(2));
+                    // Sync Win to Server
+                    fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${winAmt}&details=Jungle_Win`, {mode:'no-cors'});
                 }
                 btn.disabled = false;
             }, 500);
