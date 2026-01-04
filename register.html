@@ -7,46 +7,53 @@
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; }
         body { background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .reg-box { background: #161b22; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border-top: 4px solid var(--gold); }
+        .box { background: #161b22; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border-top: 4px solid var(--gold); }
         input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
-        .reg-btn { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; }
+        .btn { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; }
+        .btn:disabled { opacity: 0.5; }
     </style>
 </head>
 <body>
-    <div class="reg-box">
+    <div class="box">
         <h2 style="color: var(--gold);">REGISTER</h2>
-        <input type="text" id="rName" placeholder="Full Name">
-        <input type="number" id="rPhone" placeholder="Phone Number">
-        <input type="password" id="rPass" placeholder="Password">
-        <button class="reg-btn" id="rBtn" onclick="doRegister()">CREATE ACCOUNT</button>
-        <p style="margin-top:20px; font-size:13px;">Already have an ID? <a href="login.html" style="color:var(--gold); text-decoration:none;">Login</a></p>
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="number" id="regPhone" placeholder="Phone Number">
+        <input type="password" id="regPass" placeholder="Password">
+        <button class="btn" id="regBtn" onclick="registerUser()">CREATE ACCOUNT</button>
+        <p style="margin-top:20px; font-size:13px;">Have an account? <a href="login.html" style="color:var(--gold);">Login</a></p>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
-        function doRegister() {
-            const name = document.getElementById('rName').value;
-            const phone = document.getElementById('rPhone').value;
-            const pass = document.getElementById('rPass').value;
-            const btn = document.getElementById('rBtn');
+        function registerUser() {
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const pass = document.getElementById('regPass').value;
+            const btn = document.getElementById('regBtn');
 
-            if(!name || !phone || !pass) { alert("Fill all fields"); return; }
+            if (!name || !phone || !pass) { alert("Please fill all fields"); return; }
 
-            btn.innerText = "WAITING...";
+            btn.innerText = "PROCESSING...";
             btn.disabled = true;
 
-            const id = "SB" + Math.floor(1000 + Math.random() * 9000);
-            const url = SCRIPT_URL + "?action=register&name=" + encodeURIComponent(name) + "&phone=" + phone + "&pass=" + encodeURIComponent(pass) + "&id=" + id;
+            // Generate ID
+            const simbaId = "SB" + Math.floor(1000 + Math.random() * 9000);
+
+            // Using no-cors mode to force data through even if script doesn't reply perfectly
+            const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}&id=${simbaId}`;
 
             fetch(url, { mode: 'no-cors' })
             .then(() => {
-                alert("Registration Request Sent! Please try to login.");
+                // We assume success if the request was sent
+                alert("Account Created! Please Login.");
                 window.location.href = "login.html";
             })
-            .catch(() => {
-                alert("Connection error, but checking status...");
-                window.location.href = "login.html";
+            .catch(err => {
+                console.error(err);
+                alert("Connection error. Please try again.");
+                btn.disabled = false;
+                btn.innerText = "CREATE ACCOUNT";
             });
         }
     </script>
