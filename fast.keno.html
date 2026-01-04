@@ -126,9 +126,9 @@
     <audio id="sndPop" src="https://assets.mixkit.co/active_storage/sfx/2045/2045-preview.mp3"></audio>
 
     <script>
-        const WALLET_URL = "YOUR_WALLET_SCRIPT_URL"; // Existing balances script
-        const CTRL_URL = "YOUR_NEW_CONTROLLER_URL"; // We will create this next
-        
+        // CORE CONNECTION: Points to your master Google Script
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+
         let selected = [];
         let balance = 0;
         let currentBet = 5;
@@ -197,8 +197,8 @@
             balance -= currentBet;
             updateUI();
             
-            // Sync with Server (Instant deduction)
-            fetch(`${WALLET_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`, {mode:'no-cors'});
+            // Deduction synced to Google Sheets
+            fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=-${currentBet}&details=Keno_Bet`, {mode:'no-cors'});
 
             tickets.push({
                 id: tickets.length + 1,
@@ -208,8 +208,6 @@
             });
             
             renderTickets();
-            
-            // AUTOMATIC TABLE CLEAR for next bet
             selected = [];
             document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
             updatePotential();
@@ -243,7 +241,7 @@
                     }
                 } else {
                     runDraw();
-                    timeLeft = 75; // 60s bet + 15s draw
+                    timeLeft = 75; 
                 }
             }, 1000);
         }
@@ -254,41 +252,30 @@
             const side = document.getElementById('sideBoard');
             const popup = document.getElementById('drawPopup');
             
-            // RESET BOARD FOR DRAW
             side.innerHTML = '';
             popup.style.display = 'block';
-
-            // CONTACT CONTROLLER FOR RTP LOGIC
-            let forceDifficulty = "normal";
-            try {
-                let req = await fetch(`${CTRL_URL}?action=getKenoLogic&phone=${user.phone}`);
-                let res = await req.json();
-                forceDifficulty = res.mode; 
-            } catch(e) { forceDifficulty = "normal"; }
 
             for(let i=0; i<20; i++) {
                 let r = Math.floor(Math.random()*80)+1;
                 while(drawn.includes(r)) r = Math.floor(Math.random()*80)+1;
                 drawn.push(r);
                 
-                // POPUP HARMONY
                 popup.innerText = r;
                 document.getElementById('sndPop').currentTime = 0;
                 document.getElementById('sndPop').play();
 
-                // SIDE BOARD HARMONY (One by one, no blink)
+                // SIDE BOARD HARMONY: Prepending balls one by one as requested
                 let ball = document.createElement('div');
                 ball.className = 'side-ball';
                 ball.innerText = r;
                 side.prepend(ball);
 
-                // MARK TICKETS IN REAL TIME (Green/Red harmony)
                 tickets.forEach(t => {
                     let tb = document.getElementById(`tb-${t.id}-${r}`);
                     if(tb) tb.classList.add('hit');
                 });
 
-                await new Promise(res => setTimeout(res, 600)); // Smooth draw speed
+                await new Promise(res => setTimeout(res, 600)); 
             }
 
             popup.style.display = 'none';
@@ -303,19 +290,19 @@
                 let win = multiplier * t.amt;
                 totalWin += win;
                 
-                // Mark misses on tickets for clarity
                 t.nums.forEach(n => {
-                    if(!drawn.includes(n)) document.getElementById(`tb-${t.id}-${n}`).classList.add('miss');
+                    let el = document.getElementById(`tb-${t.id}-${n}`);
+                    if(el && !drawn.includes(n)) el.classList.add('miss');
                 });
             });
 
             if(totalWin > 0) {
                 balance += totalWin;
                 updateUI();
-                fetch(`${WALLET_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`, {mode:'no-cors'});
+                // Send win to Google Sheets
+                fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${totalWin}&details=Keno_Win`, {mode:'no-cors'});
             }
 
-            // Prepare for next continuous loop
             setTimeout(() => {
                 tickets = [];
                 isLocked = false;
