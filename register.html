@@ -3,58 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Register</title>
+    <title>Simba Bet | Create Account</title>
     <style>
-        :root { --gold: #fcc201; --bg: #0b0e14; }
-        body { background: var(--bg); color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #161b22; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; border-top: 4px solid var(--gold); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; width: 100%; }
-        .btn:disabled { opacity: 0.5; }
+        :root { 
+            --gold: #fcc201; 
+            --bg: #0b0e14; 
+            --card: #161b22; 
+        }
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .container { 
+            background: var(--card); 
+            padding: 40px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 380px; 
+            text-align: center;
+            border-top: 5px solid var(--gold);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+        h2 { color: var(--gold); letter-spacing: 1.5px; margin-bottom: 25px; }
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            border: 1px solid #30363d; 
+            background: #0d1117; 
+            color: white; 
+            box-sizing: border-box; 
+            font-size: 15px;
+        }
+        input:focus { border-color: var(--gold); outline: none; }
+        .btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: var(--gold); 
+            color: black; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .footer { margin-top: 25px; font-size: 14px; color: #8b949e; }
+        .footer a { color: var(--gold); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2 style="color: var(--gold);">REGISTER</h2>
-        <input type="text" id="regName" placeholder="Full Name">
-        <input type="number" id="regPhone" placeholder="Phone Number">
-        <input type="password" id="regPass" placeholder="Password">
-        <button class="btn" id="regBtn" onclick="registerUser()">CREATE ACCOUNT</button>
-        <p style="margin-top:20px; font-size:13px;">Have an account? <a href="login.html" style="color:var(--gold);">Login</a></p>
+
+    <div class="container">
+        <h2>REGISTER</h2>
+        <input type="text" id="rName" placeholder="Enter Full Name">
+        <input type="number" id="rPhone" placeholder="Enter Phone Number (09...)">
+        <input type="password" id="rPass" placeholder="Create Password">
+        
+        <button class="btn" id="regBtn" onclick="handleRegistration()">Create My Account</button>
+        
+        <div class="footer">
+            Already have an ID? <a href="login.html">Login</a>
+        </div>
     </div>
 
     <script>
+        // MUST MATCH THE URL FROM YOUR GOOGLE SCRIPT DEPLOYMENT
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
-        function registerUser() {
-            const name = document.getElementById('regName').value;
-            const phone = document.getElementById('regPhone').value;
-            const pass = document.getElementById('regPass').value;
+        async function handleRegistration() {
+            const name = document.getElementById('rName').value.trim();
+            const phone = document.getElementById('rPhone').value.trim();
+            const pass = document.getElementById('rPass').value.trim();
             const btn = document.getElementById('regBtn');
 
-            if (!name || !phone || !pass) { alert("Please fill all fields"); return; }
+            if (!name || !phone || !pass) {
+                alert("⚠️ Please fill in all fields.");
+                return;
+            }
 
             btn.innerText = "PROCESSING...";
             btn.disabled = true;
 
-            // Generate ID
-            const simbaId = "SB" + Math.floor(1000 + Math.random() * 9000);
+            // Generate a random ID (e.g., SB-8274)
+            const generatedID = "SB-" + Math.floor(1000 + Math.random() * 9000);
 
-            // Using no-cors mode to force data through even if script doesn't reply perfectly
-            const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}&id=${simbaId}`;
+            // Constructing the API call
+            const finalUrl = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}&id=${generatedID}`;
 
-            fetch(url, { mode: 'no-cors' })
-            .then(() => {
-                // We assume success if the request was sent
-                alert("Account Created! Please Login.");
+            try {
+                const response = await fetch(finalUrl);
+                const result = await response.json();
+
+                if (result.status === "SUCCESS") {
+                    alert("✅ Registration Successful!\nYour Simba ID is: " + result.id);
+                    window.location.href = "login.html";
+                } else if (result.status === "ALREADY_EXISTS") {
+                    alert("❌ Error: This phone number is already registered.");
+                    btn.disabled = false;
+                    btn.innerText = "Create My Account";
+                } else {
+                    alert("❌ System Error: Please try again later.");
+                    btn.disabled = false;
+                    btn.innerText = "Create My Account";
+                }
+            } catch (error) {
+                // If the script fails to return JSON but data went through (CORS fallback)
+                console.log("Network check:", error);
+                alert("Request sent. Please try logging in to confirm.");
                 window.location.href = "login.html";
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Connection error. Please try again.");
-                btn.disabled = false;
-                btn.innerText = "CREATE ACCOUNT";
-            });
+            }
         }
     </script>
 </body>
