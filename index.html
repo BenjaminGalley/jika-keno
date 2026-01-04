@@ -2,251 +2,144 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simba Bet | Official Lobby</title>
-    <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --gold: #fcc201; 
-            --blue: #00f2ff; 
-            --dark-bg: #05070a; 
-            --card-bg: #111827;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-
+        :root { --gold: #fcc201; --bg: #0b0e14; --card: #161b22; }
         body { 
-            background-color: var(--dark-bg); 
-            color: white; 
-            font-family: 'Goldman', sans-serif;
-            padding-bottom: 90px;
-            overflow-x: hidden;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding-bottom: 70px; overflow-x: hidden;
         }
-
-        /* --- HEADER & BALANCE --- */
+        
+        /* HEADER SECTION */
         .header {
-            background: #000;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--gold);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            background: #1a1f29; padding: 15px; display: flex;
+            justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100;
         }
-        .logo { color: var(--gold); font-weight: 900; font-size: 20px; letter-spacing: 1px; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: bold; color: var(--gold); font-size: 14px; }
+        .user-id { font-size: 11px; color: #8b949e; }
+        
         .balance-box {
-            background: #1a1a1a;
-            padding: 8px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--gold);
-            font-weight: bold;
-            color: var(--gold);
-            box-shadow: 0 0 10px rgba(252, 194, 1, 0.2);
+            background: #0d1117; padding: 8px 15px; border-radius: 20px;
+            border: 1px solid var(--gold); display: flex; align-items: center;
         }
+        .balance-amount { font-weight: bold; color: var(--gold); margin-right: 5px; }
+        .currency { font-size: 10px; color: #8b949e; }
 
-        /* --- BANNER --- */
-        .banner {
-            width: 100%;
-            height: 140px;
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://img.freepik.com/premium-photo/golden-lion-logo-black-background_853558-3561.jpg');
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
+        /* LOBBY CONTENT */
+        .hero { padding: 20px; text-align: center; background: linear-gradient(to bottom, #1a1f29, var(--bg)); }
+        .games-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px;
         }
-
-        /* --- GAME SELECTION --- */
-        .section-label {
-            padding: 20px 20px 10px;
-            font-size: 14px;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .game-scroller {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding: 10px 20px 20px;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-        }
-        .game-scroller::-webkit-scrollbar { display: none; }
-
         .game-card {
-            min-width: 160px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            overflow: hidden;
-            border: 1px solid #1e293b;
-            position: relative;
-            transition: 0.3s;
-            text-align: center;
-            padding-bottom: 12px;
-            scroll-snap-align: start;
-            flex-shrink: 0;
-            cursor: pointer;
+            background: var(--card); border-radius: 12px; overflow: hidden;
+            border: 1px solid #30363d; transition: 0.3s; text-align: center; padding-bottom: 10px;
         }
         .game-card:active { transform: scale(0.95); }
+        .game-img { width: 100%; height: 100px; background: #21262d; margin-bottom: 10px; }
+        .game-title { font-size: 13px; font-weight: bold; }
 
-        .glow-blue { border: 1.5px solid var(--blue); box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        .glow-gold { border: 1.5px solid var(--gold); box-shadow: 0 0 15px rgba(252, 194, 1, 0.2); }
-
-        .game-img {
-            width: 100%;
-            height: 120px;
-            background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
+        /* BOTTOM NAV */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: #1a1f29;
+            display: flex; justify-content: space-around; padding: 12px 0;
+            border-top: 1px solid #30363d;
         }
-
-        .game-title {
-            padding: 12px 5px 2px;
-            font-weight: bold;
-            font-size: 13px;
-        }
-
-        .game-tag {
-            font-size: 10px;
-            color: var(--blue);
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .tag-gold { color: var(--gold); }
-
-        /* --- BOTTOM NAV --- */
-        .nav-bar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0 25px;
-            border-top: 2px solid var(--gold);
-            z-index: 1000;
-        }
-        .nav-item {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 11px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .nav-item { color: #8b949e; text-decoration: none; font-size: 12px; text-align: center; }
         .nav-item.active { color: var(--gold); }
     </style>
 </head>
-<body onload="checkUser()">
+<body>
 
     <div class="header">
-        <div class="logo">SIMBA BET 🦁</div>
-        <div id="userBalance" class="balance-box">SYNCING...</div>
-    </div>
-
-    <div class="banner">
-        <h2 style="color:var(--gold); text-shadow: 2px 2px 4px #000;">WELCOME TO THE JUNGLE</h2>
-        <p style="font-size: 12px; color: #fff;">Premium Betting Experience</p>
-    </div>
-
-    <div class="section-label">Slot Games</div>
-    <div class="game-scroller">
-        <div class="game-card glow-gold" onclick="location.href='simba-gold.html'">
-            <div class="game-img">💰</div>
-            <div class="game-title">Simba's Gold</div>
-            <div class="game-tag tag-gold">Multipliers</div>
+        <div class="user-info">
+            <span class="user-name" id="displayName">Loading...</span>
+            <span class="user-id" id="displayID">ID: --</span>
         </div>
-
-        <div class="game-card glow-gold" onclick="location.href='jungle.html'">
-            <div class="game-img">🌳</div>
-            <div class="game-title">Jungle Big Win</div>
-            <div class="game-tag tag-gold">Big Jackpots</div>
-        </div>
-
-        <div class="game-card glow-gold" onclick="location.href='multi.hot.5.html'">
-            <div class="game-img">🎰</div>
-            <div class="game-title">Multi Hot 5</div>
-            <div class="game-tag tag-gold">Classic Slots</div>
+        <div class="balance-box">
+            <span class="balance-amount" id="headerLiveBalance">0.00</span>
+            <span class="currency">ETB</span>
         </div>
     </div>
 
-    <div class="section-label">Instant Wins & Keno</div>
-    <div class="game-scroller">
-        <div class="game-card glow-blue" onclick="location.href='fast.keno.html'">
-            <div class="game-img">🎱</div>
-            <div class="game-title">Fast Keno 80</div>
-            <div class="game-tag">Draw Every 60s</div>
-        </div>
+    <div class="hero">
+        <h3 style="margin:0;">SIMBA BET GAMES</h3>
+        <p style="font-size: 12px; color: #8b949e;">Select a game to start winning</p>
+    </div>
 
-        <div class="game-card glow-blue" onclick="location.href='lion.scratch.html'">
-            <div class="game-img">🦁</div>
-            <div class="game-title">Lion Scratch</div>
-            <div class="game-tag">Scratch & Win</div>
+    <div class="games-grid">
+        <div class="game-card" onclick="location.href='aviator.html'">
+            <div class="game-img"></div>
+            <span class="game-title">AVIATOR</span>
+        </div>
+        <div class="game-card" onclick="location.href='spin.html'">
+            <div class="game-img"></div>
+            <span class="game-title">SPIN & WIN</span>
         </div>
     </div>
 
-    <div class="nav-bar">
-        <a href="index.html" class="nav-item active">🏠<br>Lobby</a>
-        <a href="deposit.html" class="nav-item">💰<br>Deposit</a>
-        <a href="withdraw.html" class="nav-item">💸<br>Withdraw</a>
-        <a href="profile.html" class="nav-item">👤<br>Profile</a>
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">Home</a>
+        <a href="deposit.html" class="nav-item">Deposit</a>
+        <a href="withdraw.html" class="nav-item">Withdraw</a>
+        <a href="profile.html" class="nav-item">Profile</a>
+        <a href="#" class="nav-item" onclick="logout()">Logout</a>
     </div>
 
     <script>
-        // WEB APP URL - Must match your Deployment exactly
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+        const REFRESH_RATE = 10000; // Auto-sync every 10 seconds
 
-        async function checkUser() {
-            const rawData = localStorage.getItem('simba_active_user');
+        /**
+         * CORE ENGINE: Syncs data with Google Sheets
+         */
+        async function updateDisplay() {
+            const storedUser = localStorage.getItem('simba_active_user');
             
-            if (!rawData) {
+            if (!storedUser) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            const user = JSON.parse(rawData);
-            const balanceDisplay = document.getElementById('userBalance');
+            const user = JSON.parse(storedUser);
             
-            // Step 1: Show what we have locally (Instant feedback)
-            if (user.balance !== undefined) {
-                balanceDisplay.innerText = parseFloat(user.balance).toFixed(2) + " ETB";
-            }
+            // Set initial UI from storage
+            document.getElementById('displayName').innerText = user.name;
+            document.getElementById('displayID').innerText = "ID: " + user.id;
 
-            // Step 2: Live Sync from Server
             try {
-                // Using 'getBalance' as defined in our Master Script
-                const response = await fetch(`${SCRIPT_URL}?action=getBalance&phone=${user.phone}&_t=${Date.now()}`);
+                // Fetch LIVE balance from Sheet
+                const response = await fetch(`${SCRIPT_URL}?action=login&phone=${user.phone}&pass=SKIP_PASS`);
+                // Note: Ensure your Script handles a 'getBalance' or 'login' action to return balance
                 const data = await response.json();
                 
                 if (data && data.balance !== undefined) {
-                    // Update LocalStorage and UI with fresh server data
+                    const liveBalance = parseFloat(data.balance).toFixed(2);
+                    document.getElementById('headerLiveBalance').innerText = liveBalance;
+                    
+                    // Update storage so games have the latest balance
                     user.balance = data.balance;
                     localStorage.setItem('simba_active_user', JSON.stringify(user));
-                    balanceDisplay.innerText = parseFloat(data.balance).toFixed(2) + " ETB";
                 }
-            } catch (e) {
-                console.warn("Lobby sync failed, using cached balance.");
+            } catch (error) {
+                console.log("Syncing...");
             }
         }
 
-        // Auto-refresh when user returns to this tab
-        document.addEventListener("visibilitychange", function() {
-            if (document.visibilityState === 'visible') {
-                checkUser();
+        function logout() {
+            if(confirm("Logout from Simba Bet?")) {
+                localStorage.removeItem('simba_active_user');
+                window.location.href = 'login.html';
             }
-        });
+        }
+
+        // INITIALIZE
+        window.onload = () => {
+            updateDisplay();
+            setInterval(updateDisplay, REFRESH_RATE);
+        };
     </script>
 </body>
 </html>
