@@ -5,112 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deposit | Simba Bet</title>
     <style>
-        :root { --gold: #fcc201; --bg: #0b0e14; --card: #161b22; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 15px; }
         
-        .header { display: flex; align-items: center; margin-bottom: 25px; }
-        .back-btn { color: var(--gold); text-decoration: none; font-size: 14px; margin-right: 15px; }
-
-        .deposit-card {
-            background: var(--card); border-radius: 20px; padding: 25px;
-            border-top: 4px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .back-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 5px 12px; border-radius: 5px; text-decoration: none; font-size: 13px; }
+        
+        .instruction-card { 
+            background: #1a1f29; padding: 15px; border-radius: 12px; 
+            border-left: 4px solid var(--gold); margin-bottom: 20px; font-size: 14px;
         }
 
-        .payment-methods {
-            background: #0d1117; padding: 15px; border-radius: 10px; margin-bottom: 20px;
-            border: 1px dashed #30363d;
-        }
-        .method-title { color: var(--gold); font-size: 13px; font-weight: bold; margin-bottom: 5px; display: block; }
-        .method-detail { font-size: 14px; color: #fff; }
-
-        label { font-size: 13px; color: #8b949e; display: block; margin-top: 15px; }
-        input, select {
-            width: 100%; padding: 14px; margin: 8px 0; border-radius: 10px;
-            border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box;
+        .deposit-form { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #30363d; }
+        
+        label { display: block; margin-bottom: 8px; color: #8b949e; font-size: 13px; font-weight: bold; }
+        
+        input, select { 
+            width: 100%; background: #0d1117; border: 1px solid #30363d; 
+            padding: 12px; border-radius: 8px; color: white; font-size: 16px;
+            margin-bottom: 18px; box-sizing: border-box;
         }
 
-        .dep-btn {
-            width: 100%; padding: 18px; background: var(--gold); color: black;
-            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
-            margin-top: 20px; font-size: 16px;
+        input:focus { border-color: var(--gold); outline: none; }
+        
+        .submit-btn { 
+            width: 100%; background: var(--gold); color: black; border: none; 
+            padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px;
+            cursor: pointer; text-transform: uppercase;
         }
-        .dep-btn:disabled { opacity: 0.5; }
 
-        .note { font-size: 11px; color: #8b949e; text-align: center; margin-top: 15px; line-height: 1.4; }
+        .submit-btn:disabled { opacity: 0.5; filter: grayscale(1); }
+
+        .payment-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px; border-radius: 8px; margin-bottom: 15px;
+            font-size: 13px; border: 1px dashed #444;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <a href="index.html" class="back-btn">← Lobby</a>
+        <a href="index.html" class="back-btn">← BACK</a>
         <h3 style="margin:0;">Deposit Funds</h3>
     </div>
 
-    <div class="deposit-card">
-        <div class="payment-methods">
-            <span class="method-title">TELEBIRR / CBE (Admin Account)</span>
-            <span class="method-detail">Account Name: Simba Admin</span><br>
-            <span class="method-detail">Number: 0912345678</span>
-        </div>
+    <div class="instruction-card">
+        <strong>How to Deposit:</strong><br>
+        1. Transfer money to our Telebirr: <strong>0912345678</strong><br>
+        2. Copy the <strong>Transaction ID</strong> from the SMS.<br>
+        3. Fill the form below to update your balance.
+    </div>
 
-        <label>Select Payment Method</label>
-        <select id="payMethod">
+    <div class="deposit-form">
+        <label>Payment Method</label>
+        <select id="method">
             <option value="Telebirr">Telebirr</option>
-            <option value="CBE">Commercial Bank (CBE)</option>
-            <option value="BOA">Bank of Abyssinia</option>
+            <option value="CBE Birr">CBE Birr</option>
         </select>
 
         <label>Amount (ETB)</label>
-        <input type="number" id="depAmount" placeholder="Min. 20 ETB">
+        <input type="number" id="amount" placeholder="e.g. 50" min="1">
 
-        <label>Transaction ID / Reference Number</label>
-        <input type="text" id="depRef" placeholder="Paste the code here">
+        <label>Transaction ID / Reference No.</label>
+        <input type="text" id="ref" placeholder="Enter the ID from SMS">
 
-        <button class="dep-btn" id="depBtn" onclick="submitDeposit()">SUBMIT DEPOSIT PROOF</button>
-
-        <p class="note">
-            Transfer the money first to the admin account above, then paste your Transaction ID here. 
-            Balance will be updated after verification (1-5 mins).
-        </p>
+        <button class="submit-btn" id="subBtn" onclick="submitDeposit()">Submit Deposit</button>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+        // MASTER CONNECTION
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+        let user = JSON.parse(localStorage.getItem('simba_active_user'));
 
-        // Check Login
-        const stored = localStorage.getItem('simba_active_user');
-        if (!stored) { window.location.href = 'login.html'; }
-        const user = JSON.parse(stored);
+        if (!user) window.location.href = 'login.html';
 
         async function submitDeposit() {
-            const amount = document.getElementById('depAmount').value;
-            const ref = document.getElementById('depRef').value.trim();
-            const method = document.getElementById('payMethod').value;
-            const btn = document.getElementById('depBtn');
+            const amt = document.getElementById('amount').value;
+            const ref = document.getElementById('ref').value;
+            const method = document.getElementById('method').value;
+            const btn = document.getElementById('subBtn');
 
-            if (!amount || amount < 20) { alert("Minimum deposit is 20 ETB"); return; }
-            if (!ref) { alert("Please enter the Transaction Reference code."); return; }
+            if (!amt || !ref) {
+                alert("Please fill in both Amount and Transaction ID");
+                return;
+            }
 
             btn.disabled = true;
-            btn.innerText = "SENDING PROOF...";
-
-            // We use the 'deposit' action but we don't add balance yet.
-            // We send the details for the admin to check in the sheet.
-            const details = encodeURIComponent(`${method} Ref: ${ref}`);
-            const url = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=0&details=${details}`;
-            // Note: amount=0 because the admin must manually approve the money in the sheet
+            btn.innerText = "VERIFYING...";
 
             try {
-                // Using no-cors to ensure it reaches your script
-                await fetch(url, { mode: 'no-cors' });
+                // Sending the form data to your Google Sheet
+                // We use 'deposit' action and pass the Reference ID into the 'details' parameter
+                const fullDetails = `${method}_Ref_${ref}`;
                 
-                alert("✅ Deposit Request Submitted!\nAdmin will verify your Transaction ID: " + ref);
+                await fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${amt}&details=${fullDetails}`, {
+                    mode: 'no-cors'
+                });
+
+                alert("Deposit Request Submitted! It will be verified shortly.");
+                
+                // Redirect to lobby to wait for the sheet to update
                 window.location.href = 'index.html';
 
-            } catch (error) {
-                console.error(error);
-                alert("Request sent. Please wait for admin approval.");
-                window.location.href = 'index.html';
+            } catch (err) {
+                alert("Error connecting to server. Try again.");
+                btn.disabled = false;
+                btn.innerText = "Submit Deposit";
             }
         }
     </script>
