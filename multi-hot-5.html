@@ -19,7 +19,6 @@
             margin: 0; padding: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
 
-        /* Unique Header */
         .header { 
             background: var(--panel); height: 50px; display: flex; 
             justify-content: space-between; align-items: center; padding: 0 15px;
@@ -33,14 +32,12 @@
             position: relative;
         }
 
-        /* Visible Slot Frame */
         .slot-frame {
             width: 360px; height: 260px; border: 5px solid #333; border-radius: 15px;
             background: rgba(0,0,0,0.9); position: relative; overflow: hidden;
             box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
-        /* The Grid Backdrop */
         .reels-container { 
             display: flex; width: 100%; height: 100%; 
             background: url('assets/assets/grid.jpg') no-repeat;
@@ -49,7 +46,6 @@
 
         .reel { flex: 1; height: 100%; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.05); }
 
-        /* Smooth Scroll Strip */
         .reel-strip { 
             position: absolute; width: 100%; top: -1600px; 
             display: flex; flex-direction: column;
@@ -61,7 +57,6 @@
         }
         .symbol img { width: 68px; height: 68px; object-fit: contain; }
 
-        /* Bottom UI: Unique Bet & Spin */
         .bottom-ui {
             background: var(--panel); border-top: 3px solid var(--gold);
             padding: 10px 10px 25px 10px; display: flex;
@@ -135,15 +130,11 @@
     </audio>
 
     <script>
-        // GOOGLE SCRIPT PLANTATION (Controller Bridge)
-        const WALLET_URL = "YOUR_WALLET_APP_SCRIPT_URL";
-        const CTRL_URL = "YOUR_CONTROLLER_APP_SCRIPT_URL";
+        // MASTER CONNECTION
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
 
         const ASSET_PATH = 'assets/assets/';
-        const SYMBOLS = [
-            '777.png', 'collector.png', 'bell.png', 
-            'purple.png', 'gift.png', 'cherry.png'
-        ];
+        const SYMBOLS = ['777.png', 'collector.png', 'bell.png', 'purple.png', 'gift.png', 'cherry.png'];
 
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
         let balance = 0;
@@ -154,17 +145,11 @@
             if (!user) { window.location.href = 'login.html'; return; }
             balance = parseFloat(user.balance);
             updateUI();
-            
-            // Build Initial visible symbols
-            for(let i=0; i<5; i++) {
-                const strip = document.getElementById(`strip${i}`);
-                fillStrip(strip);
-            }
+            for(let i=0; i<5; i++) fillStrip(document.getElementById(`strip${i}`));
         }
 
         function fillStrip(strip, outcomeSym = null) {
             strip.innerHTML = '';
-            // Create a long strip of 30 symbols for smooth scrolling
             for(let j=0; j<30; j++) {
                 const sym = (j === 2 && outcomeSym) ? outcomeSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
                 const div = document.createElement('div');
@@ -196,39 +181,30 @@
             btn.disabled = true;
             document.getElementById('winBanner').style.display = 'none';
 
-            // 1. Deduct Balance
+            // 1. Deduct locally and from Sheet
             balance -= bet;
             updateUI();
-            
-            // 2. Fetch Control Seed (RTP Logic)
-            let winChance = 0.15; // Default 15%
-            try {
-                let res = await fetch(`${CTRL_URL}?action=getSpin&game=multihot5&phone=${user.phone}`);
-                let data = await res.json();
-                if(data.mode === "hard") winChance = 0.05;
-                if(data.mode === "easy") winChance = 0.35;
-            } catch(e) { /* Default to normal */ }
+            fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=-${bet}&details=MultiHot_Bet`, {mode:'no-cors'});
 
+            // 2. Win Logic
+            const winChance = 0.18; // 18% RTP
             const isWin = Math.random() < winChance;
             const winSym = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
 
-            // 3. Animate Reels (Top-to-Bottom Smooth Scroll)
+            // 3. Animate
             for(let i=0; i<5; i++) {
                 const strip = document.getElementById(`strip${i}`);
                 const result = isWin ? winSym : SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
-                
                 fillStrip(strip, result);
-                
                 strip.style.transition = 'none';
-                strip.style.top = '-2000px'; // Start far up
-                
+                strip.style.top = '-2000px';
                 setTimeout(() => {
                     strip.style.transition = `top ${2 + (i * 0.2)}s cubic-bezier(0.15, 0, 0.15, 1)`;
-                    strip.style.top = '0px'; // Smoothly slide down to the "index 2" symbol
+                    strip.style.top = '0px';
                 }, 50);
             }
 
-            // 4. Finalize Win
+            // 4. Finalize
             setTimeout(() => {
                 if(isWin) {
                     let mult = (winSym === '777.png') ? 20 : 5;
@@ -237,15 +213,11 @@
                     document.getElementById('winBanner').innerText = `WIN ${winAmt} ETB!`;
                     document.getElementById('winBanner').style.display = 'block';
                     updateUI();
-                    
-                    // Update Google Sheets Wallet
-                    fetch(`${WALLET_URL}?action=updateBalance&phone=${user.phone}&balance=${balance.toFixed(2)}`, {mode:'no-cors'});
+                    fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${winAmt}&details=MultiHot_Win`, {mode:'no-cors'});
                 }
                 btn.disabled = false;
             }, 3200);
         }
-
-        window.onload = init;
     </script>
 </body>
 </html>
