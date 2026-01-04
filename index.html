@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Lobby</title>
+    <title>Simba Bet | Official Lobby</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
@@ -12,7 +12,7 @@
         .balance-box { background: #0d1117; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--gold); font-weight: bold; color: var(--gold); }
         .section-title { padding: 20px 20px 5px; font-size: 18px; font-weight: bold; color: #8b949e; }
         .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .game-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #30363d; position: relative; transition: 0.3s; }
+        .game-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #30363d; position: relative; transition: 0.3s; cursor: pointer; }
         .game-card:active { transform: scale(0.95); }
         .game-thumb { width: 100%; height: 110px; background: #2d333b; display: flex; align-items: center; justify-content: center; font-size: 45px; }
         .game-info { padding: 12px; text-align: center; background: #252b33; }
@@ -26,7 +26,7 @@
 <body>
     <div class="header">
         <div>
-            <div class="user-name" id="userName">--</div>
+            <div class="user-name" id="userName">User</div>
             <div style="font-size: 10px; color: #8b949e;" id="userID">ID: --</div>
         </div>
         <div class="balance-box"><span id="userBal">0.00</span> <small>ETB</small></div>
@@ -44,15 +44,15 @@
         </div>
     </div>
 
-    <div class="section-title">🎱 Instant Win</div>
+    <div class="section-title">⚡ Instant Win</div>
     <div class="games-grid">
         <div class="game-card" onclick="location.href='fast.keno.html'">
             <div class="game-thumb">🎱</div>
             <div class="game-info"><span class="game-name">Fast Keno 80</span><span class="play-tag">LIVE DRAW</span></div>
         </div>
-        <div class="game-card" style="opacity: 0.5;">
+        <div class="game-card" onclick="location.href='lion-scratch.html'">
             <div class="game-thumb">🦁</div>
-            <div class="game-info"><span class="game-name">Lion Scratch</span><span class="play-tag">COMING SOON</span></div>
+            <div class="game-info"><span class="game-name">Lion Scratch</span><span class="play-tag">SCRATCH & WIN</span></div>
         </div>
     </div>
 
@@ -66,20 +66,26 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
         let user = JSON.parse(localStorage.getItem('simba_active_user'));
-        if(!user) { window.location.href = 'login.html'; }
-        else {
+        
+        if(!user) {
+            window.location.href = 'login.html';
+        } else {
             document.getElementById('userName').innerText = user.name;
             document.getElementById('userID').innerText = "ID: " + user.id;
             document.getElementById('userBal').innerText = parseFloat(user.balance).toFixed(2);
+            
+            // Auto-refresh balance every 15 seconds
             setInterval(async () => {
-                const res = await fetch(`${SCRIPT_URL}?action=login&phone=${user.phone}&pass=SKIP`);
-                const data = await res.json();
-                if(data.status === "SUCCESS") {
-                    user.balance = data.balance;
-                    document.getElementById('userBal').innerText = parseFloat(user.balance).toFixed(2);
-                    localStorage.setItem('simba_active_user', JSON.stringify(user));
-                }
-            }, 10000);
+                try {
+                    const res = await fetch(`${SCRIPT_URL}?action=login&phone=${user.phone}&pass=SKIP`);
+                    const data = await res.json();
+                    if(data.status === "SUCCESS") {
+                        user.balance = data.balance;
+                        document.getElementById('userBal').innerText = parseFloat(user.balance).toFixed(2);
+                        localStorage.setItem('simba_active_user', JSON.stringify(user));
+                    }
+                } catch(e) {}
+            }, 15000);
         }
     </script>
 </body>
