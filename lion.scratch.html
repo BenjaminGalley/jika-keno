@@ -181,14 +181,14 @@
         function init() {
             if (!user) { window.location.href = 'login.html'; return; }
             balance = parseFloat(user.balance || 0);
-            document.getElementById('balDisplay').innerText = balance.toFixed(2);
+            updateUI();
             document.getElementById('betDisplay').innerText = currentBet;
             createGrid();
         }
 
-        async function syncServerBalance(newBal) {
+        async function syncTransaction(amount, details) {
             try {
-                await fetch(`${SCRIPT_URL}?action=updateBalance&phone=${user.phone}&balance=${newBal}`, { mode: 'no-cors' });
+                await fetch(`${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${amount}&details=${details}`, { mode: 'no-cors' });
             } catch (e) { console.log("Sync queued"); }
         }
 
@@ -223,9 +223,10 @@
 
         function buyTicket() {
             if (balance < currentBet) return alert("Low Balance!");
+            
             balance -= currentBet;
             updateUI();
-            syncServerBalance(balance.toFixed(2));
+            syncTransaction(-currentBet, "LionScratch_Bet");
             
             isGameActive = true;
             cardsScratched = 0;
@@ -244,7 +245,8 @@
             prizes = new Array(9).fill(0);
             let indices = [0,1,2,3,4,5,6,7,8].sort(() => 0.5 - Math.random());
 
-            if (Math.random() > 0.6 && winningVal !== 0) {
+            // 35% Win Chance
+            if (Math.random() < 0.35 && winningVal !== 0) {
                 prizes[indices[0]] = winningVal;
                 prizes[indices[1]] = winningVal;
                 prizes[indices[2]] = winningVal;
@@ -259,7 +261,11 @@
 
         function scratchCard(card, index) {
             if (!isGameActive || card.classList.contains('scratched')) return;
-            if(!isMuted) document.getElementById('sndScratch').play();
+            if(!isMuted) {
+                const s = document.getElementById('sndScratch');
+                s.currentTime = 0;
+                s.play();
+            }
             card.classList.add('scratched');
             
             const p = prizes[index];
@@ -299,13 +305,14 @@
 
             setTimeout(() => {
                 if (isFreeTicket) {
-                    balance += 100; // Giving 100 ETB for free ticket match
-                    handleWinEffects(100, true);
-                    syncServerBalance(balance.toFixed(2));
+                    let freeVal = 100;
+                    balance += freeVal;
+                    handleWinEffects(freeVal, true);
+                    syncTransaction(freeVal, "LionScratch_FreeWin");
                 } else if (winAmount > 0) {
                     balance += winAmount;
                     handleWinEffects(winAmount, false);
-                    syncServerBalance(balance.toFixed(2));
+                    syncTransaction(winAmount, "LionScratch_Win");
                 } else {
                     document.getElementById('status').innerText = "TRY AGAIN";
                 }
