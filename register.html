@@ -48,8 +48,8 @@
 </div>
 
 <script>
-    // REPLACE WITH YOUR GOOGLE SCRIPT EXEC URL
-    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE";
+    // INSERTED YOUR NEW URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
 
     async function handleRegister() {
         const name = document.getElementById('regName').value;
@@ -67,24 +67,26 @@
         msg.innerText = "Creating account... / በመመዝገብ ላይ...";
 
         try {
-            // Updated action name to 'register' to match script
+            // Using the 'register' action defined in your Google Script brain
             const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
             const response = await fetch(url);
             const text = await response.text();
 
             if (text === "SUCCESS") {
-                // Auto-save session and redirect
+                // Auto-save session keys (Matching the Lobby logic)
                 localStorage.setItem("userPhone", phone);
                 localStorage.setItem("userName", name);
                 
                 msg.style.color = "#2ea44f";
                 msg.innerText = "Registration Successful! / ምዝገባው ተሳክቷል!";
                 
-                setTimeout(() => { window.location.href = "lobby.html"; }, 1500);
+                // Redirect to index.html (Your Lobby)
+                setTimeout(() => { window.location.href = "index.html"; }, 1500);
             } else if (text === "EXISTS") {
                 msg.style.color = "#ff4d4d";
                 msg.innerText = "Phone already registered! / ይህ ስልክ ተመዝግቧል!";
             } else {
+                msg.style.color = "#ff4d4d";
                 msg.innerText = "Error. Please try again.";
             }
         } catch (error) {
