@@ -5,121 +5,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Withdraw | Simba Bet</title>
     <style>
-        :root { --gold: #fcc201; --bg: #0b0e14; --card: #161b22; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; }
+        .withdraw-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .back-btn { color: var(--gold); text-decoration: none; font-size: 14px; }
+        h2 { color: var(--gold); text-align: center; margin-bottom: 5px; }
+        .lang-text { display: block; font-size: 13px; color: #888; text-align: center; margin-bottom: 20px; }
         
-        .withdraw-card {
-            background: var(--card); border-radius: 20px; padding: 25px;
-            border-top: 4px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        
-        .balance-display { text-align: center; margin-bottom: 25px; background: #0d1117; padding: 15px; border-radius: 10px; }
-        .balance-label { font-size: 12px; color: #8b949e; text-transform: uppercase; }
-        .balance-val { font-size: 24px; font-weight: bold; color: var(--gold); display: block; }
+        .balance-box { background: #000; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--gold); margin-bottom: 20px; }
+        .balance-box span { display: block; font-size: 12px; color: var(--gold); }
+        .balance-box strong { font-size: 24px; color: white; }
 
-        input {
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 10px;
-            border: 1px solid #30363d; background: #0d1117; color: white; box-sizing: border-box;
-        }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--gold); font-weight: bold; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; }
         
-        .wd-btn {
-            width: 100%; padding: 18px; background: var(--gold); color: black;
-            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
-            margin-top: 15px; font-size: 16px;
-        }
-        .wd-btn:disabled { opacity: 0.5; }
-        
-        .note { font-size: 12px; color: #8b949e; margin-top: 15px; text-align: center; }
+        .btn-withdraw { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .warning { color: #ff4d4d; font-size: 12px; margin-top: 10px; text-align: center; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <a href="index.html" class="back-btn">← Back to Lobby</a>
-        <div style="text-align: right;">
-            <div id="uName" style="font-weight: bold; font-size: 14px;">User</div>
-            <div id="uID" style="font-size: 11px; color: #8b949e;">ID: --</div>
-        </div>
+<div class="withdraw-card">
+    <h2>WITHDRAW / ብር ማውጣት</h2>
+    <span class="lang-text">Your balance will decrease instantly. / ሂሳብዎ ወዲያውኑ ይቀነሳል።</span>
+
+    <div class="balance-box">
+        <span>Available Balance / አሁን ያለው ቀሪ ሂሳብ</span>
+        <strong id="displayBalance">...</strong> ETB
     </div>
 
-    <div class="withdraw-card">
-        <div class="balance-display">
-            <span class="balance-label">Available Balance</span>
-            <span class="balance-val" id="currentBalDisplay">0.00 ETB</span>
-        </div>
+    <label>Withdraw Amount / የሚወጣ የገንዘብ መጠን</label>
+    <input type="number" id="wAmount" placeholder="Enter amount">
 
-        <label style="font-size: 13px; color: #8b949e;">Recipient Phone Number</label>
-        <input type="number" id="wdPhone" placeholder="09... or 07...">
+    <label>Receive Money To (Phone Number) / ገንዘቡ የሚላክበት ስልክ</label>
+    <input type="number" id="receiverPhone" placeholder="09...">
 
-        <label style="font-size: 13px; color: #8b949e;">Amount to Withdraw</label>
-        <input type="number" id="wdAmount" placeholder="Min. 50 ETB">
+    <label>Select Method / መንገድ ይምረጡ</label>
+    <select id="method" style="width: 100%; padding: 12px; border-radius: 8px; background: #0b0e14; color: white; border: 1px solid #444; margin-bottom: 20px;">
+        <option value="Telebirr">Telebirr</option>
+        <option value="CBE">CBE (Commercial Bank)</option>
+    </select>
 
-        <button class="wd-btn" id="wdActionBtn" onclick="processWithdrawal()">SEND WITHDRAWAL REQUEST</button>
-        
-        <p class="note">Requests are processed within 30 minutes by Simba Admin.</p>
-    </div>
+    <button class="btn-withdraw" onclick="processWithdrawal()">REQUEST WITHDRAW / አውጣ</button>
+    
+    <p class="warning">Warning: Double check the phone number! / ማስጠንቀቂያ፡ የስልክ ቁጥሩን በደንብ ያረጋግጡ!</p>
+    <div id="status"></div>
+</div>
 
-    <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec';
+<script>
+    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL"; // PASTE YOUR URL HERE
+    const playerPhone = localStorage.getItem("userPhone");
 
-        // Load User Data
-        const stored = localStorage.getItem('simba_active_user');
-        if (!stored) { window.location.href = 'login.html'; }
-        const user = JSON.parse(stored);
-
-        // Update UI
-        document.getElementById('uName').innerText = user.name;
-        document.getElementById('uID').innerText = "ID: " + user.id;
-        document.getElementById('currentBalDisplay').innerText = parseFloat(user.balance).toFixed(2) + " ETB";
-
-        async function processWithdrawal() {
-            const amount = parseFloat(document.getElementById('wdAmount').value);
-            const phone = document.getElementById('wdPhone').value.trim();
-            const btn = document.getElementById('wdActionBtn');
-
-            if (!amount || amount < 50) { alert("Minimum withdrawal is 50 ETB"); return; }
-            if (amount > user.balance) { alert("Insufficient Balance!"); return; }
-            if (!phone) { alert("Please enter recipient phone"); return; }
-
-            btn.disabled = true;
-            btn.innerText = "PROCESSING...";
-
-            // 1. PRE-EMPTIVE DEDUCTION (The Fix)
-            const oldBalance = user.balance;
-            const newBalance = oldBalance - amount;
-            
-            // Update UI & Storage immediately
-            document.getElementById('currentBalDisplay').innerText = newBalance.toFixed(2) + " ETB";
-            user.balance = newBalance;
-            localStorage.setItem('simba_active_user', JSON.stringify(user));
-
-            // 2. SEND TO GOOGLE SHEET
-            // We send the amount as a negative number so the Sheet script subtracts it
-            const negativeAmt = -Math.abs(amount);
-            const detail = encodeURIComponent(`Withdrawal to ${phone}`);
-            
-            const url = `${SCRIPT_URL}?action=deposit&phone=${user.phone}&amount=${negativeAmt}&details=${detail}`;
-
-            try {
-                // Using no-cors to ensure it goes through even with Google's strict headers
-                fetch(url, { mode: 'no-cors' });
-                
-                alert("✅ Withdrawal Request Sent!\nYour balance has been updated.");
-                window.location.href = 'index.html';
-
-            } catch (error) {
-                console.error("Error:", error);
-                // Revert if hard failure
-                user.balance = oldBalance;
-                localStorage.setItem('simba_active_user', JSON.stringify(user));
-                alert("Connection failed. Your balance was restored.");
-                btn.disabled = false;
-                btn.innerText = "SEND WITHDRAWAL REQUEST";
+    // 1. Fetch current balance as soon as page opens
+    async function updateBalanceDisplay() {
+        if(!playerPhone) { window.location.href="login.html"; return; }
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=login&phone=${playerPhone}&pass=SKIP`);
+            const data = await res.json();
+            if(data.status === "SUCCESS") {
+                document.getElementById('displayBalance').innerText = data.balance;
             }
+        } catch(e) { console.log("Balance fetch error"); }
+    }
+
+    // 2. Process Withdrawal
+    async function processWithdrawal() {
+        const amt = document.getElementById('wAmount').value;
+        const phone = document.getElementById('receiverPhone').value;
+        const method = document.getElementById('method').value;
+        const status = document.getElementById('status');
+
+        if(!amt || !phone) {
+            status.innerText = "Please fill all fields! / እባክዎ ሁሉንም ይሙሉ።";
+            status.style.color = "red";
+            return;
         }
-    </script>
+
+        if(parseFloat(amt) < 10) {
+            status.innerText = "Minimum withdraw is 10 ETB / ቢያንስ 10 ብር ማውጣት ይችላሉ።";
+            return;
+        }
+
+        status.style.color = "white";
+        status.innerText = "Processing... / በመላክ ላይ...";
+
+        const fullDetails = `Method: ${method} | Send To: ${phone}`;
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=withdraw&phone=${playerPhone}&amount=${amt}&details=${encodeURIComponent(fullDetails)}`);
+            const result = await res.text();
+
+            if(result === "SUCCESS") {
+                status.style.color = "#2ea44f";
+                status.innerText = "Success! Balance reduced. / ተሳክቷል! ሂሳብዎ ተቀንሷል።";
+                setTimeout(() => { window.location.href = "lobby.html"; }, 3000);
+            } else if(result === "LOW_BALANCE") {
+                status.style.color = "red";
+                status.innerText = "Insufficient Funds! / በቂ ሂሳብ የለዎትም።";
+            } else {
+                status.innerText = "Error. Try again.";
+            }
+        } catch(e) {
+            status.innerText = "Connection Error.";
+        }
+    }
+
+    window.onload = updateBalanceDisplay;
+</script>
+
 </body>
 </html>
