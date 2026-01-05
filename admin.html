@@ -3,201 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Admin | Command Center</title>
+    <title>Simba Admin Dashboard</title>
     <style>
-        :root {
-            --gold: #fcc201;
-            --cyan: #00f2ff;
-            --bg: #05070a;
-            --card-bg: #11141a;
-            --red: #ff3e3e;
-            --green: #00ff88;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: white; font-family: 'Segoe UI', sans-serif;
-            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center;
-        }
-
-        /* Tabs Styling */
-        .tabs {
-            display: flex; width: 100%; max-width: 500px; gap: 10px; margin-bottom: 20px;
-        }
-        .tab-btn {
-            flex: 1; padding: 12px; background: #222; border: none; color: #777;
-            border-radius: 8px; font-weight: bold; cursor: pointer;
-        }
-        .tab-btn.active { background: var(--cyan); color: black; }
-
-        .dashboard {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-            width: 100%; max-width: 500px; margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--card-bg); padding: 12px; border-radius: 12px;
-            text-align: center; border-bottom: 2px solid var(--gold);
-        }
-
-        .stat-val { font-size: 18px; font-weight: 900; color: var(--gold); }
-        .stat-label { font-size: 9px; text-transform: uppercase; color: #888; }
-
-        .search-box {
-            width: 90%; max-width: 460px; padding: 12px; border-radius: 10px;
-            border: 1px solid #333; background: #111; color: white; margin-bottom: 15px;
-        }
-
-        .container { width: 100%; max-width: 500px; }
-
-        .request-card {
-            background: var(--card-bg); border-left: 4px solid var(--cyan);
-            border-radius: 10px; padding: 15px; margin-bottom: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
-
-        .row-id { font-size: 10px; color: #555; float: right; }
-        .amount { font-size: 24px; font-weight: 900; color: var(--gold); margin: 5px 0; }
-        
-        .type-tag { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
-        .dep-tag { background: var(--green); color: black; }
-        .wit-tag { background: var(--red); color: white; }
-        .comp-tag { background: #444; color: #aaa; }
-
-        .approve-btn { 
-            width: 100%; background: var(--cyan); color: black; padding: 12px; 
-            border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-
-        .refresh-btn { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 15px; font-size: 12px;}
-
-        #historyList .request-card { border-left-color: #444; opacity: 0.8; }
+        body { background: #0b0e14; color: white; font-family: sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; }
+        h2 { color: #fcc201; border-bottom: 2px solid #fcc201; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; background: #1c2128; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border: 1px solid #333; }
+        th { background: #2d333b; color: #fcc201; }
+        .btn-approve { background: #2ea44f; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-approve:hover { background: #3fb950; }
+        .refresh-btn { background: #fcc201; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-
-    <h1 style="color: var(--cyan); font-size: 20px; letter-spacing: 2px;">SIMBA ADMIN</h1>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('pending')">PENDING</button>
-        <button class="tab-btn" onclick="switchTab('history')">HISTORY</button>
+    <div class="container">
+        <h2>SIMBA ADMIN: DEPOSIT APPROVALS</h2>
+        <button class="refresh-btn" onclick="loadPending()">🔄 Refresh Requests</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Registered Phone</th>
+                    <th>Amount</th>
+                    <th>Payment Details (From/Ref)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="5">Loading pending requests...</td></tr>
+            </tbody>
+        </table>
     </div>
-
-    <div class="dashboard">
-        <div class="stat-card">
-            <div class="stat-val" id="countBox">0</div>
-            <div class="stat-label">Transactions</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-val" id="volumeBox">0.00</div>
-            <div class="stat-label">Total ETB</div>
-        </div>
-    </div>
-
-    <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search Phone Number..." onkeyup="doSearch()">
-
-    <button class="refresh-btn" onclick="loadData()">🔄 REFRESH DATA</button>
-
-    <div id="pendingList" class="container"></div>
-
-    <div id="historyList" class="container" style="display: none;"></div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
-        let currentMode = 'pending';
-        let masterData = [];
+        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
 
-        async function loadData() {
-            const pList = document.getElementById('pendingList');
-            const hList = document.getElementById('historyList');
-            pList.innerHTML = "<p style='text-align:center'>Fetching...</p>";
+        async function loadPending() {
+            const table = document.getElementById('tableBody');
+            table.innerHTML = "<tr><td colspan='5'>Fetching data...</td></tr>";
             
             try {
-                // We use your script's action=getPending
-                // Note: If your script only returns PENDING items, History will show what is currently pending.
-                const response = await fetch(`${SCRIPT_URL}?action=getPending&_t=${Date.now()}`);
-                masterData = await response.json();
-                render();
-            } catch (e) {
-                pList.innerHTML = "<p style='color:red'>Connect Error</p>";
-            }
-        }
+                const response = await fetch(`${SCRIPT_URL}?action=getPending`);
+                const data = await response.json();
+                table.innerHTML = "";
 
-        function render() {
-            const pList = document.getElementById('pendingList');
-            const hList = document.getElementById('historyList');
-            pList.innerHTML = "";
-            hList.innerHTML = "";
-
-            let pCount = 0; let pVol = 0;
-            let hCount = 0; let hVol = 0;
-
-            masterData.forEach(item => {
-                const isWit = item.amount < 0;
-                const card = document.createElement('div');
-                card.className = "request-card";
-                card.setAttribute('data-phone', item.phone);
-                
-                // If the script returned it, it's currently pending in your Sheet1
-                card.innerHTML = `
-                    <span class="row-id">ROW ${item.row}</span>
-                    <span class="type-tag ${isWit ? 'wit-tag':'dep-tag'}">${isWit ? 'Withdrawal':'Deposit'}</span>
-                    <div style="margin-top:8px; font-weight:bold;">📱 ${item.phone}</div>
-                    <div class="amount">${Math.abs(item.amount).toFixed(2)} <small style="font-size:10px">ETB</small></div>
-                    <button class="approve-btn" onclick="approve(${item.row}, this)">APPROVE & SYNC</button>
-                `;
-                pList.appendChild(card);
-                pCount++;
-                pVol += Math.abs(item.amount);
-            });
-
-            document.getElementById('countBox').innerText = pCount;
-            document.getElementById('volumeBox').innerText = pVol.toFixed(2);
-            
-            if(pCount === 0) pList.innerHTML = "<p style='text-align:center; color:#444;'>No pending requests found.</p>";
-        }
-
-        async function approve(row, btn) {
-            if(!confirm("Approve this transaction?")) return;
-            btn.disabled = true;
-            btn.innerText = "SENDING...";
-
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=approve&row=${row}`);
-                const txt = await res.text();
-                if(txt === "SUCCESS") {
-                    loadData();
+                if (data.length === 0) {
+                    table.innerHTML = "<tr><td colspan='5'>No pending deposits found.</td></tr>";
+                    return;
                 }
-            } catch(e) {
-                loadData(); // CORS might trigger, but script usually completes
+
+                data.forEach(item => {
+                    table.innerHTML += `
+                        <tr>
+                            <td>${new Date(item.date).toLocaleDateString()}</td>
+                            <td><strong>${item.playerPhone}</strong></td>
+                            <td>${item.amount} ETB</td>
+                            <td style="font-size: 12px; color: #aaa;">${item.details}</td>
+                            <td>
+                                <button class="btn-approve" onclick="approve('${item.playerPhone}', '${item.amount}', '${item.rowId}')">
+                                    APPROVE & ADD BALANCE
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            } catch (err) {
+                table.innerHTML = "<tr><td colspan='5'>Error connecting to Script. Check URL and Deployment.</td></tr>";
             }
         }
 
-        function switchTab(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+        async function approve(phone, amount, rowId) {
+            if (!confirm("Approve " + amount + " ETB for " + phone + "?")) return;
             
-            if(mode === 'pending') {
-                document.getElementById('pendingList').style.display = "block";
-                document.getElementById('historyList').style.display = "none";
-            } else {
-                document.getElementById('pendingList').style.display = "none";
-                document.getElementById('historyList').style.display = "block";
-                document.getElementById('historyList').innerHTML = "<p style='text-align:center; color:#555;'>History shows items processed since your last refresh.</p>";
-            }
+            try {
+                const res = await fetch(`${SCRIPT_URL}?action=adminApprove&phone=${phone}&amount=${amount}&rowId=${rowId}`);
+                const text = await res.text();
+                if (text === "SUCCESS_APPROVED") {
+                    alert("Approved!");
+                    loadPending();
+                }
+            } catch (e) { alert("Approval failed."); }
         }
 
-        function doSearch() {
-            const val = document.getElementById('searchBar').value.toLowerCase();
-            const cards = document.querySelectorAll('.request-card');
-            cards.forEach(c => {
-                const phone = c.getAttribute('data-phone').toLowerCase();
-                c.style.display = phone.includes(val) ? "block" : "none";
-            });
-        }
-
-        window.onload = loadData;
+        window.onload = loadPending;
     </script>
 </body>
 </html>
