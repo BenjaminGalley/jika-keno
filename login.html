@@ -6,80 +6,86 @@
     <title>Login | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .login-card { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 380px; border: 1px solid #333; text-align: center; }
-        .logo { color: var(--gold); font-size: 32px; font-weight: bold; margin-bottom: 10px; letter-spacing: 2px; }
-        label { display: block; text-align: left; margin-bottom: 5px; font-size: 13px; color: var(--gold); }
-        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; }
-        .btn-login { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        #errMsg { color: #ff4d4d; margin-top: 15px; font-size: 14px; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .login-card { background: var(--card); padding: 30px; border-radius: 15px; width: 90%; max-width: 380px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .logo { color: var(--gold); font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 10px; }
+        h2 { text-align: center; font-size: 18px; margin-bottom: 25px; color: #888; letter-spacing: 1px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--gold); }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; font-size: 16px; }
+        input:focus { border-color: var(--gold); outline: none; }
+        .btn-login { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-login:hover { background: #e5b000; }
+        .links { text-align: center; margin-top: 20px; font-size: 14px; }
+        .links a { color: var(--gold); text-decoration: none; font-weight: bold; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div class="logo">SIMBA BET</div>
-    <h2 style="margin-top:0;">Login / ግባ</h2>
-    
-    <label>Phone Number / ስልክ ቁጥር</label>
-    <input type="number" id="phone" placeholder="09...">
+    <div class="logo">SIMBA</div>
+    <h2>MEMBER LOGIN</h2>
+
+    <label>Phone Number / ስልክ</label>
+    <input type="number" id="loginPhone" placeholder="09xxxxxxxx">
 
     <label>Password / የይለፍ ቃል</label>
-    <input type="password" id="pass" placeholder="••••••••">
+    <input type="password" id="loginPass" placeholder="••••••••">
 
     <button class="btn-login" onclick="handleLogin()">LOGIN / ግባ</button>
-    <div id="errMsg"></div>
+    
+    <div id="status"></div>
+
+    <div class="links">
+        Don't have an account? <br>
+        <a href="register.html">Register Here / ይመዝገቡ</a>
+    </div>
 </div>
 
 <script>
-    // INSERTED YOUR NEW URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
 
     async function handleLogin() {
-        const phone = document.getElementById('phone').value;
-        const pass = document.getElementById('pass').value;
-        const errMsg = document.getElementById('errMsg');
+        const phone = document.getElementById('loginPhone').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+        const status = document.getElementById('status');
 
         if (!phone || !pass) {
-            errMsg.innerText = "Please fill all fields! / ሁሉንም ይሙሉ!";
+            status.innerText = "Please fill all fields!";
+            status.style.color = "red";
             return;
         }
 
-        errMsg.style.color = "white";
-        errMsg.innerText = "Connecting... / በመገናኘት ላይ...";
+        status.style.color = "white";
+        status.innerText = "Authenticating...";
 
         try {
-            const finalUrl = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-            console.log("Attempting to connect to:", finalUrl);
-
-            const response = await fetch(finalUrl);
-            
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-
+            const response = await fetch(`${SCRIPT_URL}?action=login&phone=${phone}&pass=${pass}`);
             const data = await response.json();
 
             if (data.status === "SUCCESS") {
-                // Save session data exactly as index.html expects it
+                // IMPORTANT: Save to LocalStorage for script.html to find
                 localStorage.setItem("userPhone", phone);
-                localStorage.setItem("userName", data.name);
+                localStorage.setItem("userName", data.name || "User");
+                localStorage.setItem("userBalance", data.balance || 0);
                 
-                errMsg.style.color = "#2ea44f";
-                errMsg.innerText = "Success! Entering Lobby... / ተሳክቷል!";
+                status.style.color = "#2ea44f";
+                status.innerText = "Login Successful!";
                 
-                // Redirect to index.html (Your Lobby file)
-                setTimeout(() => { window.location.href = "index.html"; }, 1000);
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1000);
             } else {
-                errMsg.style.color = "#ff4d4d";
-                errMsg.innerText = "Wrong Phone or Password! / ስልክ ወይም የይለፍ ቃል ተሳስቷል!";
+                status.style.color = "red";
+                status.innerText = data.message || "Invalid Login!";
             }
         } catch (error) {
-            errMsg.style.color = "#ff4d4d";
-            errMsg.innerText = "Connection Error. Make sure Script is Deployed as 'Anyone'.";
-            console.error("Fetch Error:", error);
+            status.style.color = "red";
+            status.innerText = "Connection Error!";
+            console.error(error);
         }
     }
 </script>
+
 </body>
 </html>
