@@ -1,0 +1,6 @@
+remote_theme: jekyll-theme-cayman
+include: [".nojekyll", "script.html"]
+exclude: ["README.md"]
+timezone: Africa/Addis_Ababa
+encoding: utf-8
+markdown: kramdown
