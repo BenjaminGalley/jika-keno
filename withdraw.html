@@ -7,7 +7,7 @@
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .withdraw-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; }
+        .withdraw-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         h2 { color: var(--gold); text-align: center; margin-bottom: 5px; }
         .lang-text { display: block; font-size: 13px; color: #888; text-align: center; margin-bottom: 20px; }
@@ -18,10 +18,13 @@
 
         label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--gold); font-weight: bold; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; }
+        input:focus { border-color: var(--gold); outline: none; }
         
-        .btn-withdraw { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .btn-withdraw { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-withdraw:hover { background: #e5b000; }
+        
         .warning { color: #ff4d4d; font-size: 12px; margin-top: 10px; text-align: center; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -54,17 +57,22 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL"; // PASTE YOUR URL HERE
+    // INSERTED YOUR NEW URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
     const playerPhone = localStorage.getItem("userPhone");
 
     // 1. Fetch current balance as soon as page opens
     async function updateBalanceDisplay() {
-        if(!playerPhone) { window.location.href="login.html"; return; }
+        if(!playerPhone) { 
+            alert("Please login first!");
+            window.location.href="login.html"; 
+            return; 
+        }
         try {
             const res = await fetch(`${SCRIPT_URL}?action=login&phone=${playerPhone}&pass=SKIP`);
             const data = await res.json();
             if(data.status === "SUCCESS") {
-                document.getElementById('displayBalance').innerText = data.balance;
+                document.getElementById('displayBalance').innerText = parseFloat(data.balance).toFixed(2);
             }
         } catch(e) { console.log("Balance fetch error"); }
     }
@@ -84,6 +92,7 @@
 
         if(parseFloat(amt) < 10) {
             status.innerText = "Minimum withdraw is 10 ETB / ቢያንስ 10 ብር ማውጣት ይችላሉ።";
+            status.style.color = "red";
             return;
         }
 
@@ -93,21 +102,25 @@
         const fullDetails = `Method: ${method} | Send To: ${phone}`;
 
         try {
+            // Using the 'withdraw' action defined in your script
             const res = await fetch(`${SCRIPT_URL}?action=withdraw&phone=${playerPhone}&amount=${amt}&details=${encodeURIComponent(fullDetails)}`);
             const result = await res.text();
 
             if(result === "SUCCESS") {
                 status.style.color = "#2ea44f";
                 status.innerText = "Success! Balance reduced. / ተሳክቷል! ሂሳብዎ ተቀንሷል።";
-                setTimeout(() => { window.location.href = "lobby.html"; }, 3000);
+                // Redirect to index.html (Your Lobby)
+                setTimeout(() => { window.location.href = "index.html"; }, 2500);
             } else if(result === "LOW_BALANCE") {
                 status.style.color = "red";
                 status.innerText = "Insufficient Funds! / በቂ ሂሳብ የለዎትም።";
             } else {
-                status.innerText = "Error. Try again.";
+                status.style.color = "red";
+                status.innerText = "Error. Please try again.";
             }
         } catch(e) {
-            status.innerText = "Connection Error.";
+            status.style.color = "red";
+            status.innerText = "Connection Error. Check internet.";
         }
     }
 
