@@ -1,0 +1,145 @@
+<script>
+    /**
+     * SIMBA BET CORE SYSTEM ENGINE - v3.1.0
+     * GitHub Production Ready
+     * Integrated for: login.html, register.html, index.html, withdraw.html, deposit.html
+     */
+
+    // 1. PRODUCTION ENDPOINT
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
+    const SYNC_TIME = 10000; // 10 seconds
+
+    /**
+     * UNIVERSAL DATA SYNC
+     * This keeps the GitHub UI synced with the Google Sheet Database
+     */
+    async function updateDisplay() {
+        const phone = localStorage.getItem("userPhone");
+
+        // Auth Guard: Redirect to login if session is empty
+        if (!phone) {
+            const loc = window.location.pathname;
+            if (loc.includes('index.html') || loc.includes('withdraw') || loc.includes('deposit')) {
+                window.location.href = "login.html";
+            }
+            return;
+        }
+
+        try {
+            // Secure Ping to Google Apps Script
+            const response = await fetch(`${SCRIPT_URL}?action=login&phone=${phone}&pass=SKIP`);
+            const data = await response.json();
+
+            if (data.status === "SUCCESS") {
+                const liveBalance = parseFloat(data.balance).toFixed(2);
+                const userID = data.id || "SB-" + phone.slice(-4);
+
+                // Update Persistence Layer
+                localStorage.setItem("userBalance", liveBalance);
+                localStorage.setItem("userID", userID);
+
+                // --- UI INJECTION ---
+                // Matches the exact IDs provided in all previous HTML files
+                const targets = {
+                    'headerLiveBalance': liveBalance, // Index Header
+                    'displayBalance': liveBalance,    // Withdraw Box
+                    'userBal': liveBalance,           // Header Small
+                    'displayID': userID,              // Footer ID
+                    'footerAccountID': userID,        // Sidebar ID
+                    'userID': userID                  // Profile ID
+                };
+
+                for (let [id, val] of Object.entries(targets)) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        if (el.tagName === "INPUT") el.value = val;
+                        else el.innerText = val;
+                    }
+                }
+                console.log("GitHub Sync Active: " + userID + " | Bal: " + liveBalance);
+            }
+        } catch (e) {
+            console.error("Database connection interrupted.");
+        }
+    }
+
+    /**
+     * PRODUCTION WITHDRAWAL LOGIC
+     * Handles the 'onclick' from withdraw.html
+     */
+    async function processWithdrawal() {
+        const amtInput = document.getElementById('wAmount');
+        const phoneInput = document.getElementById('receiverPhone');
+        const methodInput = document.getElementById('method');
+        const statusBox = document.getElementById('status');
+        
+        const userPhone = localStorage.getItem("userPhone");
+        const currentBal = parseFloat(localStorage.getItem("userBalance")) || 0;
+
+        if(!amtInput || !phoneInput) return;
+
+        const amt = parseFloat(amtInput.value);
+        const recPhone = phoneInput.value.trim();
+
+        if(!amt || !recPhone) {
+            if(statusBox) { statusBox.innerText = "Please fill all fields!"; statusBox.style.color = "red"; }
+            return;
+        }
+
+        if (amt > currentBal) {
+            if(statusBox) { statusBox.innerText = "Insufficient Funds!"; statusBox.style.color = "red"; }
+            return;
+        }
+
+        // --- PRE-EMPTIVE SECURITY DEDUCTION ---
+        // Immediate UI update to prevent double-spending on GitHub Pages
+        const tempBal = (currentBal - amt).toFixed(2);
+        localStorage.setItem("userBalance", tempBal);
+        
+        const balDisplay = document.getElementById('displayBalance') || document.getElementById('headerLiveBalance');
+        if(balDisplay) balDisplay.innerText = tempBal;
+
+        if(statusBox) { statusBox.innerText = "Requesting... / በመላክ ላይ..."; statusBox.style.color = "white"; }
+
+        const method = methodInput ? methodInput.value : "Telebirr";
+        const details = encodeURIComponent(`Method: ${method} | Send to: ${recPhone}`);
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=withdraw&phone=${userPhone}&amount=${amt}&details=${details}`);
+            const result = await res.text();
+
+            if (result === "SUCCESS") {
+                if(statusBox) { statusBox.style.color = "#2ea44f"; statusBox.innerText = "Success! Redirecting..."; }
+                setTimeout(() => { window.location.href = "index.html"; }, 2000);
+            } else {
+                // Revert balance on Database error
+                localStorage.setItem("userBalance", currentBal);
+                if(statusBox) { statusBox.innerText = "Error: " + result; statusBox.style.color = "red"; }
+            }
+        } catch (err) {
+            localStorage.setItem("userBalance", currentBal);
+            if(statusBox) statusBox.innerText = "Network Error. Check Connection.";
+        }
+    }
+
+    /**
+     * UI UTILITIES
+     */
+    function toggleSidebarMenu() {
+        const menu = document.getElementById('mainSidebar') || document.getElementById('sideMenu');
+        if (menu) menu.classList.toggle('is-active');
+    }
+
+    function logoutUser() {
+        if (confirm("Confirm Logout?")) {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
+    }
+
+    // Initialize Engine
+    window.addEventListener('DOMContentLoaded', () => {
+        updateDisplay();
+        setInterval(updateDisplay, SYNC_TIME);
+    });
+</script>
