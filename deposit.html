@@ -6,60 +6,58 @@
     <title>Deposit | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; }
-        .deposit-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        .deposit-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        h2 { color: var(--gold); text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .lang-text { display: block; font-size: 14px; color: #aaa; text-align: center; margin-bottom: 20px; }
+        h2 { color: var(--gold); text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .lang-text { display: block; font-size: 13px; color: #888; text-align: center; margin-bottom: 20px; }
         
         .bank-choice { display: flex; gap: 10px; margin-bottom: 20px; }
         .bank-opt { flex: 1; background: #2d333b; padding: 15px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; text-align: center; transition: 0.3s; }
-        .bank-opt.active { border-color: var(--gold); background: #3d444d; box-shadow: 0 0 10px rgba(252, 194, 1, 0.2); }
-        .bank-opt strong { font-size: 16px; display: block; margin-bottom: 5px; }
+        .bank-opt.active { border-color: var(--gold); background: #3d444d; }
+        .bank-opt strong { font-size: 16px; display: block; color: white; }
         
         .payment-info { background: #000; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed var(--gold); display: none; }
-        .payment-info.show { display: block; animation: fadeIn 0.4s; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .payment-info.show { display: block; }
         
         label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--gold); font-weight: bold; }
         input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; font-size: 16px; }
         input:focus { border-color: var(--gold); outline: none; }
         
         .btn-submit { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-submit:hover { background: #e5b000; }
+        .btn-submit:hover { background: #e5b000; transform: translateY(-1px); }
         
-        #status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
 <div class="deposit-card">
     <h2>DEPOSIT / ብር ማስገቢያ</h2>
-    <span class="lang-text">Choose your bank and fill the form below. / ባንክ ይምረጡና ከታች ያለውን ፎርም ይሙሉ።</span>
+    <span class="lang-text">Choose bank & fill form. / ባንክ ይምረጡና ፎርሙን ይሙሉ።</span>
 
     <div class="bank-choice">
         <div class="bank-opt" id="optTele" onclick="selectBank('Telebirr', '0988733637', 'SIMBA ADMIN')">
             <strong>Telebirr</strong>
-            <span style="font-size:11px">ቴሌብር</span>
+            <span style="font-size:11px; color:#aaa;">ቴሌብር</span>
         </div>
         <div class="bank-opt" id="optCBE" onclick="selectBank('CBE', '0911045825', 'SIMBA ADMIN')">
             <strong>CBE</strong>
-            <span style="font-size:11px">የኢትዮጵያ ንግድ ባንክ</span>
+            <span style="font-size:11px; color:#aaa;">ንግድ ባንክ</span>
         </div>
     </div>
 
     <div id="paymentDetails" class="payment-info">
-        <p id="bankNameDisplay" style="color:var(--gold); margin:0; font-weight:bold; font-size: 14px;"></p>
-        <p id="bankAccountDisplay" style="font-size:20px; letter-spacing:1px; margin:8px 0; color: white; font-weight: bold;"></p>
+        <p id="bankNameDisplay" style="color:var(--gold); margin:0; font-weight:bold; font-size: 13px;"></p>
+        <p id="bankAccountDisplay" style="font-size:22px; letter-spacing:1px; margin:8px 0; color: white; font-weight: bold;"></p>
         <p id="bankOwnerDisplay" style="font-size:12px; margin:0; color: #888;"></p>
     </div>
 
-    <label>Deposit Amount / የገንዘብ መጠን</label>
-    <input type="number" id="amount" placeholder="Amount in ETB">
+    <label>Amount / የገንዘብ መጠን</label>
+    <input type="number" id="amount" placeholder="ETB">
 
     <label>Sender Name / የላኪው ሙሉ ስም</label>
-    <input type="text" id="senderName" placeholder="Name on your account">
+    <input type="text" id="senderName" placeholder="Your Bank Account Name">
 
     <label>Sender Phone / የላኪው ስልክ ቁጥር</label>
     <input type="number" id="senderPhone" placeholder="09...">
@@ -69,8 +67,7 @@
 </div>
 
 <script>
-    // MAKE SURE TO PASTE YOUR GOOGLE SCRIPT URL HERE
-    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
     let selectedBankName = "";
 
     function selectBank(name, acc, owner) {
@@ -96,13 +93,13 @@
         const playerPhone = localStorage.getItem("userPhone");
 
         if(!selectedBankName || !amt || !name || !phone) {
-            status.innerText = "Please fill all fields! / እባክዎ ሁሉንም ይሙሉ!";
+            status.innerText = "Please fill all fields! / ሁሉንም ይሙሉ!";
             status.style.color = "red";
             return;
         }
 
         if(!playerPhone) {
-            alert("You are not logged in!");
+            alert("Please Login First! / መጀመሪያ ይግቡ!");
             window.location.href = "login.html";
             return;
         }
@@ -122,7 +119,7 @@
                 setTimeout(() => { window.location.href = "lobby.html"; }, 2500);
             } else {
                 status.style.color = "red";
-                status.innerText = "Error. Try again.";
+                status.innerText = "Error. Please try again.";
             }
         } catch(e) {
             status.style.color = "red";
