@@ -6,7 +6,7 @@
     <title>Deposit | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; justify-content: center; margin: 0; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; }
         .deposit-card { background: var(--card); padding: 25px; border-radius: 15px; width: 100%; max-width: 450px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         h2 { color: var(--gold); text-align: center; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
@@ -28,6 +28,7 @@
         .btn-submit:hover { background: #e5b000; transform: translateY(-1px); }
         
         #status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 20px; }
+        .back-link { margin-top: 20px; color: var(--gold); text-decoration: none; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -65,6 +66,10 @@
     <button class="btn-submit" onclick="sendDeposit()">SEND FOR APPROVAL / አረጋግጥ</button>
     <div id="status"></div>
 </div>
+
+<a href="index.html" class="back-link">← Back to Lobby / ወደ ዋናው ገጽ ተመለስ</a>
+
+<div id="script-container"></div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
@@ -116,7 +121,7 @@
             if(result === "SUCCESS") {
                 status.style.color = "#2ea44f";
                 status.innerText = "Sent! Waiting for Admin. / ተልኳል! በአስተዳዳሪው እስኪረጋገጥ ይጠብቁ።";
-                setTimeout(() => { window.location.href = "lobby.html"; }, 2500);
+                setTimeout(() => { window.location.href = "index.html"; }, 2500);
             } else {
                 status.style.color = "red";
                 status.innerText = "Error. Please try again.";
@@ -126,6 +131,20 @@
             status.innerText = "Connection Error. Check internet.";
         }
     }
+
+    // GitHub Loader for script.html
+    fetch('script.html')
+        .then(res => res.text())
+        .then(data => {
+            const div = document.getElementById('script-container');
+            div.innerHTML = data;
+            const scripts = div.querySelectorAll("script");
+            scripts.forEach(s => {
+                const newS = document.createElement("script");
+                newS.text = s.text;
+                document.body.appendChild(newS);
+            });
+        });
 </script>
 
 </body>
