@@ -1,68 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simba Admin Panel</title>
     <style>
-        body { background: #0b0e14; color: white; font-family: sans-serif; }
-        .box { max-width: 900px; margin: 20px auto; background: #1c2128; padding: 20px; border-radius: 10px; }
-        h2 { color: #fcc201; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #333; text-align: left; }
-        th { background: #2d333b; color: #fcc201; }
-        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-dep { background: #2ea44f; color: white; }
-        .btn-wit { background: #fcc201; color: black; }
+        :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
+        .box { max-width: 1000px; margin: 20px auto; background: var(--card); padding: 25px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { color: var(--gold); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-top: 0; }
+        
+        .controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-refresh { background: #444; color: white; }
+        .btn-refresh:hover { background: #555; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { padding: 15px; border: 1px solid #333; text-align: left; }
+        th { background: #2d333b; color: var(--gold); text-transform: uppercase; font-size: 12px; }
+        
+        tr:hover { background: #252b33; }
+        
+        .btn-dep { background: #2ea44f; color: white; width: 100%; }
+        .btn-dep:hover { background: #3fb950; }
+        .btn-wit { background: var(--gold); color: black; width: 100%; }
+        .btn-wit:hover { background: #e5b000; }
+        
+        .status-tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .tag-deposit { background: rgba(46, 164, 79, 0.2); color: #2ea44f; border: 1px solid #2ea44f; }
+        .tag-withdraw { background: rgba(252, 194, 1, 0.2); color: var(--gold); border: 1px solid var(--gold); }
+        
+        #loadingMsg { text-align: center; color: var(--gold); margin: 20px; display: none; }
     </style>
 </head>
 <body>
+
     <div class="box">
         <h2>SIMBA ADMIN CONTROL</h2>
-        <button class="btn" style="background:#444; color:white;" onclick="loadData()">🔄 Refresh Requests</button>
+        
+        <div class="controls">
+            <span>Pending Requests</span>
+            <button class="btn btn-refresh" onclick="loadData()">🔄 Refresh List</button>
+        </div>
+
+        <div id="loadingMsg">Loading transactions...</div>
+
         <table id="adminTable">
             <thead>
                 <tr>
                     <th>Type</th>
                     <th>Player Phone</th>
                     <th>Amount</th>
-                    <th>Details (From/Ref/Bank)</th>
+                    <th>Details (Sender/Bank/Method)</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="tbody"></tbody>
+            <tbody id="tbody">
+                </tbody>
         </table>
     </div>
 
     <script>
-        const URL = "YOUR_DEPLOYED_SCRIPT_URL";
+        // INSERTED YOUR NEW URL
+        const URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
 
         async function loadData() {
-            const res = await fetch(URL + "?action=adminGet");
-            const data = await res.json();
             const tbody = document.getElementById('tbody');
+            const loader = document.getElementById('loadingMsg');
+            
+            loader.style.display = "block";
             tbody.innerHTML = "";
 
-            data.forEach(item => {
-                const isDeposit = item.type === "PENDING_DEPOSIT";
-                tbody.innerHTML += `<tr>
-                    <td style="color:${isDeposit?'#2ea44f':'#fcc201'}">${isDeposit?'DEPOSIT':'WITHDRAW'}</td>
-                    <td>${item.phone}</td>
-                    <td>${item.amount} ETB</td>
-                    <td>${item.details}</td>
-                    <td>
-                        <button class="btn ${isDeposit?'btn-dep':'btn-wit'}" onclick="approve('${item.row}','${item.type}','${item.phone}','${item.amount}')">
-                            ${isDeposit ? 'APPROVE & ADD MONEY' : 'MARK AS PAID OUT'}
-                        </button>
-                    </td>
-                </tr>`;
-            });
+            try {
+                const res = await fetch(URL + "?action=adminGet");
+                const data = await res.json();
+                
+                loader.style.display = "none";
+
+                if (data.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No pending requests found.</td></tr>";
+                    return;
+                }
+
+                data.forEach(item => {
+                    const isDeposit = item.type === "PENDING_DEPOSIT";
+                    const rowHtml = `
+                        <tr>
+                            <td>
+                                <span class="status-tag ${isDeposit ? 'tag-deposit' : 'tag-withdraw'}">
+                                    ${isDeposit ? 'DEPOSIT' : 'WITHDRAW'}
+                                </span>
+                            </td>
+                            <td style="font-weight:bold;">${item.phone}</td>
+                            <td style="color:${isDeposit ? '#2ea44f' : var(--gold)}; font-weight:bold;">${item.amount} ETB</td>
+                            <td style="font-size:12px; color:#aaa;">${item.details}</td>
+                            <td>
+                                <button class="btn ${isDeposit ? 'btn-dep' : 'btn-wit'}" 
+                                    onclick="approve('${item.row}','${item.type}','${item.phone}','${item.amount}')">
+                                    ${isDeposit ? 'APPROVE & ADD MONEY' : 'CONFIRM PAID OUT'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += rowHtml;
+                });
+            } catch (error) {
+                loader.innerText = "Error loading data. Check Script URL.";
+                console.error(error);
+            }
         }
 
         async function approve(row, type, phone, amount) {
-            if(!confirm("Confirm processing this transaction?")) return;
-            await fetch(`${URL}?action=adminApprove&row=${row}&type=${type}&phone=${phone}&amount=${amount}`);
-            alert("Updated successfully!");
-            loadData();
+            const actionText = type === "PENDING_DEPOSIT" ? "add money to this user's balance" : "mark this withdrawal as completed";
+            
+            if(!confirm(`Are you sure you want to ${actionText}?`)) return;
+
+            // Change button text to show progress
+            event.target.innerText = "Processing...";
+            event.target.disabled = true;
+
+            try {
+                const res = await fetch(`${URL}?action=adminApprove&row=${row}&type=${type}&phone=${phone}&amount=${amount}`);
+                const result = await res.text();
+                
+                if(result === "OK") {
+                    alert("Transaction Completed Successfully!");
+                    loadData();
+                } else {
+                    alert("Error updating record.");
+                    loadData();
+                }
+            } catch(e) {
+                alert("Connection error. Try again.");
+                loadData();
+            }
         }
+
+        // Auto-load on open
         window.onload = loadData;
     </script>
 </body>
