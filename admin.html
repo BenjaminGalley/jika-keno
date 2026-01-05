@@ -1,92 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Admin Dashboard</title>
+    <title>Simba Admin Panel</title>
     <style>
-        body { background: #0b0e14; color: white; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 1000px; margin: auto; }
-        h2 { color: #fcc201; border-bottom: 2px solid #fcc201; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; background: #1c2128; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border: 1px solid #333; }
+        body { background: #0b0e14; color: white; font-family: sans-serif; }
+        .box { max-width: 900px; margin: 20px auto; background: #1c2128; padding: 20px; border-radius: 10px; }
+        h2 { color: #fcc201; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #333; text-align: left; }
         th { background: #2d333b; color: #fcc201; }
-        .btn-approve { background: #2ea44f; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn-approve:hover { background: #3fb950; }
-        .refresh-btn { background: #fcc201; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-bottom: 20px; }
+        .btn { padding: 8px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-dep { background: #2ea44f; color: white; }
+        .btn-wit { background: #fcc201; color: black; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>SIMBA ADMIN: DEPOSIT APPROVALS</h2>
-        <button class="refresh-btn" onclick="loadPending()">🔄 Refresh Requests</button>
-        
-        <table>
+    <div class="box">
+        <h2>SIMBA ADMIN CONTROL</h2>
+        <button class="btn" style="background:#444; color:white;" onclick="loadData()">🔄 Refresh Requests</button>
+        <table id="adminTable">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Registered Phone</th>
+                    <th>Type</th>
+                    <th>Player Phone</th>
                     <th>Amount</th>
-                    <th>Payment Details (From/Ref)</th>
+                    <th>Details (From/Ref/Bank)</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="5">Loading pending requests...</td></tr>
-            </tbody>
+            <tbody id="tbody"></tbody>
         </table>
     </div>
 
     <script>
-        const SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
+        const URL = "YOUR_DEPLOYED_SCRIPT_URL";
 
-        async function loadPending() {
-            const table = document.getElementById('tableBody');
-            table.innerHTML = "<tr><td colspan='5'>Fetching data...</td></tr>";
-            
-            try {
-                const response = await fetch(`${SCRIPT_URL}?action=getPending`);
-                const data = await response.json();
-                table.innerHTML = "";
+        async function loadData() {
+            const res = await fetch(URL + "?action=adminGet");
+            const data = await res.json();
+            const tbody = document.getElementById('tbody');
+            tbody.innerHTML = "";
 
-                if (data.length === 0) {
-                    table.innerHTML = "<tr><td colspan='5'>No pending deposits found.</td></tr>";
-                    return;
-                }
-
-                data.forEach(item => {
-                    table.innerHTML += `
-                        <tr>
-                            <td>${new Date(item.date).toLocaleDateString()}</td>
-                            <td><strong>${item.playerPhone}</strong></td>
-                            <td>${item.amount} ETB</td>
-                            <td style="font-size: 12px; color: #aaa;">${item.details}</td>
-                            <td>
-                                <button class="btn-approve" onclick="approve('${item.playerPhone}', '${item.amount}', '${item.rowId}')">
-                                    APPROVE & ADD BALANCE
-                                </button>
-                            </td>
-                        </tr>`;
-                });
-            } catch (err) {
-                table.innerHTML = "<tr><td colspan='5'>Error connecting to Script. Check URL and Deployment.</td></tr>";
-            }
+            data.forEach(item => {
+                const isDeposit = item.type === "PENDING_DEPOSIT";
+                tbody.innerHTML += `<tr>
+                    <td style="color:${isDeposit?'#2ea44f':'#fcc201'}">${isDeposit?'DEPOSIT':'WITHDRAW'}</td>
+                    <td>${item.phone}</td>
+                    <td>${item.amount} ETB</td>
+                    <td>${item.details}</td>
+                    <td>
+                        <button class="btn ${isDeposit?'btn-dep':'btn-wit'}" onclick="approve('${item.row}','${item.type}','${item.phone}','${item.amount}')">
+                            ${isDeposit ? 'APPROVE & ADD MONEY' : 'MARK AS PAID OUT'}
+                        </button>
+                    </td>
+                </tr>`;
+            });
         }
 
-        async function approve(phone, amount, rowId) {
-            if (!confirm("Approve " + amount + " ETB for " + phone + "?")) return;
-            
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=adminApprove&phone=${phone}&amount=${amount}&rowId=${rowId}`);
-                const text = await res.text();
-                if (text === "SUCCESS_APPROVED") {
-                    alert("Approved!");
-                    loadPending();
-                }
-            } catch (e) { alert("Approval failed."); }
+        async function approve(row, type, phone, amount) {
+            if(!confirm("Confirm processing this transaction?")) return;
+            await fetch(`${URL}?action=adminApprove&row=${row}&type=${type}&phone=${phone}&amount=${amount}`);
+            alert("Updated successfully!");
+            loadData();
         }
-
-        window.onload = loadPending;
+        window.onload = loadData;
     </script>
 </body>
 </html>
