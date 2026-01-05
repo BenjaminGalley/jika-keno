@@ -6,92 +6,74 @@
     <title>Register | Simba Bet</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .register-card { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 400px; border: 1px solid #333; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .logo { color: var(--gold); font-size: 28px; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px; }
-        h2 { margin-bottom: 20px; font-weight: 500; color: white; }
-        
-        label { display: block; text-align: left; margin-bottom: 5px; font-size: 13px; color: var(--gold); }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; font-size: 16px; }
-        input:focus { border-color: var(--gold); outline: none; }
-
-        .btn-reg { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-reg:hover { background: #e5b000; }
-
-        #msg { margin-top: 15px; font-size: 14px; min-height: 20px; }
-        .footer { margin-top: 20px; font-size: 14px; color: #888; }
-        .footer a { color: var(--gold); text-decoration: none; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .login-card { background: var(--card); padding: 30px; border-radius: 15px; width: 90%; max-width: 380px; border: 1px solid #333; }
+        .logo { color: var(--gold); font-size: 32px; font-weight: 900; text-align: center; margin-bottom: 5px; }
+        h2 { text-align: center; font-size: 16px; margin-bottom: 20px; color: #888; }
+        label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--gold); }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; }
+        .btn-reg { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .links { text-align: center; margin-top: 15px; font-size: 13px; }
+        .links a { color: var(--gold); text-decoration: none; }
+        #status { text-align: center; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="register-card">
-    <div class="logo">SIMBA BET</div>
-    <h2>CREATE ACCOUNT / ይመዝገቡ</h2>
-    
-    <label>Full Name / ሙሉ ስም</label>
-    <input type="text" id="regName" placeholder="Enter your name">
+<div class="login-card">
+    <div class="logo">SIMBA</div>
+    <h2>CREATE ACCOUNT</h2>
 
-    <label>Phone Number / ስልክ ቁጥር</label>
-    <input type="number" id="regPhone" placeholder="09...">
+    <label>Full Name / ሙሉ ስም</label>
+    <input type="text" id="regName" placeholder="Enter name">
+
+    <label>Phone Number / ስልክ</label>
+    <input type="number" id="regPhone" placeholder="09xxxxxxxx">
 
     <label>Create Password / የይለፍ ቃል</label>
-    <input type="password" id="regPass" placeholder="Min 4 characters">
+    <input type="password" id="regPass" placeholder="Min. 4 characters">
 
-    <button class="btn-reg" onclick="handleRegister()">REGISTER / ይመዝገቡ</button>
+    <button class="btn-reg" onclick="handleRegister()">REGISTER / ተመዝገብ</button>
     
-    <div id="msg"></div>
+    <div id="status"></div>
 
-    <div class="footer">
-        Already have an account? <a href="login.html">Login here</a>
+    <div class="links">
+        Already have an account? <a href="login.html">Login / ግባ</a>
     </div>
 </div>
 
 <script>
-    // INSERTED YOUR NEW URL
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
 
     async function handleRegister() {
-        const name = document.getElementById('regName').value;
-        const phone = document.getElementById('regPhone').value;
-        const pass = document.getElementById('regPass').value;
-        const msg = document.getElementById('msg');
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        const pass = document.getElementById('regPass').value.trim();
+        const status = document.getElementById('status');
 
         if (!name || !phone || !pass) {
-            msg.style.color = "#ff4d4d";
-            msg.innerText = "Please fill all fields! / ሁሉንም ይሙሉ!";
+            status.innerText = "Fill all fields!";
+            status.style.color = "red";
             return;
         }
 
-        msg.style.color = "white";
-        msg.innerText = "Creating account... / በመመዝገብ ላይ...";
+        status.style.color = "white";
+        status.innerText = "Creating account...";
 
         try {
-            // Using the 'register' action defined in your Google Script brain
-            const url = `${SCRIPT_URL}?action=register&name=${encodeURIComponent(name)}&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-            const response = await fetch(url);
-            const text = await response.text();
+            const response = await fetch(`${SCRIPT_URL}?action=register&phone=${phone}&pass=${pass}&name=${encodeURIComponent(name)}`);
+            const data = await response.json();
 
-            if (text === "SUCCESS") {
-                // Auto-save session keys (Matching the Lobby logic)
-                localStorage.setItem("userPhone", phone);
-                localStorage.setItem("userName", name);
-                
-                msg.style.color = "#2ea44f";
-                msg.innerText = "Registration Successful! / ምዝገባው ተሳክቷል!";
-                
-                // Redirect to index.html (Your Lobby)
-                setTimeout(() => { window.location.href = "index.html"; }, 1500);
-            } else if (text === "EXISTS") {
-                msg.style.color = "#ff4d4d";
-                msg.innerText = "Phone already registered! / ይህ ስልክ ተመዝግቧል!";
+            if (data.status === "SUCCESS") {
+                status.style.color = "#2ea44f";
+                status.innerText = "Registration Success!";
+                setTimeout(() => { window.location.href = "login.html"; }, 1500);
             } else {
-                msg.style.color = "#ff4d4d";
-                msg.innerText = "Error. Please try again.";
+                status.style.color = "red";
+                status.innerText = data.message || "Error!";
             }
         } catch (error) {
-            msg.style.color = "#ff4d4d";
-            msg.innerText = "Connection Error. Check your Script URL.";
+            status.innerText = "Error connecting to server.";
         }
     }
 </script>
