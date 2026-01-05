@@ -3,123 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Official Lobby</title>
+    <title>Simba Bet - Official Lobby</title>
     <style>
         :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding-bottom: 80px; }
-        .header { background: #1a1f29; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
-        .user-name { font-weight: bold; color: var(--gold); font-size: 14px; }
-        .balance-box { background: #0d1117; padding: 8px 15px; border-radius: 20px; border: 1px solid var(--gold); font-weight: bold; color: var(--gold); }
-        .section-title { padding: 20px 20px 5px; font-size: 18px; font-weight: bold; color: #8b949e; }
-        .games-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .game-card { background: var(--card); border-radius: 15px; overflow: hidden; border: 1px solid #30363d; position: relative; transition: 0.3s; cursor: pointer; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        
+        /* Header & Balance */
+        .header { background: var(--card); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 100; }
+        .logo { color: var(--gold); font-weight: 900; font-size: 22px; letter-spacing: 1px; }
+        .balance-area { background: #2d333b; padding: 6px 15px; border-radius: 25px; border: 1px solid var(--gold); display: flex; align-items: center; gap: 8px; }
+        #userBal { font-weight: bold; color: white; font-size: 16px; }
+
+        /* Sidebar Menu */
+        .sidebar { position: fixed; left: -280px; top: 0; width: 260px; height: 100%; background: var(--card); z-index: 1000; transition: 0.3s; padding: 20px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+        .sidebar.is-active { left: 0; }
+        .sidebar h3 { color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .menu-link { display: block; color: #ccc; padding: 12px 0; text-decoration: none; border-bottom: 1px solid #2d333b; transition: 0.2s; }
+        .menu-link:hover { color: var(--gold); }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; z-index: 999; }
+
+        /* Promotions Slider Placeholder */
+        .promo-banner { width: 92%; margin: 15px auto; height: 150px; background: linear-gradient(45deg, #1c2128, #2d333b); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; overflow: hidden; }
+        .promo-banner::after { content: "JACKPOT: 50,000 ETB"; color: var(--gold); font-weight: bold; font-size: 18px; text-shadow: 0 0 10px rgba(252,194,1,0.5); }
+
+        /* Game Section */
+        .section-title { padding: 0 20px; font-size: 14px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; margin-bottom: 80px; }
+        .game-card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #333; transition: 0.3s; position: relative; }
         .game-card:active { transform: scale(0.95); }
-        .game-thumb { width: 100%; height: 110px; background: #2d333b; display: flex; align-items: center; justify-content: center; font-size: 45px; }
-        .game-info { padding: 12px; text-align: center; background: #252b33; }
-        .game-name { font-size: 12px; font-weight: bold; display: block; text-transform: uppercase; }
-        .play-tag { font-size: 10px; color: var(--gold); margin-top: 5px; display: block; }
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #1a1f29; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid #30363d; }
-        .nav-item { color: #8b949e; text-decoration: none; font-size: 11px; text-align: center; }
+        .game-card img { width: 100%; height: 110px; object-fit: cover; opacity: 0.8; }
+        .game-info { padding: 10px; text-align: center; }
+        .game-name { font-weight: bold; font-size: 14px; margin-bottom: 8px; display: block; }
+        .btn-play { background: var(--gold); color: black; border: none; padding: 6px 15px; border-radius: 4px; font-weight: 900; font-size: 12px; cursor: pointer; width: 80%; }
+
+        /* Bottom Nav */
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #333; z-index: 100; }
+        .nav-item { text-align: center; font-size: 11px; color: #888; text-decoration: none; display: flex; flexDirection: column; align-items: center; }
         .nav-item.active { color: var(--gold); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
+
+    <div class="overlay" id="menuOverlay" onclick="toggleSidebarMenu()"></div>
+
+    <div class="sidebar" id="mainSidebar">
+        <h3>MENU</h3>
+        <div style="margin-bottom: 20px; font-size: 12px; color: #888;">Account ID: <span id="footerAccountID">--</span></div>
+        <a href="index.html" class="menu-link">Home Lobby</a>
+        <a href="deposit.html" class="menu-link">Deposit Money</a>
+        <a href="withdraw.html" class="menu-link">Withdraw Funds</a>
+        <a href="#" class="menu-link">Transaction History</a>
+        <a href="#" class="menu-link">Terms & Conditions</a>
+        <a href="#" onclick="logoutUser()" class="menu-link" style="color: #ff4444;">Logout</a>
+    </div>
+
     <div class="header">
-        <div>
-            <div class="user-name" id="userName">User</div>
-            <div style="font-size: 10px; color: #8b949e;" id="userID">ID: --</div>
-        </div>
-        <div class="balance-box"><span id="userBal">0.00</span> <small>ETB</small></div>
-    </div>
-
-    <div class="section-title">🎰 Slot Games</div>
-    <div class="games-grid">
-        <div class="game-card" onclick="location.href='multi-hot-5.html'">
-            <div class="game-thumb">🔥</div>
-            <div class="game-info">
-                <span class="game-name">Multi Hot 5</span>
-                <span class="play-tag">WIN BIG</span>
-            </div>
-        </div>
-        <div class="game-card" onclick="location.href='jungle.html'">
-            <div class="game-thumb">🌴</div>
-            <div class="game-info">
-                <span class="game-name">Jungle Big Win</span>
-                <span class="play-tag">EXPLORE</span>
-            </div>
+        <div style="font-size: 20px; cursor: pointer;" onclick="toggleSidebarMenu()">☰</div>
+        <div class="logo">SIMBA</div>
+        <div class="balance-area">
+            <span id="userBal">0.00</span>
+            <span style="color: var(--gold); font-size: 12px; font-weight: bold;">ETB</span>
         </div>
     </div>
 
-    <div class="section-title">⚡ Instant Win</div>
-    <div class="games-grid">
-        <div class="game-card" onclick="location.href='fast.keno.html'">
-            <div class="game-thumb">🎱</div>
+    <div class="promo-banner"></div>
+
+    <div class="section-title">Popular Games</div>
+    <div class="grid">
+        <div class="game-card">
+            <img src="https://img.freepik.com/free-vector/jungle-background-design_1212-302.jpg" alt="Jungle">
             <div class="game-info">
-                <span class="game-name">Fast Keno 80</span>
-                <span class="play-tag">LIVE DRAW</span>
+                <span class="game-name">Simba Jungle</span>
+                <button class="btn-play" onclick="window.location.href='jungle.html'">PLAY NOW</button>
             </div>
         </div>
-        <div class="game-card" onclick="location.href='lion-scratch.html'">
-            <div class="game-thumb">🦁</div>
+        <div class="game-card">
+            <img src="https://static.vecteezy.com/system/resources/thumbnails/011/204/104/small/fire-flame-background-free-vector.jpg" alt="Hot">
             <div class="game-info">
-                <span class="game-name">Lion Scratch</span>
-                <span class="play-tag">SCRATCH & WIN</span>
+                <span class="game-name">Multi Hot</span>
+                <button class="btn-play" onclick="window.location.href='multihot.html'">PLAY NOW</button>
+            </div>
+        </div>
+        <div class="game-card">
+            <img src="https://t3.ftcdn.net/jpg/02/86/03/85/360_F_286038535_S6k1P8BfU0sXJ3v9z7kLqS7YmUjYmU9W.jpg" alt="Dice">
+            <div class="game-info">
+                <span class="game-name">Golden Dice</span>
+                <button class="btn-play">COMING SOON</button>
+            </div>
+        </div>
+        <div class="game-card">
+            <img src="https://img.freepik.com/free-vector/casino-background-with-roulette-wheel_23-2147881018.jpg" alt="Roulette">
+            <div class="game-info">
+                <span class="game-name">Mega Wheel</span>
+                <button class="btn-play">COMING SOON</button>
             </div>
         </div>
     </div>
 
-    <nav class="bottom-nav">
-        <a href="index.html" class="nav-item active">Lobby</a>
-        <a href="deposit.html" class="nav-item">Deposit</a>
-        <a href="withdraw.html" class="nav-item">Withdraw</a>
-        <a href="profile.html" class="nav-item">Profile</a>
-    </nav>
+    <div class="footer-nav">
+        <a href="index.html" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <span>Home</span>
+        </a>
+        <a href="deposit.html" class="nav-item">
+            <div class="nav-icon">➕</div>
+            <span>Deposit</span>
+        </a>
+        <a href="withdraw.html" class="nav-item">
+            <div class="nav-icon">💸</div>
+            <span>Withdraw</span>
+        </a>
+        <div class="nav-item">
+            <div class="nav-icon">🆔</div>
+            <span id="displayID">ID: --</span>
+        </div>
+    </div>
 
+    <div id="script-container"></div>
     <script>
-        // NEW URL APPLIED
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
-        
-        // This looks for the phone saved during login/registration
-        const userPhone = localStorage.getItem('userPhone');
-        const userName = localStorage.getItem('userName');
-
-        // Check if user is logged in
-        if(!userPhone) {
-            window.location.href = 'login.html';
-        } else {
-            // Initial UI Setup
-            document.getElementById('userName').innerText = userName || "User";
-            
-            // Function to fetch latest data from the script (Sheet 3)
-            async function fetchUserUpdate() {
-                try {
-                    // This hits the 'login' action with 'SKIP' password to safely get the balance
-                    const response = await fetch(`${SCRIPT_URL}?action=login&phone=${userPhone}&pass=SKIP`);
-                    const data = await response.json();
-                    
-                    if(data.status === "SUCCESS") {
-                        // Update the balance on screen
-                        document.getElementById('userBal').innerText = parseFloat(data.balance).toFixed(2);
-                        
-                        // Update the localStorage in case other pages need the new balance
-                        localStorage.setItem('userBalance', data.balance);
-                        
-                        // If the script returns an ID, update it
-                        if(data.id) {
-                            document.getElementById('userID').innerText = "ID: " + data.id;
-                        }
-                    }
-                } catch(error) {
-                    console.error("Balance Sync Error:", error);
-                }
-            }
-
-            // Run immediately on load
-            fetchUserUpdate();
-            
-            // Auto-refresh balance every 15 seconds to check for approved deposits
-            setInterval(fetchUserUpdate, 15000);
-        }
+        // GitHub-ready loader for script.html logic
+        fetch('script.html')
+            .then(res => res.text())
+            .then(data => {
+                const container = document.getElementById('script-container');
+                container.innerHTML = data;
+                const scripts = container.querySelectorAll("script");
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement("script");
+                    newScript.text = oldScript.text;
+                    document.body.appendChild(newScript);
+                });
+            });
     </script>
 </body>
 </html>
