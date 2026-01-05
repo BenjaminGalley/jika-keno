@@ -3,127 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simba Bet | Player Login</title>
+    <title>Login | Simba Bet</title>
     <style>
-        :root { 
-            --gold: #fcc201; 
-            --bg: #0b0e14; 
-            --card: #161b22; 
-        }
-        body { 
-            background: var(--bg); 
-            color: white; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-        }
-        .container { 
-            background: var(--card); 
-            padding: 40px; 
-            border-radius: 20px; 
-            width: 90%; 
-            max-width: 380px; 
-            text-align: center;
-            border-top: 5px solid var(--gold);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-        }
-        h2 { color: var(--gold); letter-spacing: 1.5px; margin-bottom: 25px; }
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            margin: 10px 0; 
-            border-radius: 10px; 
-            border: 1px solid #30363d; 
-            background: #0d1117; 
-            color: white; 
-            box-sizing: border-box; 
-            font-size: 15px;
-        }
+        :root { --gold: #fcc201; --bg: #0b0e14; --card: #1c2128; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        
+        .login-card { background: var(--card); padding: 30px; border-radius: 15px; width: 100%; max-width: 380px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
+        
+        .logo { color: var(--gold); font-size: 32px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        h2 { margin-bottom: 5px; font-weight: 500; }
+        p.subtitle { color: #888; font-size: 14px; margin-bottom: 25px; }
+
+        label { display: block; text-align: left; margin-bottom: 5px; font-size: 13px; color: var(--gold); }
+        input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #444; background: #0b0e14; color: white; box-sizing: border-box; font-size: 16px; }
         input:focus { border-color: var(--gold); outline: none; }
-        .btn { 
-            width: 100%; 
-            padding: 16px; 
-            background: var(--gold); 
-            color: black; 
-            border: none; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 20px; 
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .footer { margin-top: 25px; font-size: 14px; color: #8b949e; }
-        .footer a { color: var(--gold); text-decoration: none; font-weight: bold; }
+
+        .btn-login { width: 100%; padding: 15px; background: var(--gold); color: black; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+        .btn-login:hover { background: #e5b000; }
+
+        .footer-links { margin-top: 20px; font-size: 14px; }
+        .footer-links a { color: var(--gold); text-decoration: none; }
+        
+        #errMsg { color: #ff4d4d; margin-top: 15px; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>LOGIN</h2>
-        <input type="number" id="lPhone" placeholder="Phone Number">
-        <input type="password" id="lPass" placeholder="Password">
-        
-        <button class="btn" id="loginBtn" onclick="handleLogin()">Access Account</button>
-        
-        <div class="footer">
-            New player? <a href="register.html">Register Now</a>
-        </div>
+<div class="login-card">
+    <div class="logo">SIMBA BET</div>
+    <h2>Login / ግባ</h2>
+    <p class="subtitle">Enter your details to start playing.</p>
+
+    <label>Phone Number / ስልክ ቁጥር</label>
+    <input type="number" id="phone" placeholder="09..." required>
+
+    <label>Password / የይለፍ ቃል</label>
+    <input type="password" id="pass" placeholder="••••••••" required>
+
+    <button class="btn-login" onclick="handleLogin()">LOGIN / ግባ</button>
+    
+    <div id="errMsg"></div>
+
+    <div class="footer-links">
+        Don't have an account? <a href="register.html">Register Here</a>
     </div>
+</div>
 
-    <script>
-        // MUST MATCH YOUR GOOGLE SCRIPT DEPLOYMENT URL
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzI2sCF2oVeQOSwND3nrF_c9I6wHUVKfb2CpQD6g_F__tZuBWc6NkpecpFwTtEd8bW5/exec";
+<script>
+    // REPLACE THIS with your specific Web App URL from Google Script
+    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL";
 
-        async function handleLogin() {
-            const phone = document.getElementById('lPhone').value.trim();
-            const pass = document.getElementById('lPass').value.trim();
-            const btn = document.getElementById('loginBtn');
+    async function handleLogin() {
+        const phone = document.getElementById('phone').value;
+        const pass = document.getElementById('pass').value;
+        const errMsg = document.getElementById('errMsg');
 
-            if (!phone || !pass) {
-                alert("⚠️ Please enter both phone and password.");
-                return;
-            }
-
-            btn.innerText = "VERIFYING...";
-            btn.disabled = true;
-
-            const finalUrl = `${SCRIPT_URL}?action=login&phone=${phone}&pass=${encodeURIComponent(pass)}`;
-
-            try {
-                const response = await fetch(finalUrl);
-                const data = await response.json();
-
-                if (data.status === "SUCCESS") {
-                    // This creates the exact object required by your SIMBA BET CORE ENGINE v2.0.0
-                    const sessionData = {
-                        phone: data.phone,
-                        name: data.name,
-                        id: data.id,
-                        balance: data.balance || 0
-                    };
-                    
-                    // Save to local storage for the Lobby/Index page
-                    localStorage.setItem('simba_active_user', JSON.stringify(sessionData));
-                    
-                    alert("✅ Welcome back, " + data.name + "!");
-                    window.location.href = "index.html";
-                } else {
-                    alert("❌ Login Failed: " + (data.message || "Invalid credentials"));
-                    btn.disabled = false;
-                    btn.innerText = "Access Account";
-                }
-            } catch (error) {
-                console.error("Login error:", error);
-                alert("⚠️ Connection Error. Ensure your Google Script is deployed to 'Anyone'.");
-                btn.disabled = false;
-                btn.innerText = "Access Account";
-            }
+        if (!phone || !pass) {
+            errMsg.innerText = "Please fill all fields!";
+            return;
         }
-    </script>
+
+        errMsg.style.color = "white";
+        errMsg.innerText = "Authenticating...";
+
+        try {
+            // We use the action 'login' which we defined in the Google Script
+            const response = await fetch(`${SCRIPT_URL}?action=login&phone=${phone}&pass=${pass}`);
+            const data = await response.json();
+
+            if (data.status === "SUCCESS") {
+                // IMPORTANT: Save the user's info so other pages can use it
+                localStorage.setItem("userPhone", phone);
+                localStorage.setItem("userName", data.name);
+                localStorage.setItem("userBalance", data.balance);
+
+                errMsg.style.color = "#2ea44f";
+                errMsg.innerText = "Login Successful! Redirecting...";
+                
+                // Redirect to the lobby
+                setTimeout(() => { window.location.href = "lobby.html"; }, 1500);
+            } else {
+                errMsg.style.color = "#ff4d4d";
+                errMsg.innerText = "Invalid phone or password!";
+            }
+        } catch (error) {
+            errMsg.style.color = "#ff4d4d";
+            errMsg.innerText = "Connection error. Please try again.";
+            console.error(error);
+        }
+    }
+</script>
+
 </body>
 </html>
