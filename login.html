@@ -32,8 +32,8 @@
 </div>
 
 <script>
-    // CRITICAL: Ensure this ends in /exec
-    const SCRIPT_URL = "YOUR_DEPLOYED_SCRIPT_URL_HERE";
+    // INSERTED YOUR NEW URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzlGluUJHQZRobo1J4kp08qfUY-wTZyJNAsU_rdB7btL6gFaemKzNhvT6cH4sL4PvXm/exec";
 
     async function handleLogin() {
         const phone = document.getElementById('phone').value;
@@ -61,14 +61,15 @@
             const data = await response.json();
 
             if (data.status === "SUCCESS") {
-                // Save session data
+                // Save session data exactly as index.html expects it
                 localStorage.setItem("userPhone", phone);
                 localStorage.setItem("userName", data.name);
                 
                 errMsg.style.color = "#2ea44f";
                 errMsg.innerText = "Success! Entering Lobby... / ተሳክቷል!";
                 
-                setTimeout(() => { window.location.href = "lobby.html"; }, 1000);
+                // Redirect to index.html (Your Lobby file)
+                setTimeout(() => { window.location.href = "index.html"; }, 1000);
             } else {
                 errMsg.style.color = "#ff4d4d";
                 errMsg.innerText = "Wrong Phone or Password! / ስልክ ወይም የይለፍ ቃል ተሳስቷል!";
